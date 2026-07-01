@@ -1,0 +1,26 @@
+{
+  "name": "Ogbenjuwa Community Safety Network",
+  "short_name": "Ogbenjuwa",
+  "description": "Warriors protecting the Idoma Region — early warning and emergency response platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#1e40af",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/ogbenjuwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["safety", "emergency", "community"],
+  "lang": "en",
+  "dir": "ltr"
+}

@@ -1,0 +1,505 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ── OGBENJUWA STRICT TOKENS ───── */
+:root {
+  --green: #1A6B3A;
+  --green-mid: #2D9B57;
+  --green-light: #E8F5EE;
+  --amber: #B45309;
+  --amber-light: #FEF3C7;
+  --red: #DC2626;
+  --red-light: #FEE2E2;
+  --ink: #0D1F14;
+  --ink-mid: #374151;
+  --muted: #6B7280;
+  --border: #D1FAE5;
+  --white: #FFFFFF;
+
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "DM Serif Display", ui-serif, Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --radius: 0.625rem;
+}
+
+/* ── LIGHT THEME (default) ───── */
+:root, :root:not(.dark) {
+  --background: var(--green-light);
+  --foreground: var(--ink);
+  --card: var(--white);
+  --card-foreground: var(--ink);
+  --popover: var(--white);
+  --popover-foreground: var(--ink);
+  --primary: var(--green);
+  --primary-foreground: var(--white);
+  --secondary: var(--green-mid);
+  --secondary-foreground: var(--white);
+  --accent: var(--green-light);
+  --accent-foreground: var(--ink);
+  --destructive: var(--red);
+  --destructive-foreground: var(--white);
+  --input: var(--border);
+  --ring: var(--green-mid);
+
+  --chart-1: var(--green);
+  --chart-2: var(--green-mid);
+  --chart-3: var(--amber);
+  --chart-4: var(--red);
+  --chart-5: var(--ink-mid);
+
+  --sidebar: var(--white);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--green);
+  --sidebar-primary-foreground: var(--white);
+  --sidebar-accent: var(--green-light);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--green-mid);
+
+  --muted: #6B7280;
+  --muted-foreground: #6B7280;
+}
+
+/* ── DARK THEME ───── */
+.dark {
+  --background: var(--ink);
+  --foreground: var(--white);
+  --card: var(--ink);
+  --card-foreground: var(--white);
+  --popover: var(--ink);
+  --popover-foreground: var(--white);
+  --primary: var(--green);
+  --primary-foreground: var(--white);
+  --secondary: var(--green-mid);
+  --secondary-foreground: var(--white);
+  --accent: var(--ink-mid);
+  --accent-foreground: var(--white);
+  --destructive: var(--red);
+  --destructive-foreground: var(--white);
+  --input: var(--border);
+  --ring: var(--green-mid);
+
+  --chart-1: var(--green);
+  --chart-2: var(--green-mid);
+  --chart-3: var(--amber);
+  --chart-4: var(--red);
+  --chart-5: var(--ink-mid);
+
+  --sidebar: var(--ink);
+  --sidebar-foreground: var(--white);
+  --sidebar-primary: var(--green);
+  --sidebar-primary-foreground: var(--white);
+  --sidebar-accent: var(--ink-mid);
+  --sidebar-accent-foreground: var(--white);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--green-mid);
+
+  --muted: #6B7280;
+  --muted-foreground: #6B7280;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Expose Ogbenjuwa specifics as tailwind classes (e.g., bg-ogbenjuwa-green) */
+  --color-ogbenjuwa-green: var(--green);
+  --color-ogbenjuwa-green-mid: var(--green-mid);
+  --color-ogbenjuwa-green-light: var(--green-light);
+  --color-ogbenjuwa-amber: var(--amber);
+  --color-ogbenjuwa-amber-light: var(--amber-light);
+  --color-ogbenjuwa-red: var(--red);
+  --color-ogbenjuwa-red-light: var(--red-light);
+  --color-ogbenjuwa-ink: var(--ink);
+  --color-ogbenjuwa-ink-mid: var(--ink-mid);
+  --color-ogbenjuwa-muted: var(--muted);
+  --color-ogbenjuwa-border: var(--border);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ── LEAFLET DARK THEME OVERRIDES ───── */
+.leaflet-container {
+  background: var(--ink) !important;
+}
+
+.leaflet-tile {
+  filter: brightness(0.5) saturate(0.3) hue-rotate(80deg);
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--ink) !important;
+  color: var(--white) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--ink) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.leaflet-popup-close-button {
+  color: var(--white) !important;
+}
+
+.leaflet-control-zoom a {
+  background: var(--ink) !important;
+  color: var(--white) !important;
+  border-color: var(--border) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--ink-mid) !important;
+}
+
+/* ── OGBENJUWA COMPONENT STYLES ───── */
+
+/* SOS Button */
+.sos-button {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: var(--red);
+  color: white;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1;
+  position: relative;
+  box-shadow: 0 0 40px rgba(220, 38, 38, 0.5);
+}
+
+.sos-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 60px rgba(220, 38, 38, 0.7);
+}
+
+.sos-button:active {
+  transform: scale(0.95);
+}
+
+/* Ring animation for SOS */
+.ring-anim {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 3px solid var(--red);
+  transform: translate(-50%, -50%);
+  animation: ringPulse 2s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes ringPulse {
+  0% {
+    width: 140px;
+    height: 140px;
+    opacity: 0.8;
+  }
+  100% {
+    width: 300px;
+    height: 300px;
+    opacity: 0;
+  }
+}
+
+/* SMS Feed */
+.sms-feed {
+  max-height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sms-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  animation: smsSlideIn 0.3s ease-out;
+}
+
+@keyframes smsSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sms-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--green-mid);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.sms-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.sms-phone {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+.sms-text {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 2px;
+}
+
+.sms-tick {
+  margin-left: auto;
+  color: var(--green-mid);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* Phone shell / USSD */
+.phone-shell {
+  width: 220px;
+  margin: 0 auto;
+  background: #1a1a2e;
+  border-radius: 24px;
+  padding: 8px;
+  border: 2px solid #333;
+}
+
+.phone-notch {
+  width: 60px;
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  margin: 8px auto 12px;
+}
+
+.phone-screen {
+  background: #0a0a0a;
+  border-radius: 16px;
+  padding: 12px;
+  min-height: 280px;
+}
+
+.ussd-screen {
+  font-family: var(--font-mono);
+  color: #22c55e;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.ussd-title {
+  color: #22c55e;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.ussd-option {
+  color: #22c55e;
+  padding: 2px 0;
+}
+
+.ussd-input {
+  color: #22c55e;
+  margin-top: 16px;
+}
+
+.ussd-cursor {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* Progress bar */
+.progress-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--green-mid);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Badge pulse */
+.badge-pulse::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  animation: badgePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Dead man's switch */
+.dead-man-warning {
+  border: 2px solid var(--red);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(220, 38, 38, 0.08);
+  animation: borderPulse 2s ease-in-out infinite;
+}
+
+@keyframes borderPulse {
+  0%, 100% { border-color: var(--red); }
+  50% { border-color: rgba(220, 38, 38, 0.3); }
+}
+
+/* Member card */
+.member-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.member-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border);
+}
+
+/* Coverage zone bars */
+.cov-zone {
+  height: 12px;
+  background: var(--green-mid);
+  border-radius: 3px;
+  opacity: 0.6;
+}
+
+.cov-zone.gap {
+  background: var(--red);
+  opacity: 0.6;
+}
+
+/* Map placeholder (for heatmap simulation) */
+.map-placeholder {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  min-height: 300px;
+  background: var(--ink);
+}
+
+.heat-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(20px);
+}
+
+/* ── PRINT STYLES (for Dashboard PDF export) ───── */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #root > div > * {
+    visibility: hidden;
+  }
+  [data-print-area] {
+    visibility: visible !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+  [data-print-area] * {
+    visibility: visible !important;
+  }
+  header nav,
+  aside,
+  .no-print {
+    display: none !important;
+  }
+}
+

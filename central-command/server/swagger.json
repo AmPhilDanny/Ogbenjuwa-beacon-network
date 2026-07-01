@@ -1,0 +1,202 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Ogbenjuwa Central Command API",
+    "description": "Community safety platform — alert management, patrol tracking, user administration, and real-time incident response for the Idoma Region, Benue State.",
+    "version": "1.0.0",
+    "contact": { "name": "Ogbenjuwa Team" }
+  },
+  "servers": [
+    { "url": "http://localhost:4001/api/v1", "description": "Local development" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string" },
+              "message": { "type": "string" }
+            }
+          }
+        }
+      },
+      "Alert": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "type": { "type": "string" },
+          "severity": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "lgaId": { "type": "string", "format": "uuid" },
+          "location": { "type": "string" },
+          "status": { "type": "string", "enum": ["active", "investigating", "resolved", "false_alarm"] },
+          "isPublic": { "type": "boolean" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PatrolCheckin": {
+        "type": "object",
+        "properties": {
+          "shiftId": { "type": "string", "format": "uuid" },
+          "lat": { "type": "number" },
+          "lng": { "type": "number" },
+          "note": { "type": "string" }
+        }
+      },
+      "AuditLog": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "userId": { "type": "string", "format": "uuid" },
+          "action": { "type": "string" },
+          "resource": { "type": "string" },
+          "resourceId": { "type": "string" },
+          "details": { "type": "object" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "tags": ["System"],
+        "security": [],
+        "responses": {
+          "200": { "description": "Server is healthy", "content": { "application/json": { "schema": { "type": "object", "properties": { "status": { "type": "string" }, "timestamp": { "type": "string" } } } } } }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Admin email/password login",
+        "tags": ["Auth"],
+        "security": [],
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "email": { "type": "string", "format": "email" }, "password": { "type": "string" } }, "required": ["email", "password"] } } } },
+        "responses": { "200": { "description": "Login successful" }, "401": { "description": "Invalid credentials" } }
+      }
+    },
+    "/auth/phone-login": {
+      "post": {
+        "summary": "Phone + OTP login (beacon-network & citizen portal)",
+        "tags": ["Auth"],
+        "security": [],
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "phone": { "type": "string" }, "otp": { "type": "string" } }, "required": ["phone", "otp"] } } } },
+        "responses": { "200": { "description": "Login successful with JWT" } }
+      }
+    },
+    "/alerts": {
+      "get": {
+        "summary": "List alerts (paginated)",
+        "tags": ["Alerts"],
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Paginated alerts list", "content": { "application/json": { "schema": { "type": "object", "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/Alert" } } } } } } } }
+      },
+      "post": {
+        "summary": "Create a new alert",
+        "tags": ["Alerts"],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Alert" } } } },
+        "responses": { "201": { "description": "Alert created" } }
+      }
+    },
+    "/alerts/{id}": {
+      "get": {
+        "summary": "Get alert by ID",
+        "tags": ["Alerts"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Alert details" }, "404": { "description": "Not found" } }
+      },
+      "put": {
+        "summary": "Update alert",
+        "tags": ["Alerts"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Alert updated" } }
+      }
+    },
+    "/patrols": {
+      "get": {
+        "summary": "List patrol teams",
+        "tags": ["Patrols"],
+        "responses": { "200": { "description": "Patrol teams" } }
+      }
+    },
+    "/patrols/checkin": {
+      "post": {
+        "summary": "Submit patrol GPS checkin",
+        "tags": ["Patrols"],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PatrolCheckin" } } } },
+        "responses": { "201": { "description": "Checkin recorded + broadcast via WebSocket" } }
+      }
+    },
+    "/patrols/checkins/live": {
+      "get": {
+        "summary": "Get live patrol locations (last 10 min)",
+        "tags": ["Patrols"],
+        "responses": { "200": { "description": "Latest location per member" } }
+      }
+    },
+    "/dashboard/stats": {
+      "get": {
+        "summary": "Aggregated dashboard stats",
+        "tags": ["Dashboard"],
+        "responses": { "200": { "description": "Stats object" } }
+      }
+    },
+    "/dashboard/export/csv": {
+      "get": {
+        "summary": "Export all alerts as CSV",
+        "tags": ["Dashboard"],
+        "responses": { "200": { "description": "CSV file download" } }
+      }
+    },
+    "/dashboard/trends": {
+      "get": {
+        "summary": "14-day alert trend data",
+        "tags": ["Dashboard"],
+        "responses": { "200": { "description": "Daily trend counts by severity" } }
+      }
+    },
+    "/audit-logs": {
+      "get": {
+        "summary": "List audit logs (filterable)",
+        "tags": ["Audit"],
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer" } },
+          { "name": "action", "in": "query", "schema": { "type": "string" } },
+          { "name": "resource", "in": "query", "schema": { "type": "string" } },
+          { "name": "userId", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Filtered audit log list", "content": { "application/json": { "schema": { "type": "object", "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/AuditLog" } } } } } } } }
+      }
+    },
+    "/notification-preferences": {
+      "get": {
+        "summary": "Get current user's notification preferences",
+        "tags": ["Notifications"],
+        "responses": { "200": { "description": "Preference object" } }
+      },
+      "put": {
+        "summary": "Update notification preferences",
+        "tags": ["Notifications"],
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "smsAlerts": { "type": "boolean" }, "pushAlerts": { "type": "boolean" }, "emailAlerts": { "type": "boolean" }, "criticalOnly": { "type": "boolean" } } } } } },
+        "responses": { "200": { "description": "Preferences updated" } }
+      }
+    }
+  }
+}

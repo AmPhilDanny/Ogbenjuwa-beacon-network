@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* ── Core Brand ──────────────────────────── */
+  --green: #166534;
+  --green-mid: #22A05C;
+  --green-light: #E6F7EC;
+  --green-dark: #0F4A26;
+
+  /* ── Neutrals ────────────────────────────── */
+  --amber: #D97706;
+  --amber-light: #FEF3C7;
+  --red: #DC2626;
+  --red-light: #FEE2E2;
+  --ink: #0C0F14;
+  --ink-light: #1E2329;
+  --gray-50: #F7F8FA;
+  --gray-100: #EDEEF0;
+  --gray-200: #D4D6DA;
+  --gray-400: #8E9199;
+  --gray-500: #6B6F78;
+  --gray-600: #4B4E55;
+  --white: #FFFFFF;
+
+  /* ── Typography ──────────────────────────── */
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "DM Serif Display", ui-serif, Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* ── Radii ───────────────────────────────── */
+  --radius: 0.625rem;
+}
+
+/* ─── LIGHT MODE (default) ────────────────── */
+:root, :root:not(.dark) {
+  --background: var(--white);
+  --foreground: #1A1D23;
+  --card: var(--white);
+  --card-foreground: #1A1D23;
+  --popover: var(--white);
+  --popover-foreground: #1A1D23;
+  --primary: var(--green);
+  --primary-foreground: var(--white);
+  --secondary: #E8ECF0;
+  --secondary-foreground: #1A1D23;
+  --accent: #DCFCE7;
+  --accent-foreground: #0F4A26;
+  --destructive: var(--red);
+  --destructive-foreground: var(--white);
+  --input: #C8CCD0;
+  --ring: var(--green-mid);
+  --muted: #E8ECF0;
+  --muted-foreground: #5C5F66;
+  --border: #C8CCD0;
+}
+
+/* ─── DARK MODE ────────────────────────────── */
+.dark {
+  --background: #0C0F14;
+  --foreground: #E4E6EA;
+  --card: #1C2029;
+  --card-foreground: #E4E6EA;
+  --popover: #1C2029;
+  --popover-foreground: #E4E6EA;
+  --primary: #22A05C;
+  --primary-foreground: #FFFFFF;
+  --secondary: #2D323D;
+  --secondary-foreground: #D4D6DA;
+  --accent: rgba(34, 160, 92, 0.18);
+  --accent-foreground: #3EBA72;
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+  --input: #3A3F4A;
+  --ring: #22A05C;
+  --muted: #2D323D;
+  --muted-foreground: #9CA0A8;
+  --border: #3A3F4A;
+}
+
+/* ─── Tailwind v4 Theme Tokens ────────────── */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-ogbenjuwa-green: #166534;
+  --color-ogbenjuwa-green-mid: #22A05C;
+  --color-ogbenjuwa-green-light: #E6F7EC;
+  --color-ogbenjuwa-amber: #D97706;
+  --color-ogbenjuwa-red: #DC2626;
+  --color-ogbenjuwa-ink: #0C0F14;
+  --color-ogbenjuwa-ink-mid: #1E2329;
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Card with visible border */
+.card-border {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.dark .card-border {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1);
+}

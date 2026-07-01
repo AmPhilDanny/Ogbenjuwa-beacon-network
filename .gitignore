@@ -1,0 +1,76 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Env files
+.env
+.env.local
+.env.*.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test snapshots
+__snapshots__/
+
+# Playwright
+playwright-report/
+test-results/
+
+# Docker
+.docker/
+
+# Project-specific excludes
+refactoring-plan.md
+OGBENJUWA_BUILD_PROMPT.md
+OGBENJUWA_MVP_PLAN.md
+OGBENJUWA_MVP_SPEC.md
+OGBENJUWA_PLATFORM_SPEC.md
+USER_APPS_BUILD.md
+USER_APPS_PLAN.md
+USER_APPS_PLATFORM.md
+USER_DASHBOARD_PLATFORM.md
+deepseek.md
+Idoma communities.txt
+TEST_ACCOUNTS.txt
+CENTRAL_COMMAND_FEATURES.md
+CENTRAL_COMMAND_PLAN.md
+CENTRAL_COMMAND_SPEC.md
+
+# OpenCode session data
+.omo/
+.playwright-mcp/
+.opencode/
+
+# Screenshots / dev images
+*.png
+admin-login-snapshot
+dashboard-snapshot
+login-form-snapshot
+ee7f7f37-8c95-442e-96a1-2f0a8b610bd2.png
+
+# Vite temp files
+*.timestamp-*.mjs
+
+# Development notes
+notes/
+*.notes.md
