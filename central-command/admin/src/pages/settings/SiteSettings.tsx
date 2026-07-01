@@ -361,7 +361,6 @@ export default function SiteSettings() {
               <textarea className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm min-h-[60px]" value={form.footerText || ''} onChange={e => handleChange('footerText', e.target.value)} placeholder="Warriors protecting the Idoma Region, Benue State, Nigeria." />
             </div>
           </CardContent>
-          </CardContent>
         </Card>
         <Card>
           <CardHeader><CardTitle>Maintenance Mode</CardTitle></CardHeader>
