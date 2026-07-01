@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -n server,admin -c blue,green \"bun run server:dev\" \"bun run admin:dev\"",
-    "build": "bun run build:server && bun run build:admin",
+    "build": "bun run build:admin",
     "build:server": "tsc -p server/tsconfig.json",
     "build:admin": "cd admin && vite build",
     "server:dev": "bun --watch server/index.ts",
