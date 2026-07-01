@@ -4,7 +4,6 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "ignoreDeprecations": "6.0",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
