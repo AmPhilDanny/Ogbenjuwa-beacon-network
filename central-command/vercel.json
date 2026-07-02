@@ -1,9 +1,12 @@
 {
-  "outputDirectory": "admin/dist",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
+  "functions": {
+    "api/index.ts": {
+      "maxDuration": 30
     }
-  ]
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "outputDirectory": "admin/dist"
 }

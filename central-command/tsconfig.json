@@ -22,6 +22,6 @@
     },
     "baseUrl": "."
   },
-  "include": ["server/**/*.ts"],
+  "include": ["server/**/*.ts", "api/**/*.ts"],
   "exclude": ["node_modules", "dist", "admin"]
 }

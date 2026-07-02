@@ -37,14 +37,20 @@ app.use(helmet({
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://unpkg.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
       imgSrc: ["'self'", "data:", "https://*.tile.openstreetmap.org", "https://unpkg.com"],
-      connectSrc: ["'self'", "ws://localhost:4001", "http://localhost:4001"],
+      connectSrc: ["'self'", "ws://localhost:4001", "http://localhost:4001", "ws://localhost:4000", "http://localhost:4000", "https://*.vercel.app"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
     },
   },
   crossOriginEmbedderPolicy: false,
 }));
 app.use(cors({
-  origin: corsOrigins,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (server-to-server, curl, etc.)
+    if (!origin) return callback(null, true);
+    // Allow localhost origins and production Vercel domains
+    const allowed = corsOrigins.some(o => origin.startsWith(o)) || origin.endsWith('.vercel.app');
+    callback(null, allowed);
+  },
   credentials: true,
 }));
 app.use(morgan('dev'));
