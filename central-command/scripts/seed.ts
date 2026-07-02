@@ -16,18 +16,16 @@ const db = drizzle(queryClient, { schema });
 const SEED_EMAIL_DOMAIN = 'ogbenjuwa.local';
 
 async function truncateAll() {
-  const tables = [
-    'patrol_checkins', 'patrol_shifts', 'patrol_members', 'patrol_teams',
-    'incident_evidence', 'incidents', 'alerts', 'announcements', 'messages',
-    'notifications', 'connections', 'resident_reports', 'sms_logs',
-    'alert_contacts', 'family_registry', 'resources', 'villages', 'wards', 'lgas',
-    'api_keys', 'audit_logs', 'sos_signals', 'sessions', 'site_settings',
-    'alert_types',
-  ];
-  for (const table of tables) {
-    try { await queryClient.unsafe(`DELETE FROM "${table}"`); } catch {}
-  }
-  await queryClient.unsafe(`DELETE FROM users WHERE email LIKE '%@${SEED_EMAIL_DOMAIN}'`);
+  await queryClient.unsafe(`
+    TRUNCATE TABLE
+      patrol_checkins, patrol_shifts, patrol_members, patrol_teams,
+      incident_evidence, incidents, alerts, announcements, messages,
+      notifications, connections, resident_reports, sms_logs,
+      alert_contacts, family_registry, resources, villages, wards, lgas,
+      api_keys, audit_logs, sos_signals, sessions, site_settings,
+      alert_types, users, file_uploads
+    CASCADE
+  `);
 }
 
 async function seed() {

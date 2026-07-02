@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import db from '../config/db.js';
-import { users, sessions } from '../db/schema/index.js';
+import { users, sessions, lgas, wards } from '../db/schema/index.js';
 import { env } from '../config/env.js';
 import { authenticate } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
