@@ -82,6 +82,21 @@ export interface ResidentPublicProfile {
 
 export type ConnectionStatus = 'none' | 'pending' | 'connected';
 
+// ─── Idoma LGAs ─────────────────────────────────────────────────────────
+
+export const IDOMA_LGAS = [
+  'Otukpo',
+  'Okpokwu',
+  'Ado',
+  'Ogbadibo',
+  'Ohimini',
+  'Agatu',
+  'Apa',
+  'Obi',
+  'Ukum',
+  'Katsina-Ala',
+] as const;
+
 // ─── Quick Report ──────────────────────────────────────────────────────
 
 export interface QuickReport {

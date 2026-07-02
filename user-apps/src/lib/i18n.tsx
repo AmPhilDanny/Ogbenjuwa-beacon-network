@@ -4,7 +4,9 @@
 
 import { createContext, useContext, useState, useCallback, useMemo, useEffect, type ReactNode } from 'react';
 import { t as translate, type Language } from './translations';
-import { PROFILE_STORAGE_KEY } from './data';
+
+// localStorage constants
+const PROFILE_STORAGE_KEY = 'ogbenjuwa_resident_profile';
 
 interface LanguageContextValue {
   language: Language;
