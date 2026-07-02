@@ -3,14 +3,24 @@ import { readFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const spec = JSON.parse(readFileSync(resolve(__dirname, '../swagger.json'), 'utf-8'));
+let specCache: Record<string, unknown> | null = null;
+
+function loadSwaggerSpec(): Record<string, unknown> {
+  if (specCache) return specCache;
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  specCache = JSON.parse(readFileSync(resolve(__dirname, '../swagger.json'), 'utf-8'));
+  return specCache;
+}
 
 const router = Router();
 
 // Serve the swagger.json spec
 router.get('/openapi.json', (_req: Request, res: Response) => {
-  res.json(spec);
+  try {
+    res.json(loadSwaggerSpec());
+  } catch {
+    res.status(500).json({ error: { code: 'SWAGGER_NOT_FOUND', message: 'API spec not available' } });
+  }
 });
 
 // Serve Swagger UI as a simple HTML page (no npm deps needed)
