@@ -384,7 +384,7 @@ export default function Alert() {
               {alertTypes.filter((t) => t.id !== 'other').map((at) => (
                 <button
                   key={at.id}
-                  onClick={() => setAlertType(at.id)}
+                  onClick={() => setAlertType(at.id as AlertTypeId)}
                   disabled={isTriggered}
                   className={`w-full flex items-center gap-3 rounded-lg border p-3 text-left transition-all ${
                     alertType === at.id
