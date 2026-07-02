@@ -1,0 +1,15 @@
+node_modules
+.git
+*.log
+.env
+.env.example
+server-output.log
+server-error.log
+docker-compose.yml
+Dockerfile
+Dockerfile.admin
+uploads
+scripts
+server/tsconfig.json
+drizzle.config.ts
+bun.lock

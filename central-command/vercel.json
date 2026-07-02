@@ -8,5 +8,8 @@
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
-  "outputDirectory": "admin/dist"
+  "outputDirectory": "admin/dist",
+  "buildCommand": "bun run build:admin",
+  "installCommand": "bun install",
+  "framework": null
 }
