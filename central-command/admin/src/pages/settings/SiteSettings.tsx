@@ -44,7 +44,7 @@ const TABS = [
   { id: 'hero', label: 'Hero Content', icon: Layout },
   { id: 'meta', label: 'Meta & SEO', icon: Search },
   { id: 'contact', label: 'Contact', icon: Globe },
-  { id: 'social', label: 'Social Links', icon: Link },
+  { id: 'social', label: 'Social Links', icon: LinkIcon },
   { id: 'advanced', label: 'Advanced', icon: Settings },
 ];
 
