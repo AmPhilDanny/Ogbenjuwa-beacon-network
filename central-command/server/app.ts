@@ -1,4 +1,7 @@
 import express from 'express';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -63,11 +66,33 @@ app.get('/api/v1/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Provide a simple root response for hosting platforms that request "/".
-// Redirect to the health endpoint so browsers and healthchecks see a JSON status.
-app.get('/', (_req, res) => {
-  res.redirect('/api/v1/health');
-});
+// If an admin frontend build exists, serve it as static files and
+// fallback to index.html for SPA routing. This allows the same server
+// to host the admin UI at the root path.
+try {
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const adminDist = path.join(__dirname, '..', '..', 'admin', 'dist');
+  if (fs.existsSync(adminDist)) {
+    app.use(express.static(adminDist));
+
+    // Serve index.html for non-API routes (SPA fallback)
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api/')) return next();
+      res.sendFile(path.join(adminDist, 'index.html'));
+    });
+  } else {
+    // Provide a simple root response for hosting platforms that request "/".
+    // Redirect to the health endpoint so browsers and healthchecks see a JSON status.
+    app.get('/', (_req, res) => {
+      res.redirect('/api/v1/health');
+    });
+  }
+} catch (err) {
+  // ignore if the runtime environment doesn't support fileURLToPath
+  app.get('/', (_req, res) => {
+    res.redirect('/api/v1/health');
+  });
+}
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
