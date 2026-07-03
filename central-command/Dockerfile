@@ -9,7 +9,7 @@ WORKDIR /app
 COPY package.json bun.lock tsconfig.json ./
 COPY admin/ ./admin/
 RUN bun install
-RUN cd admin && npx vite build
+RUN cd admin && bun x vite build
 
 FROM oven/bun:1 AS production
 WORKDIR /app
