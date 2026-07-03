@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import StatusBadge from '../../components/StatusBadge';
@@ -9,7 +9,6 @@ import type { Alert } from '../../lib/types';
 
 export default function AlertDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { data: alert, loading, refetch } = useApi<Alert>(`/alerts/${id}`);
 
   if (loading) return <p className="text-muted-foreground">Loading...</p>;

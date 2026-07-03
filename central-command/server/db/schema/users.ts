@@ -5,6 +5,7 @@ import { wards } from './lgas';
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   email: text('email').unique().notNull(),
+  username: text('username').unique(),
   passwordHash: text('password_hash').notNull(),
   name: text('name').notNull(),
   phone: text('phone'),
@@ -15,6 +16,8 @@ export const users = pgTable('users', {
   wardId: uuid('ward_id'),
   avatar: text('avatar'),
   isActive: boolean('is_active').default(true).notNull(),
+  otpCode: text('otp_code'),
+  otpExpiresAt: timestamp('otp_expires_at'),
   lastLoginAt: timestamp('last_login_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),

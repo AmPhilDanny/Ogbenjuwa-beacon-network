@@ -174,7 +174,6 @@ export default function Analytics() {
                   const highH = (d.high / maxTotal) * CHART_H;
                   const mediumH = (d.medium / maxTotal) * CHART_H;
                   const lowH = (d.low / maxTotal) * CHART_H;
-                  const totalH = (d.total / maxTotal) * CHART_H;
                   let yOffset = CHART_H;
                   const label = d.date.slice(5);
 
@@ -242,8 +241,6 @@ export default function Analytics() {
                     return segments.map((seg, i) => {
                       const sRad = (seg.startAngle * Math.PI) / 180;
                       const eRad = (seg.endAngle * Math.PI) / 180;
-                      const x1 = cx + r * Math.cos(sRad);
-                      const y1 = cy + r * Math.sin(sRad);
                       const x2 = cx + r * Math.cos(eRad);
                       const y2 = cy + r * Math.sin(eRad);
                       const largeArc = seg.endAngle - seg.startAngle > 180 ? 1 : 0;

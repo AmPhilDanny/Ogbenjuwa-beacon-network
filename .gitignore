@@ -74,3 +74,16 @@ ee7f7f37-8c95-442e-96a1-2f0a8b610bd2.png
 # Development notes
 notes/
 *.notes.md
+
+.vercel
+.env*
+
+# Debug / temp scripts
+central-command/scripts/check-*.ts
+central-command/scripts/debug-*.ts
+central-command/scripts/migrate-*.ts
+*_err.txt
+*_out.txt
+ogbenjuwa-reset/
+logs/
+*.exe

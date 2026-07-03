@@ -5,7 +5,7 @@ import { cn } from '../lib/utils';
 import { api } from '../lib/api';
 import {
   LayoutDashboard, Users, MapPin, AlertTriangle, ShieldAlert,
-  Siren, MessageSquare, BarChart3, ScrollText, Key, Settings, Smartphone, X, Shield, Bell, type LucideIcon,
+  Siren, MessageSquare, BarChart3, ScrollText, Key, Settings, Smartphone, X, Bell, type LucideIcon,
 } from 'lucide-react';
 
 interface NavItem {

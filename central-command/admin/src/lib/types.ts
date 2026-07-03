@@ -118,6 +118,13 @@ export interface AuthResponse {
   };
   accessToken: string;
   refreshToken: string;
+  requiresOtp?: never;
+}
+
+export interface OtpRequiredResponse {
+  requiresOtp: true;
+  phone: string;
+  message: string;
 }
 
 export interface PaginatedResponse<T> {

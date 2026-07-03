@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Phone, ChevronRight, ChevronLeft, AlertCircle, Clock } from 'lucide-react';
+import { Shield, Phone, Mail, KeyRound, ChevronRight, ChevronLeft, AlertCircle, Clock, User } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,20 +12,51 @@ import { useAuth } from '@/hooks/useAuth';
 import { getSiteSettings } from '@/lib/site-settings';
 
 const PHONE_REGEX = /^\+234[789][01]\d{8}$/;
-type Step = 'phone' | 'otp';
+type AuthMethod = 'credentials' | 'phone';
+type Step = 'credentials' | 'phone' | 'otp';
 
 export default function Login() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login: phoneLogin, loginWithCredentials, isAuthenticated } = useAuth();
   const brand = getSiteSettings();
-  const [step, setStep] = useState<Step>('phone');
+
+  const [authMethod, setAuthMethod] = useState<AuthMethod>('credentials');
+  const [step, setStep] = useState<Step>('credentials');
+
+  const [loginField, setLoginField] = useState('');
+  const [password, setPassword] = useState('');
+  const [credError, setCredError] = useState('');
+  const [credLoading, setCredLoading] = useState(false);
+
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState('');
   const [otpValue, setOtpValue] = useState('');
   const [attempts, setAttempts] = useState(0);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/vigilante-dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleCredentialsSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCredError('');
+    setCredLoading(true);
+    try {
+      await loginWithCredentials(loginField, password);
+      toast.success(t('general.welcome') || 'Welcome!');
+      navigate('/vigilante-dashboard', { replace: true });
+    } catch (err) {
+      setCredError((err as Error).message || 'Login failed. Please try again.');
+    } finally {
+      setCredLoading(false);
+    }
+  }, [loginField, password, loginWithCredentials, navigate, t]);
 
   const handlePhoneSubmit = useCallback(() => {
     const cleaned = phone.trim();
@@ -42,7 +73,7 @@ export default function Login() {
     if (lockedUntil && Date.now() < lockedUntil) return;
     setSubmitting(true);
     try {
-      await login(phone, value);
+      await phoneLogin(phone, value);
       toast.success(t('general.welcome') || 'Welcome!');
       navigate('/vigilante-dashboard', { replace: true });
     } catch {
@@ -58,7 +89,7 @@ export default function Login() {
     } finally {
       setSubmitting(false);
     }
-  }, [attempts, lockedUntil, phone, login, navigate, t]);
+  }, [attempts, lockedUntil, phone, phoneLogin, navigate, t]);
 
   const formatLockout = () => {
     if (!lockedUntil) return '';
@@ -66,6 +97,15 @@ export default function Login() {
     const m = Math.floor(remaining / 60);
     const s = remaining % 60;
     return `${m}:${String(s).padStart(2, '0')}`;
+  };
+
+  const switchMethod = (method: AuthMethod) => {
+    setAuthMethod(method);
+    setStep(method);
+    setError('');
+    setCredError('');
+    setPhoneError('');
+    setOtpValue('');
   };
 
   return (
@@ -83,18 +123,83 @@ export default function Login() {
           <p className="mt-1 text-sm text-muted-foreground">{brand?.tagline || (t('auth.subtitle') || 'Citizen Portal')}</p>
         </div>
 
+        {step !== 'otp' && (
+          <div className="mb-4 flex rounded-lg border border-ogbenjuwa-green-mid/20 bg-ogbenjuwa-ink-mid/30 p-1">
+            <button
+              onClick={() => switchMethod('credentials')}
+              className={`flex-1 flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                authMethod === 'credentials' ? 'bg-ogbenjuwa-green-mid text-white' : 'text-muted-foreground hover:text-white'
+              }`}
+            >
+              <Mail className="h-4 w-4" /> Email/Username
+            </button>
+            <button
+              onClick={() => switchMethod('phone')}
+              className={`flex-1 flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                authMethod === 'phone' ? 'bg-ogbenjuwa-green-mid text-white' : 'text-muted-foreground hover:text-white'
+              }`}
+            >
+              <Phone className="h-4 w-4" /> Phone
+            </button>
+          </div>
+        )}
+
         <Card className="border-ogbenjuwa-green-mid/20 bg-ogbenjuwa-ink-mid/50">
           <CardHeader>
             <CardTitle className="text-center text-white">
-              {step === 'phone' ? (t('auth.login') || 'Welcome') : (t('auth.enter_otp') || 'Enter Code')}
+              {step === 'credentials' && 'Sign in'}
+              {step === 'phone' && (t('auth.login') || 'Welcome')}
+              {step === 'otp' && (t('auth.enter_otp') || 'Enter Code')}
             </CardTitle>
             <CardDescription className="text-center text-muted-foreground">
-              {step === 'phone'
-                ? (t('auth.phone_instruction') || 'Enter your Nigerian phone number')
-                : `${t('auth.code_sent') || 'Code sent to'} ${phone}`}
+              {step === 'credentials' && 'Enter your email or username and password'}
+              {step === 'phone' && (t('auth.phone_instruction') || 'Enter your Nigerian phone number')}
+              {step === 'otp' && `${t('auth.code_sent') || 'Code sent to'} ${phone}`}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {step === 'credentials' && (
+              <form onSubmit={handleCredentialsSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="login" className="text-white">{t('auth.email_label') || 'Email or Username'}</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="login"
+                      className="border-ogbenjuwa-green-mid/20 bg-ogbenjuwa-ink pl-9 text-white"
+                      placeholder="email@example.com or username"
+                      value={loginField}
+                      onChange={(e) => { setLoginField(e.target.value); setCredError(''); }}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-white">{t('auth.password_label') || 'Password'}</Label>
+                  <div className="relative">
+                    <KeyRound className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type="password"
+                      className="border-ogbenjuwa-green-mid/20 bg-ogbenjuwa-ink pl-9 text-white"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                {credError && (
+                  <p className="flex items-center gap-1 text-xs text-ogbenjuwa-red">
+                    <AlertCircle className="h-3 w-3" /> {credError}
+                  </p>
+                )}
+                <Button type="submit" disabled={credLoading} className="w-full gap-2 bg-ogbenjuwa-green-mid text-white hover:bg-ogbenjuwa-green-mid/90">
+                  {credLoading ? 'Signing in...' : 'Sign in'} <ChevronRight className="h-4 w-4" />
+                </Button>
+              </form>
+            )}
+
             {step === 'phone' && (
               <>
                 <div className="space-y-2">
@@ -122,7 +227,7 @@ export default function Login() {
                 <div className="rounded-lg border border-ogbenjuwa-green-mid/20 bg-ogbenjuwa-green-light/5 p-3">
                   <p className="mb-1 text-xs font-semibold text-ogbenjuwa-green-mid">How to login</p>
                   <p className="font-mono text-xs text-muted-foreground">
-                    Enter your registered phone number to receive an OTP code. If you haven't registered, contact your LGA coordinator.
+                    Enter your registered phone number to receive an OTP code.
                   </p>
                 </div>
               </>
@@ -144,6 +249,11 @@ export default function Login() {
                     </InputOTPGroup>
                   </InputOTP>
                 </div>
+                {error && !lockedUntil && (
+                  <p className="flex items-center justify-center gap-1 text-xs text-ogbenjuwa-red">
+                    <AlertCircle className="h-3 w-3" /> {error}
+                  </p>
+                )}
                 {lockedUntil && Date.now() < lockedUntil ? (
                   <div className="flex items-center justify-center gap-2 text-sm text-ogbenjuwa-red">
                     <Clock className="h-4 w-4" /> {t('auth.locked') || 'Locked'}: {formatLockout()}
@@ -153,7 +263,7 @@ export default function Login() {
                 ) : (
                   <p className="text-center text-xs text-muted-foreground">{t('auth.attempt') || 'Attempt'} {attempts + 1} {t('general.of') || 'of'} 3</p>
                 )}
-                <Button variant="ghost" className="w-full text-muted-foreground" onClick={() => { setStep('phone'); setOtpValue(''); }} disabled={submitting}>
+                <Button variant="ghost" className="w-full text-muted-foreground" onClick={() => { setStep(authMethod); setOtpValue(''); setError(''); }} disabled={submitting}>
                   <ChevronLeft className="mr-1 h-4 w-4" /> {t('auth.otp_hint') || 'Back'}
                 </Button>
               </>

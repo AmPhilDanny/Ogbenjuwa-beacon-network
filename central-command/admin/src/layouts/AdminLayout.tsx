@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
-import { Sun, Moon, Bell, Search, LogOut, Menu, X } from 'lucide-react';
+import { Sun, Moon, Bell, Search, LogOut, Menu } from 'lucide-react';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();

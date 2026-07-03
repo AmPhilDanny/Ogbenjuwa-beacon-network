@@ -5,6 +5,24 @@ import type { UserRole, PageId, Session } from '@/lib/types';
 
 const SESSION_KEY = 'ogbenjuwaAuth';
 
+interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: { id: string; name: string; role: UserRole; lga: string };
+}
+
+interface OtpRequiredResponse {
+  requiresOtp: true;
+  phone: string;
+  message: string;
+}
+
+type LoginResponse = AuthResponse | OtpRequiredResponse;
+
+function isOtpRequired(r: LoginResponse): r is OtpRequiredResponse {
+  return 'requiresOtp' in r && r.requiresOtp === true;
+}
+
 export function createSession(user: { id: string; name: string; role: UserRole; lga: string }): Session {
   const session: Session = {
     id: user.id,
@@ -59,7 +77,30 @@ export function useAuth() {
     sessionStorage.setItem('refreshToken', res.refreshToken);
     const s = createSession(res.user);
     setSession(s);
-    // Best-effort push subscription
+    subscribeToPush();
+    return s;
+  }, []);
+
+  const loginWithCredentials = useCallback(async (loginVal: string, password: string): Promise<LoginResponse> => {
+    const res = await api.post<LoginResponse>('/auth/login', { login: loginVal, password }, { skipAuth: true });
+    if (isOtpRequired(res)) {
+      return res;
+    }
+    const authRes = res as AuthResponse;
+    sessionStorage.setItem('accessToken', authRes.accessToken);
+    sessionStorage.setItem('refreshToken', authRes.refreshToken);
+    const s = createSession(authRes.user);
+    setSession(s);
+    subscribeToPush();
+    return authRes;
+  }, []);
+
+  const verifyOtp = useCallback(async (phone: string, otp: string) => {
+    const res = await api.post<AuthResponse>('/auth/verify-otp', { phone, otp }, { skipAuth: true });
+    sessionStorage.setItem('accessToken', res.accessToken);
+    sessionStorage.setItem('refreshToken', res.refreshToken);
+    const s = createSession(res.user);
+    setSession(s);
     subscribeToPush();
     return s;
   }, []);
@@ -85,6 +126,8 @@ export function useAuth() {
     loading,
     isAuthenticated: !!session,
     login,
+    loginWithCredentials,
+    verifyOtp,
     logout: logoutSession,
     checkAccess,
     defaultRoute: defaultRoute(),

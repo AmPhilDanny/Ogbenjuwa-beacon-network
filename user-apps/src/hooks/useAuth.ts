@@ -5,6 +5,12 @@ import type { ResidentSession } from '@/lib/types';
 
 const SESSION_KEY = 'ogbenjuwa_resident_session';
 
+interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: { id: string; name: string; lga: string; ward: string };
+}
+
 export function createSession(user: { id: string; name: string; lga: string; ward: string }): ResidentSession {
   const session: ResidentSession = {
     id: user.id,
@@ -51,9 +57,19 @@ export function useAuth() {
   }, []);
 
   const login = useCallback(async (phone: string, otp: string) => {
-    const res = await api.post<{ accessToken: string; refreshToken: string; user: { id: string; name: string; lga: string; ward: string } }>(
+    const res = await api.post<AuthResponse>(
       '/auth/phone-login', { phone, otp }, { skipAuth: true }
     );
+    sessionStorage.setItem('accessToken', res.accessToken);
+    sessionStorage.setItem('refreshToken', res.refreshToken);
+    const s = createSession(res.user);
+    setSession(s);
+    subscribeToPush();
+    return s;
+  }, []);
+
+  const loginWithCredentials = useCallback(async (loginVal: string, password: string) => {
+    const res = await api.post<AuthResponse>('/auth/login', { login: loginVal, password }, { skipAuth: true });
     sessionStorage.setItem('accessToken', res.accessToken);
     sessionStorage.setItem('refreshToken', res.refreshToken);
     const s = createSession(res.user);
@@ -69,5 +85,5 @@ export function useAuth() {
     setSession(null);
   }, []);
 
-  return { session, loading, isAuthenticated: !!session, login, logout };
+  return { session, loading, isAuthenticated: !!session, login, loginWithCredentials, logout };
 }

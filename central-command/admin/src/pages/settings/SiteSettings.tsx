@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Button } from '../../components/ui/button';
 import { useApi } from '../../hooks/useApi';
 import { api } from '../../lib/api';
-import { Save, Upload, Palette, Globe, Link as LinkIcon, Settings, Image, FileText, Search, Layout } from 'lucide-react';
+import { Save, Upload, Palette, Globe, Link as LinkIcon, Settings, Image, Search, Layout } from 'lucide-react';
 
 interface SiteSettingData {
   siteName?: string;

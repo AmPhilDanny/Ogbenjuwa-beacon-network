@@ -6,7 +6,7 @@ import { loadSiteSettings } from "./lib/site-settings";
 
 loadSiteSettings();
 
-if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   });

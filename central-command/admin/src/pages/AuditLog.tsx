@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { api } from '../lib/api';
 import { ScrollText, ChevronDown, ChevronUp, X } from 'lucide-react';
@@ -163,7 +163,7 @@ export default function AuditLog() {
                     </button>
                   </div>
                 </div>
-                {expandedId === log.id && log.details && (
+                {expandedId === log.id && !!log.details && (
                   <div className="mt-3 pt-3 border-t border-border">
                     <pre className="text-xs bg-muted p-3 rounded-lg overflow-x-auto max-h-48">
                       {JSON.stringify(log.details, null, 2)}

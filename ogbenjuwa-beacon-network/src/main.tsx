@@ -9,8 +9,8 @@ import { loadSiteSettings } from "./lib/site-settings";
 // Load branding before rendering
 loadSiteSettings();
 
-// Register service worker for PWA offline support
-if ('serviceWorker' in navigator) {
+// Skip service worker in dev mode — Vite HMR conflicts with SW caching
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => {
       // SW registration failed — app works without it

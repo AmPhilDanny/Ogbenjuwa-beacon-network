@@ -84,11 +84,11 @@ async function seed() {
   const passwordHash = await bcrypt.hash('Password123!', 12);
 
   const usersData = [
-    { name: 'Daniel Ochoche', email: `daniel@${SEED_EMAIL_DOMAIN}`, role: 'super_admin' as const, phone: '+2348034412290', lga: 'Otukpo' },
-    { name: 'Oche Agbo', email: `oche.agbo@${SEED_EMAIL_DOMAIN}`, role: 'lga_coordinator' as const, phone: '+2348123456789', lga: 'Agatu' },
-    { name: 'Adah Ogiri', email: `adah.ogiri@${SEED_EMAIL_DOMAIN}`, role: 'vigilante_leader' as const, phone: '+2348065432109', lga: 'Apa' },
-    { name: 'Mama Ojoma', email: `mama.ojoma@${SEED_EMAIL_DOMAIN}`, role: 'community_admin' as const, phone: '+2348157890123', lga: 'Ohimini' },
-    { name: 'Godwin Ibe', email: `godwin.ibe@${SEED_EMAIL_DOMAIN}`, role: 'resident' as const, phone: '+2347056789012', lga: 'Otukpo' },
+    { name: 'Daniel Ochoche', email: `daniel@${SEED_EMAIL_DOMAIN}`, username: 'daniel', role: 'super_admin' as const, phone: '+2348034412290', lga: 'Otukpo' },
+    { name: 'Oche Agbo', email: `oche.agbo@${SEED_EMAIL_DOMAIN}`, username: 'oche.agbo', role: 'lga_coordinator' as const, phone: '+2348123456789', lga: 'Agatu' },
+    { name: 'Adah Ogiri', email: `adah.ogiri@${SEED_EMAIL_DOMAIN}`, username: 'adah.ogiri', role: 'vigilante_leader' as const, phone: '+2348065432109', lga: 'Apa' },
+    { name: 'Mama Ojoma', email: `mama.ojoma@${SEED_EMAIL_DOMAIN}`, username: 'mama.ojoma', role: 'community_admin' as const, phone: '+2348157890123', lga: 'Ohimini' },
+    { name: 'Godwin Ibe', email: `godwin.ibe@${SEED_EMAIL_DOMAIN}`, username: 'godwin.ibe', role: 'resident' as const, phone: '+2347056789012', lga: 'Otukpo' },
   ];
 
   const userIdMap = new Map<string, string>();
@@ -97,6 +97,7 @@ async function seed() {
     const [user] = await db.insert(schema.users).values({
       name: u.name,
       email: u.email,
+      username: u.username,
       passwordHash,
       phone: u.phone,
       role: u.role,

@@ -45,6 +45,33 @@ router.post('/', requirePermission('patrols', 'create'), validate(createTeamSche
   }
 });
 
+router.get('/teams', async (_req, res, next) => {
+  try {
+    const allTeams = await db.select({
+      id: patrolTeams.id,
+      name: patrolTeams.name,
+      lgaId: patrolTeams.lgaId,
+      leaderId: patrolTeams.leaderId,
+      memberCount: patrolTeams.memberCount,
+      isActive: patrolTeams.isActive,
+    }).from(patrolTeams);
+
+    const members = allTeams.map((t, idx) => ({
+      id: idx + 1,
+      name: t.name,
+      role: t.isActive ? 'Active' : 'Standby',
+      lat: 7.2 + (idx * 0.05),
+      lng: 8.1 + (idx * 0.03),
+      active: t.isActive,
+      lastSeen: 'Just now',
+    }));
+
+    res.json({ data: members });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get('/:id', async (req, res, next) => {
   try {
     const [team] = await db.select().from(patrolTeams).where(eq(patrolTeams.id, req.params.id as string));

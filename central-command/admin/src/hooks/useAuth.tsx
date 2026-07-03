@@ -1,12 +1,21 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { api } from '../lib/api';
-import type { AuthResponse, User, Role } from '../lib/types';
+import type { AuthResponse, Role } from '../lib/types';
+
+interface OtpRequired {
+  requiresOtp: true;
+  phone: string;
+  message: string;
+}
+
+type LoginResult = AuthResponse | OtpRequired;
 
 interface AuthState {
   user: { id: string; email: string; name: string; role: Role; lgaId?: string | null; avatar?: string | null } | null;
   isAuthenticated: boolean;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (login: string, password: string) => Promise<LoginResult>;
+  verifyOtp: (phone: string, otp: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -31,8 +40,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const data = await api.post<AuthResponse>('/auth/login', { email, password }, { skipAuth: true });
+  const login = useCallback(async (loginVal: string, password: string): Promise<LoginResult> => {
+    const data = await api.post<LoginResult>('/auth/login', { login: loginVal, password }, { skipAuth: true });
+
+    if ('requiresOtp' in data && data.requiresOtp) {
+      return data;
+    }
+
+    const authData = data as AuthResponse;
+    localStorage.setItem('accessToken', authData.accessToken);
+    localStorage.setItem('refreshToken', authData.refreshToken);
+    setUser(authData.user);
+    return authData;
+  }, []);
+
+  const verifyOtp = useCallback(async (phone: string, otp: string) => {
+    const data = await api.post<AuthResponse>('/auth/verify-otp', { phone, otp }, { skipAuth: true });
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
     setUser(data.user);
@@ -50,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, loading, login, verifyOtp, logout }}>
       {children}
     </AuthContext.Provider>
   );

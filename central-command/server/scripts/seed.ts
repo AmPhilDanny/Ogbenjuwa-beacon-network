@@ -178,14 +178,14 @@ async function seed() {
   // ── 5 Users ────────────────────────────────────────────────────
   console.log('Seeding users...');
   const userData = [
-    { name: 'Daniel Ochoche', email: 'daniel@ogbenjuwa.local', role: 'super_admin', phone: '+2348034412290', lgaId: lgaMap['Otukpo'] },
-    { name: 'Oche Agbo', email: 'oche.agbo@ogbenjuwa.local', role: 'lga_coordinator', phone: '+2348123456789', lgaId: lgaMap['Agatu'] },
-    { name: 'Adah Ogiri', email: 'adah.ogiri@ogbenjuwa.local', role: 'vigilante_leader', phone: '+2348065432109', lgaId: lgaMap['Apa'] },
-    { name: 'Mama Ojoma', email: 'mama.ojoma@ogbenjuwa.local', role: 'community_admin', phone: '+2348056789012', lgaId: lgaMap['Ohimini'] },
-    { name: 'Godwin Ibe', email: 'godwin.ibe@ogbenjuwa.local', role: 'resident', phone: '+2348162345678', lgaId: lgaMap['Otukpo'] },
+    { name: 'Daniel Ochoche', email: 'daniel@ogbenjuwa.local', role: 'super_admin' as const, phone: '+2348034412290', lgaId: lgaMap['Otukpo'] },
+    { name: 'Oche Agbo', email: 'oche.agbo@ogbenjuwa.local', role: 'lga_coordinator' as const, phone: '+2348123456789', lgaId: lgaMap['Agatu'] },
+    { name: 'Adah Ogiri', email: 'adah.ogiri@ogbenjuwa.local', role: 'vigilante_leader' as const, phone: '+2348065432109', lgaId: lgaMap['Apa'] },
+    { name: 'Mama Ojoma', email: 'mama.ojoma@ogbenjuwa.local', role: 'community_admin' as const, phone: '+2348056789012', lgaId: lgaMap['Ohimini'] },
+    { name: 'Godwin Ibe', email: 'godwin.ibe@ogbenjuwa.local', role: 'resident' as const, phone: '+2348162345678', lgaId: lgaMap['Otukpo'] },
   ];
   const insertedUsers = await db.insert(users).values(
-    userData.map(u => ({ ...u, password: PASSWORD, isActive: true }))
+    userData.map(u => ({ ...u, passwordHash: PASSWORD, isActive: true }))
   ).returning();
 
   const userMap: Record<string, string> = {};
@@ -214,11 +214,11 @@ async function seed() {
   // ── 5 Resources ───────────────────────────────────────────────
   console.log('Seeding resources...');
   const resourceData = [
-    { type: 'medical', name: 'FMC Otukpo', lgaId: lgaMap['Otukpo'], lat: 7.148, lng: 8.135, capacity: 200, occupied: 156, phone: '+23444234567' },
-    { type: 'shelter', name: "St. John's Camp", lgaId: lgaMap['Agatu'], lat: 7.71, lng: 8.108, capacity: 300, occupied: 247, phone: '+2348034412291' },
-    { type: 'water', name: 'Oglewu Borehole', lgaId: lgaMap['Agatu'], lat: 7.702, lng: 8.115, capacity: 5000, occupied: 3200 },
-    { type: 'food', name: 'Otukpo Food Bank', lgaId: lgaMap['Otukpo'], lat: 7.145, lng: 8.128, capacity: 1000, occupied: 640, phone: '+2348034412292' },
-    { type: 'shelter', name: 'Igumale IDP Camp', lgaId: lgaMap['Apa'], lat: 7.005, lng: 8.23, capacity: 500, occupied: 412 },
+    { type: 'medical' as const, name: 'FMC Otukpo', lgaId: lgaMap['Otukpo'], lat: '7.148', lng: '8.135', capacity: 200, occupied: 156, phone: '+23444234567' },
+    { type: 'shelter' as const, name: "St. John's Camp", lgaId: lgaMap['Agatu'], lat: '7.71', lng: '8.108', capacity: 300, occupied: 247, phone: '+2348034412291' },
+    { type: 'water' as const, name: 'Oglewu Borehole', lgaId: lgaMap['Agatu'], lat: '7.702', lng: '8.115', capacity: 5000, occupied: 3200 },
+    { type: 'food' as const, name: 'Otukpo Food Bank', lgaId: lgaMap['Otukpo'], lat: '7.145', lng: '8.128', capacity: 1000, occupied: 640, phone: '+2348034412292' },
+    { type: 'shelter' as const, name: 'Igumale IDP Camp', lgaId: lgaMap['Apa'], lat: '7.005', lng: '8.23', capacity: 500, occupied: 412 },
   ];
   await db.insert(resources).values(resourceData);
 
@@ -234,7 +234,6 @@ async function seed() {
 
   // ── 5 Patrol Teams ────────────────────────────────────────────
   console.log('Seeding patrol teams...');
-  const now = new Date();
   const teamData = [
     { name: 'Otukpo Ward 1 Watch', lgaId: lgaMap['Otukpo'], leaderId: Object.values(userMap)[1] },
     { name: 'Agatu Riverine Patrol', lgaId: lgaMap['Agatu'], leaderId: Object.values(userMap)[2] },
@@ -246,9 +245,9 @@ async function seed() {
 
   for (const team of insertedTeams) {
     await db.insert(patrolMembers).values([
-      { teamId: team.id, userId: Object.values(userMap)[0], role: 'leader' },
-      { teamId: team.id, userId: Object.values(userMap)[1], role: 'member' },
-      { teamId: team.id, userId: Object.values(userMap)[2], role: 'member' },
+      { teamId: team.id, userId: Object.values(userMap)[0] },
+      { teamId: team.id, userId: Object.values(userMap)[1] },
+      { teamId: team.id, userId: Object.values(userMap)[2] },
     ]);
   }
 
@@ -259,27 +258,27 @@ async function seed() {
     { title: 'Fire Outbreak at Market', type: 'fire', severity: 'high', status: 'active', lgaId: lgaMap['Agatu'], location: 'Obagaji Market', description: 'Fire reported at the main market. Emergency services responding.', isPublic: true, reportedBy: Object.values(userMap)[1] },
     { title: 'Medical Emergency', type: 'medical', severity: 'critical', status: 'active', lgaId: lgaMap['Apa'], location: 'Igumale Health Centre', description: 'Multiple casualties from road accident near Igumale junction.', isPublic: false, reportedBy: Object.values(userMap)[2] },
     { title: 'Missing Child Report', type: 'security', severity: 'medium', status: 'active', lgaId: lgaMap['Ohimini'], location: 'Oglewu', description: '10-year-old boy missing since morning. Last seen near the borehole.', isPublic: true, reportedBy: Object.values(userMap)[3] },
-    { title: 'Flood Warning', type: 'environmental', severity: 'high', status: 'monitoring', lgaId: lgaMap['Otukpo'], location: 'Otukpo Lowland Areas', description: 'Heavy rainfall expected. Low-lying areas advised to prepare for evacuation.', isPublic: true, reportedBy: Object.values(userMap)[0] },
+    { title: 'Flood Warning', type: 'environmental', severity: 'high', status: 'active' as const, lgaId: lgaMap['Otukpo'], location: 'Otukpo Lowland Areas', description: 'Heavy rainfall expected. Low-lying areas advised to prepare for evacuation.', isPublic: true, reportedBy: Object.values(userMap)[0] },
   ]);
 
   // ── 5 Incidents ───────────────────────────────────────────────
   console.log('Seeding incidents...');
   await db.insert(incidents).values([
-    { title: 'Armed Robbery at Otukpo', description: 'Armed robbery at a filling station. Suspects escaped.', status: 'open', severity: 'high', lgaId: lgaMap['Otukpo'], location: 'Otukpo Town', reportedBy: Object.values(userMap)[0] },
-    { title: 'Cult Clash in Agatu', description: 'Suspected cult clash resulting in injuries.', status: 'investigating', severity: 'high', lgaId: lgaMap['Agatu'], location: 'Obagaji', reportedBy: Object.values(userMap)[1] },
-    { title: 'Domestic Fire', description: 'Kitchen fire spread to two adjacent homes.', status: 'open', severity: 'medium', lgaId: lgaMap['Apa'], location: 'Igumale', reportedBy: Object.values(userMap)[2] },
-    { title: 'Land Dispute', description: 'Communal land dispute between two families escalating.', status: 'monitoring', severity: 'low', lgaId: lgaMap['Ohimini'], location: 'Oglewu', reportedBy: Object.values(userMap)[3] },
-    { title: 'Hit and Run', description: 'Driver struck pedestrian and fled the scene.', status: 'open', severity: 'medium', lgaId: lgaMap['Otukpo'], location: 'Otukpo-Agatu Road', reportedBy: Object.values(userMap)[4] },
+    { title: 'Armed Robbery at Otukpo', description: 'Armed robbery at a filling station. Suspects escaped.', type: 'security', status: 'reported' as const, priority: 'high' as const, lgaId: lgaMap['Otukpo'], location: 'Otukpo Town', reportedBy: Object.values(userMap)[0] },
+    { title: 'Cult Clash in Agatu', description: 'Suspected cult clash resulting in injuries.', type: 'security', status: 'investigating' as const, priority: 'high' as const, lgaId: lgaMap['Agatu'], location: 'Obagaji', reportedBy: Object.values(userMap)[1] },
+    { title: 'Domestic Fire', description: 'Kitchen fire spread to two adjacent homes.', type: 'fire', status: 'reported' as const, priority: 'medium' as const, lgaId: lgaMap['Apa'], location: 'Igumale', reportedBy: Object.values(userMap)[2] },
+    { title: 'Land Dispute', description: 'Communal land dispute between two families escalating.', type: 'security', status: 'investigating' as const, priority: 'low' as const, lgaId: lgaMap['Ohimini'], location: 'Oglewu', reportedBy: Object.values(userMap)[3] },
+    { title: 'Hit and Run', description: 'Driver struck pedestrian and fled the scene.', type: 'security', status: 'reported' as const, priority: 'medium' as const, lgaId: lgaMap['Otukpo'], location: 'Otukpo-Agatu Road', reportedBy: Object.values(userMap)[4] },
   ]);
 
   // ── 5 Announcements ───────────────────────────────────────────
   console.log('Seeding announcements...');
   await db.insert(announcements).values([
-    { title: 'Ward Security Meeting', content: 'Community safety meeting at Otukpo Local Govt Hall this Saturday 10AM.', lgaId: lgaMap['Otukpo'], isPublished: true, createdBy: Object.values(userMap)[0] },
-    { title: 'Market Day Security', content: 'Extra patrols deployed during market days. Stay vigilant.', lgaId: lgaMap['Agatu'], isPublished: true, createdBy: Object.values(userMap)[1] },
-    { title: 'New Patrol Roster', content: 'Night patrol schedule changed. Check the new roster at the ward office.', lgaId: lgaMap['Apa'], isPublished: true, createdBy: Object.values(userMap)[2] },
-    { title: 'Community Clean-up', content: 'Community clean-up exercise this Saturday. All hands needed.', lgaId: lgaMap['Ohimini'], isPublished: true, createdBy: Object.values(userMap)[3] },
-    { title: 'Siren Test Notice', content: 'Weekly siren test scheduled for tomorrow at 10AM. Do not panic.', lgaId: lgaMap['Otukpo'], isPublished: true, createdBy: Object.values(userMap)[4] },
+    { title: 'Ward Security Meeting', body: 'Community safety meeting at Otukpo Local Govt Hall this Saturday 10AM.', lgaId: lgaMap['Otukpo'], isPublished: true, createdBy: Object.values(userMap)[0] },
+    { title: 'Market Day Security', body: 'Extra patrols deployed during market days. Stay vigilant.', lgaId: lgaMap['Agatu'], isPublished: true, createdBy: Object.values(userMap)[1] },
+    { title: 'New Patrol Roster', body: 'Night patrol schedule changed. Check the new roster at the ward office.', lgaId: lgaMap['Apa'], isPublished: true, createdBy: Object.values(userMap)[2] },
+    { title: 'Community Clean-up', body: 'Community clean-up exercise this Saturday. All hands needed.', lgaId: lgaMap['Ohimini'], isPublished: true, createdBy: Object.values(userMap)[3] },
+    { title: 'Siren Test Notice', body: 'Weekly siren test scheduled for tomorrow at 10AM. Do not panic.', lgaId: lgaMap['Otukpo'], isPublished: true, createdBy: Object.values(userMap)[4] },
   ]);
 
   // ── Site Settings ─────────────────────────────────────────────
@@ -308,8 +307,9 @@ async function seed() {
   console.log('Seeding API key...');
   await db.insert(apiKeys).values({
     name: 'Beacon-Network Integration',
-    key: 'ogb_sk_beacon_' + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2),
-    layer: 'beacon-network',
+    keyPrefix: 'ogb_sk_beacon',
+    keyHash: await bcrypt.hash('ogb_sk_beacon_' + Math.random().toString(36).substring(2), 10),
+    layer: 'external' as const,
     permissions: ['alerts_read', 'alerts_write', 'patrols_read', 'resources_read'],
     isActive: true,
     createdBy: Object.values(userMap)[0],
