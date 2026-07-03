@@ -9,7 +9,7 @@
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "outputDirectory": "admin/dist",
-  "buildCommand": "bun run build:admin",
+  "buildCommand": "bun run build:admin && bun run build:server",
   "installCommand": "bun install",
   "framework": null
 }
