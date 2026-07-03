@@ -3,14 +3,16 @@
 # Static Sites (frontends) must be created manually via Dashboard.
 
 services:
-  # ── Backend API (Docker) ────────────────────────────────────────────────
+  # ── Backend API (Node — Free Tier) ──────────────────────────────────────
   - type: web
     name: ogbenjuwa-api
-    env: docker
+    env: node
     region: frankfurt
     branch: main
+    plan: free
     rootDir: central-command
-    dockerfilePath: ./Dockerfile
+    buildCommand: npm install && npm run build:server
+    startCommand: node server/dist/index.js
     healthCheckPath: /api/v1/health
     autoDeploy: true
     envVars:
