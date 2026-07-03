@@ -27,7 +27,7 @@ const updateKeySchema = z.object({
 router.use(authenticate);
 router.use(requireRole('super_admin'));
 
-router.get('/', async (req, res, next) => {
+router.get('/', async (_req, res, next) => {
   try {
     const all = await db.select({
       id: apiKeys.id,

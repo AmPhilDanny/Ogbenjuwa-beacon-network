@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { eq, desc } from 'drizzle-orm';
+import { desc } from 'drizzle-orm';
 import db from '../config/db.js';
 import { smsLogs } from '../db/schema/index.js';
 import { authenticate } from '../middleware/auth.js';

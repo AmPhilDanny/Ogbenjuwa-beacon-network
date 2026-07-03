@@ -8,7 +8,7 @@ let specCache: Record<string, unknown> | null = null;
 function loadSwaggerSpec(): Record<string, unknown> {
   if (specCache) return specCache;
   const __dirname = dirname(fileURLToPath(import.meta.url));
-  specCache = JSON.parse(readFileSync(resolve(__dirname, '../swagger.json'), 'utf-8'));
+  specCache = JSON.parse(readFileSync(resolve(__dirname, '../swagger.json'), 'utf-8')) as Record<string, unknown>;
   return specCache;
 }
 
