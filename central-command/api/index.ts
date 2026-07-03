@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import app from '../server/dist/app.js';
+import app from '../server/app.js';
 
 /**
  * Vercel serverless entry point.

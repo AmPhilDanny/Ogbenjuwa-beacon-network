@@ -9,7 +9,4 @@ docker-compose.yml
 Dockerfile
 Dockerfile.admin
 uploads
-scripts
-server/tsconfig.json
 drizzle.config.ts
-bun.lock
