@@ -7,6 +7,7 @@ import { LanguageProvider, useLanguage } from '@/lib/i18n';
 import ProtectedRoute from '@/auth/ProtectedRoute';
 import MainLayout from '@/layouts/MainLayout';
 import Login from '@/auth/Login';
+import Signup from '@/auth/Signup';
 import VigilanteDashboard from '@/dashboards/vigilante/VigilanteDashboard';
 import CommunityDashboard from '@/dashboards/community/CommunityDashboard';
 import DirectoryPage from '@/directory/DirectoryPage';
@@ -59,6 +60,7 @@ function AppContent() {
       <OfflineBanner />
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>

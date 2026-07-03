@@ -311,4 +311,61 @@ router.get('/me', authenticate, async (req, res, next) => {
   }
 });
 
+const registerSchema = z.object({
+  email: z.string().email(),
+  username: z.string().min(3).max(30),
+  password: z.string().min(8),
+  name: z.string().min(1),
+  phone: z.string().optional(),
+  lgaId: z.string().uuid().optional(),
+});
+
+// POST /auth/register — self-registration for residents
+router.post('/register', rateLimit({ windowMs: 60_000, maxRequests: 3 }), validate(registerSchema), async (req, res, next) => {
+  try {
+    const { email, username, password, name, phone, lgaId } = req.body;
+
+    const existing = await db.select().from(users).where(
+      or(eq(users.email, email), eq(users.username!, username))
+    );
+    if (existing.length > 0) {
+      res.status(409).json({ error: { code: 'ACCOUNT_EXISTS', message: 'An account with this email or username already exists' } });
+      return;
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    const [user] = await db.insert(users).values({
+      email,
+      username,
+      passwordHash,
+      name,
+      phone: phone || null,
+      role: 'resident',
+      lgaId: lgaId || null,
+      isActive: true,
+    }).returning();
+
+    const tokens = generateTokens(user);
+    await db.insert(sessions).values({
+      userId: user.id,
+      refreshToken: tokens.refreshToken,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
+    res.status(201).json({
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        name: user.name,
+        role: user.role,
+        lgaId: user.lgaId,
+      },
+      ...tokens,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export { router as authRouter };
