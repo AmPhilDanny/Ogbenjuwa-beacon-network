@@ -2,13 +2,13 @@
 FROM oven/bun:1 AS deps
 WORKDIR /app
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile --production
+RUN bun install --production
 
 FROM oven/bun:1 AS build
 WORKDIR /app
 COPY package.json bun.lock tsconfig.json ./
 COPY server/ ./server/
-RUN bun install --frozen-lockfile
+RUN bun install
 RUN bun run build 2>/dev/null || true  # Build TS if script exists
 
 FROM oven/bun:1 AS production
