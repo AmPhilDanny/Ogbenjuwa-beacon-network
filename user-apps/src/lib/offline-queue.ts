@@ -64,7 +64,8 @@ export async function processQueue(fetchFn: typeof fetch = fetch): Promise<{ suc
 
   for (const action of actions) {
     try {
-      const res = await fetchFn(`http://localhost:4001/api/v1${action.endpoint}`, {
+      const apiBase = import.meta.env.VITE_API_BASE || 'https://ogbenjuwa-api.onrender.com/api/v1';
+      const res = await fetchFn(`${apiBase}${action.endpoint}`, {
         method: action.method,
         headers: { 'Content-Type': 'application/json' },
         body: action.body ? JSON.stringify(action.body) : undefined,

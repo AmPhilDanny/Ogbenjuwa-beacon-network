@@ -44,7 +44,8 @@ export async function unsubscribeFromPush(): Promise<void> {
       const endpoint = subscription.endpoint;
       await subscription.unsubscribe();
       const encoded = btoa(endpoint);
-      await fetch(`http://localhost:4001/api/v1/push-subscriptions/${encoded}`, { method: 'DELETE' });
+      const apiBase = import.meta.env.VITE_API_BASE || 'https://ogbenjuwa-api.onrender.com/api/v1';
+      await fetch(`${apiBase}/push-subscriptions/${encoded}`, { method: 'DELETE' });
     }
   } catch {}
 }
