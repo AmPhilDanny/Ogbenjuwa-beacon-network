@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, foreignKey, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, jsonb } from 'drizzle-orm/pg-core';
 import { users } from './users';
 
 export const pushSubscriptions = pgTable('push_subscriptions', {

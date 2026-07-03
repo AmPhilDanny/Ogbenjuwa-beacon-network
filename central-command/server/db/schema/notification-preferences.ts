@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, boolean, timestamp, foreignKey } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, boolean, timestamp } from 'drizzle-orm/pg-core';
 import { users } from './users';
 
 export const notificationPreferences = pgTable('notification_preferences', {
