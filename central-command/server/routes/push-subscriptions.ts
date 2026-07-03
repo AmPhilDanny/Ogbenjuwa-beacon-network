@@ -59,7 +59,7 @@ router.post('/', validate(subscribeSchema), async (req: Request, res: Response, 
 // Remove subscription
 router.delete('/:endpoint', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const endpoint = Buffer.from(req.params.endpoint, 'base64').toString('utf-8');
+    const endpoint = Buffer.from(String(req.params.endpoint), 'base64').toString('utf-8');
     await db.delete(pushSubscriptions)
       .where(eq(pushSubscriptions.endpoint, endpoint));
     res.status(204).end();

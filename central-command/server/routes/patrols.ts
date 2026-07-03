@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { eq } from 'drizzle-orm';
+import { eq, desc, gte } from 'drizzle-orm';
 import db from '../config/db.js';
 import { patrolTeams, patrolMembers, patrolShifts, patrolCheckins } from '../db/schema/index.js';
 import { authenticate } from '../middleware/auth.js';
@@ -106,7 +106,7 @@ router.post('/checkin', authenticate, validate(checkinSchema), async (req, res, 
   }
 });
 
-router.get('/checkins/live', authenticate, async (req, res, next) => {
+router.get('/checkins/live', authenticate, async (_req, res, next) => {
   try {
     const tenMinAgo = new Date(Date.now() - 10 * 60 * 1000);
     const recent = await db.select({
@@ -117,7 +117,7 @@ router.get('/checkins/live', authenticate, async (req, res, next) => {
       shiftId: patrolCheckins.shiftId,
     })
       .from(patrolCheckins)
-      .where(patrolCheckins.timestamp >= tenMinAgo)
+      .where(gte(patrolCheckins.timestamp, tenMinAgo))
       .orderBy(desc(patrolCheckins.timestamp));
 
     // Get latest per member
