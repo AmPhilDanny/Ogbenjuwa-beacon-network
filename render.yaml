@@ -1,78 +1,67 @@
+# ─── Ogbenjuwa Platform — Render Blueprint ────────────────────────────────
+# Connect this repo on Render Dashboard → Blueprint → auto-creates all services
+
 services:
+  # ── Backend API (Docker) ────────────────────────────────────────────────
   - type: web
     name: ogbenjuwa-api
-    plan: free
-    runtime: node
+    env: docker
+    region: frankfurt
+    branch: main
     rootDir: central-command
-    buildCommand: npm install && npm run build
-    startCommand: node dist/server/index.js
-    healthCheckPath: /health
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 4001
+        value: "4001"
       - key: DATABASE_URL
-        scope: shared-env
-      - key: REDIS_URL
-        scope: shared-env
+        sync: false      # paste your Supabase connection string in dashboard
       - key: JWT_SECRET
-        scope: shared-env
+        generateValue: true
       - key: JWT_REFRESH_SECRET
-        scope: shared-env
+        generateValue: true
       - key: CORS_ORIGINS
-        value: https://beacon-network.onrender.com,https://admin-panel.onrender.com,https://user-apps.onrender.com
+        value: https://ogbenjuwa-beacon.onrender.com,https://ogbenjuwa-userapps.onrender.com
+      - key: REDIS_URL
+        value: redis://localhost:6379
 
-  - type: web
-    name: ogbenjuwa-admin
-    plan: free
-    runtime: node
-    rootDir: central-command
-    buildCommand: npm install && npm run build:admin
-    startCommand: npx serve -s admin/dist --listen 4000
-    envVars:
-      - key: NODE_ENV
-        value: production
-
-  - type: web
-    name: ogbenjuwa-beacon-network
-    plan: free
-    runtime: node
+  # ── Beacon Network SPA ─────────────────────────────────────────────────
+  - type: static_site
+    name: ogbenjuwa-beacon
+    region: frankfurt
+    branch: main
     rootDir: ogbenjuwa-beacon-network
     buildCommand: npm install && npm run build
-    startCommand: npm start
+    publishPath: dist
+    autoDeploy: true
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: REACT_APP_API_URL
-        value: https://ogbenjuwa-api.onrender.com
+      - key: VITE_API_BASE
+        value: https://ogbenjuwa-api.onrender.com/api/v1
 
-  - type: web
-    name: ogbenjuwa-user-apps
-    plan: free
-    runtime: node
+  # ── User Apps SPA ─────────────────────────────────────────────────────
+  - type: static_site
+    name: ogbenjuwa-userapps
+    region: frankfurt
+    branch: main
     rootDir: user-apps
     buildCommand: npm install && npm run build
-    startCommand: npm start
+    publishPath: dist
+    autoDeploy: true
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: REACT_APP_API_URL
-        value: https://ogbenjuwa-api.onrender.com
-
-  - type: pserv
-    name: ogbenjuwa-postgres
-    plan: free
-    ipAllowList: []
-    envVars:
-      - key: POSTGRES_USER
-        value: postgres
-      - key: POSTGRES_PASSWORD
-        scope: shared-env
-      - key: POSTGRES_DB
-        value: ogbenjuwa_central
-
-  - type: redis
-    name: ogbenjuwa-redis
-    plan: free
-    ipAllowList: []
+      - key: VITE_API_BASE
+        value: https://ogbenjuwa-api.onrender.com/api/v1
