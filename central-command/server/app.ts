@@ -71,7 +71,7 @@ app.get('/api/v1/health', (_req, res) => {
 // to host the admin UI at the root path.
 try {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  const adminDist = path.join(__dirname, '..', '..', 'admin', 'dist');
+    const adminDist = path.join(__dirname, '..', 'admin', 'dist');
   if (fs.existsSync(adminDist)) {
     app.use(express.static(adminDist));
 
