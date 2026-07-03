@@ -1,5 +1,6 @@
 # ─── Ogbenjuwa Platform — Render Blueprint ────────────────────────────────
-# Connect this repo on Render Dashboard → Blueprint → auto-creates all services
+# Blueprint supports: web, worker, cron, pserv, postgres, redis
+# Static Sites (frontends) must be created manually via Dashboard.
 
 services:
   # ── Backend API (Docker) ────────────────────────────────────────────────
@@ -18,7 +19,7 @@ services:
       - key: PORT
         value: "4001"
       - key: DATABASE_URL
-        sync: false      # paste your Supabase connection string in dashboard
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET
@@ -27,41 +28,3 @@ services:
         value: https://ogbenjuwa-beacon.onrender.com,https://ogbenjuwa-userapps.onrender.com
       - key: REDIS_URL
         value: redis://localhost:6379
-
-  # ── Beacon Network SPA ─────────────────────────────────────────────────
-  - type: static_site
-    name: ogbenjuwa-beacon
-    region: frankfurt
-    branch: main
-    rootDir: ogbenjuwa-beacon-network
-    buildCommand: npm install && npm run build
-    publishPath: dist
-    autoDeploy: true
-    headers:
-      - path: /*
-        name: X-Frame-Options
-        value: DENY
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      - key: VITE_API_BASE
-        value: https://ogbenjuwa-api.onrender.com/api/v1
-
-  # ── User Apps SPA ─────────────────────────────────────────────────────
-  - type: static_site
-    name: ogbenjuwa-userapps
-    region: frankfurt
-    branch: main
-    rootDir: user-apps
-    buildCommand: npm install && npm run build
-    publishPath: dist
-    autoDeploy: true
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      - key: VITE_API_BASE
-        value: https://ogbenjuwa-api.onrender.com/api/v1
