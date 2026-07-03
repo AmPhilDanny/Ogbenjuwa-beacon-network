@@ -40,7 +40,7 @@ app.use(helmet({
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://unpkg.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
       imgSrc: ["'self'", "data:", "https://*.tile.openstreetmap.org", "https://unpkg.com"],
-      connectSrc: ["'self'", "ws://localhost:4001", "http://localhost:4001", "ws://localhost:4000", "http://localhost:4000", "https://*.vercel.app"],
+      connectSrc: ["'self'", "ws://localhost:4001", "http://localhost:4001", "ws://localhost:4000", "http://localhost:4000", "https://*.vercel.app", "https://*.onrender.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
     },
   },
@@ -51,7 +51,7 @@ app.use(cors({
     // Allow requests with no origin (server-to-server, curl, etc.)
     if (!origin) return callback(null, true);
     // Allow localhost origins and production Vercel domains
-    const allowed = corsOrigins.some(o => origin.startsWith(o)) || origin.endsWith('.vercel.app');
+    const allowed = corsOrigins.some(o => origin.startsWith(o)) || origin.endsWith('.vercel.app') || origin.endsWith('.onrender.com');
     callback(null, allowed);
   },
   credentials: true,
