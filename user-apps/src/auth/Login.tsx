@@ -67,7 +67,7 @@ export default function Login() {
           <CardContent className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="login" className="text-white">{t('auth.email_label') || 'Email or Username'}</Label>
+                <Label htmlFor="login" className="text-white">Email or Username</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -81,7 +81,7 @@ export default function Login() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-white">{t('auth.password_label') || 'Password'}</Label>
+                <Label htmlFor="password" className="text-white">Password</Label>
                 <div className="relative">
                   <KeyRound className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input

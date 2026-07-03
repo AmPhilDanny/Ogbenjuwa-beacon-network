@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || 'https://ogbenjuwa-backend.vercel.app/api/v1';
+const API_BASE = import.meta.env.VITE_API_BASE || 'https://ogbenjuwa-api.onrender.com/api/v1';
 
 interface ApiError {
   code: string;
