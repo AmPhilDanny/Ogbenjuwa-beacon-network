@@ -1,0 +1,78 @@
+services:
+  - type: web
+    name: ogbenjuwa-api
+    plan: free
+    runtime: node
+    rootDir: central-command
+    buildCommand: npm install && npm run build
+    startCommand: node dist/server/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4001
+      - key: DATABASE_URL
+        scope: shared-env
+      - key: REDIS_URL
+        scope: shared-env
+      - key: JWT_SECRET
+        scope: shared-env
+      - key: JWT_REFRESH_SECRET
+        scope: shared-env
+      - key: CORS_ORIGINS
+        value: https://beacon-network.onrender.com,https://admin-panel.onrender.com,https://user-apps.onrender.com
+
+  - type: web
+    name: ogbenjuwa-admin
+    plan: free
+    runtime: node
+    rootDir: central-command
+    buildCommand: npm install && npm run build:admin
+    startCommand: npx serve -s admin/dist --listen 4000
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+  - type: web
+    name: ogbenjuwa-beacon-network
+    plan: free
+    runtime: node
+    rootDir: ogbenjuwa-beacon-network
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REACT_APP_API_URL
+        value: https://ogbenjuwa-api.onrender.com
+
+  - type: web
+    name: ogbenjuwa-user-apps
+    plan: free
+    runtime: node
+    rootDir: user-apps
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REACT_APP_API_URL
+        value: https://ogbenjuwa-api.onrender.com
+
+  - type: pserv
+    name: ogbenjuwa-postgres
+    plan: free
+    ipAllowList: []
+    envVars:
+      - key: POSTGRES_USER
+        value: postgres
+      - key: POSTGRES_PASSWORD
+        scope: shared-env
+      - key: POSTGRES_DB
+        value: ogbenjuwa_central
+
+  - type: redis
+    name: ogbenjuwa-redis
+    plan: free
+    ipAllowList: []
