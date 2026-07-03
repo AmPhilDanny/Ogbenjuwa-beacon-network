@@ -63,6 +63,12 @@ app.get('/api/v1/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Provide a simple root response for hosting platforms that request "/".
+// Redirect to the health endpoint so browsers and healthchecks see a JSON status.
+app.get('/', (_req, res) => {
+  res.redirect('/api/v1/health');
+});
+
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/lgas', lgaRouter);
