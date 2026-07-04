@@ -3,7 +3,9 @@ import { WebSocketServer } from 'ws';
 import app from './app.js';
 import { env } from './config/env.js';
 import { getRedis, closeRedis } from './config/redis.js';
+import { queryClient } from './config/db.js';
 import { setupWebSocket } from './ws/index.js';
+import { ensureAuthTables } from './migrate.js';
 
 const server = createServer(app);
 
@@ -15,6 +17,15 @@ async function start() {
     await getRedis();
   } catch {
     console.warn('Redis unavailable — running without cache/pubsub');
+  }
+
+  // Ensure auth-critical tables exist before accepting requests
+  try {
+    console.log('  Running startup DB migration...');
+    await ensureAuthTables(queryClient);
+  } catch (err) {
+    console.error('  Migration failed:', err);
+    // Don't crash — the server may still serve static/admin content
   }
 
   server.listen(env.PORT, () => {
