@@ -1,6 +1,6 @@
 # ─── Ogbenjuwa Platform — Render Blueprint ────────────────────────────────
-# Blueprint supports: web, worker, cron, pserv, postgres, redis
-# Static Sites (frontends) must be created manually via Dashboard.
+# Blueprint supports: web, worker, cron, pserv, postgres, redis, and static sites.
+# Sync via: render blueprints sync (applies changes to existing services by name)
 
 services:
   # ── Backend API (Node — Free Tier) ──────────────────────────────────────
@@ -30,3 +30,39 @@ services:
         value: https://ogbenjuwa-beacon.onrender.com,https://ogbenjuwa-userapps.onrender.com
       - key: REDIS_URL
         value: redis://localhost:6379
+
+  # ── Beacon Network (React SPA — Static Site) ──────────────────────────
+  - type: web
+    runtime: static
+    name: ogbenjuwa-beacon
+    repo: https://github.com/AmPhilDanny/Ogbenjuwa-beacon-network
+    branch: main
+    rootDir: ogbenjuwa-beacon-network
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE
+        value: https://ogbenjuwa-api.onrender.com/api/v1
+
+  # ── User Apps (React SPA — Static Site) ───────────────────────────────
+  - type: web
+    runtime: static
+    name: ogbenjuwa-userapps
+    repo: https://github.com/AmPhilDanny/Ogbenjuwa-beacon-network
+    branch: main
+    rootDir: user-apps
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE
+        value: https://ogbenjuwa-api.onrender.com/api/v1
