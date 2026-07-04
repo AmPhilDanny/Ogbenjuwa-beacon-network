@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || 'https://ogbenjuwa-api.onrender.com/api/v1';
+import { API_BASE } from './api-config';
 
 export interface SiteSettings {
   siteName: string;

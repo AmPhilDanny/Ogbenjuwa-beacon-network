@@ -8,8 +8,7 @@ type WsMessage = {
 
 type ConnectionStatus = 'disconnected' | 'connecting' | 'connected';
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'https://ogbenjuwa-api.onrender.com/api/v1';
-const WS_URL = API_BASE.replace(/^http/, 'ws').replace(/\/api\/v1\/?$/, '') + '/ws';
+import { API_BASE, WS_URL } from '../lib/api-config';
 const RECONNECT_DELAY = 3000;
 
 export function useWebSocket() {

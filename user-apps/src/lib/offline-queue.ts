@@ -1,3 +1,5 @@
+import { API_BASE } from './api-config';
+
 const DB_NAME = 'ogbenjuwa-offline';
 const DB_VERSION = 1;
 const STORE_NAME = 'actions';
@@ -64,8 +66,7 @@ export async function processQueue(fetchFn: typeof fetch = fetch): Promise<{ suc
 
   for (const action of actions) {
     try {
-      const apiBase = import.meta.env.VITE_API_BASE || 'https://ogbenjuwa-api.onrender.com/api/v1';
-      const res = await fetchFn(`${apiBase}${action.endpoint}`, {
+      const res = await fetchFn(`${API_BASE}${action.endpoint}`, {
         method: action.method,
         headers: { 'Content-Type': 'application/json' },
         body: action.body ? JSON.stringify(action.body) : undefined,

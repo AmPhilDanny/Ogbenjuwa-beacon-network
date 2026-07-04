@@ -1,4 +1,5 @@
 import { api } from './api';
+import { API_BASE } from './api-config';
 
 const VAPID_PUBLIC_KEY = 'BKMuF6xR1xk_T0vURnH0aFYXrLgGWsWM3mnFaMkKY9rJZY6Aqj_LN5mdvFRq2JQejbTOKz4LCEkXTPk-WORCPhI';
 
@@ -44,8 +45,7 @@ export async function unsubscribeFromPush(): Promise<void> {
       const endpoint = subscription.endpoint;
       await subscription.unsubscribe();
       const encoded = btoa(endpoint);
-      const apiBase = import.meta.env.VITE_API_BASE || 'https://ogbenjuwa-api.onrender.com/api/v1';
-      await fetch(`${apiBase}/push-subscriptions/${encoded}`, { method: 'DELETE' });
+      await fetch(`${API_BASE}/push-subscriptions/${encoded}`, { method: 'DELETE' });
     }
   } catch {}
 }
