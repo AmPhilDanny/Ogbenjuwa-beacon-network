@@ -34,7 +34,7 @@ export default function Login() {
     try {
       await loginWithCredentials(loginField, password);
       toast.success(t('general.welcome') || 'Welcome!');
-      navigate('/vigilante-dashboard', { replace: true });
+      // useEffect handles navigation when isAuthenticated changes
     } catch (err) {
       setError((err as Error).message || 'Invalid email/username or password');
     } finally {
