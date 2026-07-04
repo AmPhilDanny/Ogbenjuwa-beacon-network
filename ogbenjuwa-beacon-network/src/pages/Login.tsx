@@ -21,9 +21,9 @@ type Step = 'credentials' | 'phone' | 'otp';
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
   const { lang } = useLanguage();
   const { login: phoneLogin, loginWithCredentials, verifyOtp, isAuthenticated } = useAuth();
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || (isAuthenticated ? '/home' : '/');
   const brand = getSiteSettings();
 
   const [authMethod, setAuthMethod] = useState<AuthMethod>('credentials');
@@ -61,7 +61,7 @@ export default function Login() {
         toast.success('OTP sent to your registered phone');
       } else {
         toast.success('Welcome!');
-        navigate(from, { replace: true });
+        // useEffect handles navigation when isAuthenticated changes
       }
     } catch (err) {
       if (err instanceof ApiClientError) {
@@ -96,7 +96,7 @@ export default function Login() {
         await verifyOtp(targetPhone, value);
       }
       toast.success('Welcome!');
-      navigate(from, { replace: true });
+      // useEffect handles navigation when isAuthenticated changes
     } catch (err) {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
