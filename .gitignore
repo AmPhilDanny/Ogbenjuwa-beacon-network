@@ -82,6 +82,14 @@ notes/
 central-command/scripts/check-*.ts
 central-command/scripts/debug-*.ts
 central-command/scripts/migrate-*.ts
+central-command/scripts/*-via-*.mjs
+central-command/scripts/test-*.mjs
+central-command/scripts/gen-*.mjs
+central-command/scripts/db_check_*
+
+# Supabase CLI temp files
+supabase/
+!supabase/.gitkeep
 *_err.txt
 *_out.txt
 ogbenjuwa-reset/
