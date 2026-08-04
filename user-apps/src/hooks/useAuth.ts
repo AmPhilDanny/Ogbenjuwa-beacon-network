@@ -56,17 +56,19 @@ export function useAuth() {
     setLoading(false);
   }, []);
 
-  const login = useCallback(async (phone: string, otp: string) => {
-    const res = await api.post<AuthResponse>(
-      '/auth/phone-login', { phone, otp }, { skipAuth: true }
-    );
-    sessionStorage.setItem('accessToken', res.accessToken);
-    sessionStorage.setItem('refreshToken', res.refreshToken);
-    const s = createSession(res.user);
-    setSession(s);
-    subscribeToPush();
-    return s;
-  }, []);
+  // 2FA (OTP) DISABLED — phone-number OTP login removed. To re-enable, restore
+  // the /auth/phone-login route in central-command/server/routes/auth.ts.
+  // const login = useCallback(async (phone: string, otp: string) => {
+  //   const res = await api.post<AuthResponse>(
+  //     '/auth/phone-login', { phone, otp }, { skipAuth: true }
+  //   );
+  //   sessionStorage.setItem('accessToken', res.accessToken);
+  //   sessionStorage.setItem('refreshToken', res.refreshToken);
+  //   const s = createSession(res.user);
+  //   setSession(s);
+  //   subscribeToPush();
+  //   return s;
+  // }, []);
 
   const loginWithCredentials = useCallback(async (loginVal: string, password: string) => {
     const res = await api.post<AuthResponse>('/auth/login', { login: loginVal, password }, { skipAuth: true });
@@ -85,5 +87,5 @@ export function useAuth() {
     setSession(null);
   }, []);
 
-  return { session, loading, isAuthenticated: !!session, login, loginWithCredentials, logout };
+  return { session, loading, isAuthenticated: !!session, loginWithCredentials, logout };
 }

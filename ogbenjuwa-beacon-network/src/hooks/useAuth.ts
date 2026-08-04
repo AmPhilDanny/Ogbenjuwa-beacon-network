@@ -11,17 +11,20 @@ interface AuthResponse {
   user: { id: string; name: string; role: UserRole; lga: string };
 }
 
-interface OtpRequiredResponse {
-  requiresOtp: true;
-  phone: string;
-  message: string;
-}
+// 2FA (OTP) DISABLED — server /auth/login returns tokens directly. To re-enable,
+// restore the OTP branch in central-command/server/routes/auth.ts and uncomment
+// the types/helpers/functions below plus the phone/OTP UI in Login.tsx.
+// interface OtpRequiredResponse {
+//   requiresOtp: true;
+//   phone: string;
+//   message: string;
+// }
 
-type LoginResponse = AuthResponse | OtpRequiredResponse;
+// type LoginResponse = AuthResponse | OtpRequiredResponse;
 
-function isOtpRequired(r: LoginResponse): r is OtpRequiredResponse {
-  return 'requiresOtp' in r && r.requiresOtp === true;
-}
+// function isOtpRequired(r: LoginResponse): r is OtpRequiredResponse {
+//   return 'requiresOtp' in r && r.requiresOtp === true;
+// }
 
 export function createSession(user: { id: string; name: string; role: UserRole; lga: string }): Session {
   const session: Session = {
@@ -69,41 +72,39 @@ export function useAuth() {
     setLoading(false);
   }, []);
 
-  const login = useCallback(async (phone: string, otp: string) => {
-    const res = await api.post<{ accessToken: string; refreshToken: string; user: { id: string; name: string; role: UserRole; lga: string } }>(
-      '/auth/phone-login', { phone, otp }, { skipAuth: true }
-    );
+  // 2FA (OTP) DISABLED — phone-number OTP login removed.
+  // const login = useCallback(async (phone: string, otp: string) => {
+  //   const res = await api.post<{ accessToken: string; refreshToken: string; user: { id: string; name: string; role: UserRole; lga: string } }>(
+  //     '/auth/phone-login', { phone, otp }, { skipAuth: true }
+  //   );
+  //   sessionStorage.setItem('accessToken', res.accessToken);
+  //   sessionStorage.setItem('refreshToken', res.refreshToken);
+  //   const s = createSession(res.user);
+  //   setSession(s);
+  //   subscribeToPush();
+  //   return s;
+  // }, []);
+
+  const loginWithCredentials = useCallback(async (loginVal: string, password: string): Promise<AuthResponse> => {
+    const res = await api.post<AuthResponse>('/auth/login', { login: loginVal, password }, { skipAuth: true });
     sessionStorage.setItem('accessToken', res.accessToken);
     sessionStorage.setItem('refreshToken', res.refreshToken);
     const s = createSession(res.user);
     setSession(s);
     subscribeToPush();
-    return s;
+    return res;
   }, []);
 
-  const loginWithCredentials = useCallback(async (loginVal: string, password: string): Promise<LoginResponse> => {
-    const res = await api.post<LoginResponse>('/auth/login', { login: loginVal, password }, { skipAuth: true });
-    if (isOtpRequired(res)) {
-      return res;
-    }
-    const authRes = res as AuthResponse;
-    sessionStorage.setItem('accessToken', authRes.accessToken);
-    sessionStorage.setItem('refreshToken', authRes.refreshToken);
-    const s = createSession(authRes.user);
-    setSession(s);
-    subscribeToPush();
-    return authRes;
-  }, []);
-
-  const verifyOtp = useCallback(async (phone: string, otp: string) => {
-    const res = await api.post<AuthResponse>('/auth/verify-otp', { phone, otp }, { skipAuth: true });
-    sessionStorage.setItem('accessToken', res.accessToken);
-    sessionStorage.setItem('refreshToken', res.refreshToken);
-    const s = createSession(res.user);
-    setSession(s);
-    subscribeToPush();
-    return s;
-  }, []);
+  // 2FA (OTP) DISABLED — OTP verification step removed.
+  // const verifyOtp = useCallback(async (phone: string, otp: string) => {
+  //   const res = await api.post<AuthResponse>('/auth/verify-otp', { phone, otp }, { skipAuth: true });
+  //   sessionStorage.setItem('accessToken', res.accessToken);
+  //   sessionStorage.setItem('refreshToken', res.refreshToken);
+  //   const s = createSession(res.user);
+  //   setSession(s);
+  //   subscribeToPush();
+  //   return s;
+  // }, []);
 
   const logoutSession = useCallback(() => {
     unsubscribeFromPush();
@@ -125,9 +126,8 @@ export function useAuth() {
     session,
     loading,
     isAuthenticated: !!session,
-    login,
+    // 2FA (OTP) DISABLED — login (phone-login) and verifyOtp removed.
     loginWithCredentials,
-    verifyOtp,
     logout: logoutSession,
     checkAccess,
     defaultRoute: defaultRoute(),

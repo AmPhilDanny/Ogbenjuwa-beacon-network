@@ -19,10 +19,18 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-const otpSchema = z.object({
-  phone: z.string().min(1),
-  otp: z.string().length(6),
-});
+// ─── 2FA (OTP) DISABLED ───────────────────────────────────────────────
+// Two-Factor Authentication via OTP has been disabled across the platform.
+// To re-enable:
+//   1. Uncomment otpSchema, generateOtp, the OTP branch in POST /auth/login,
+//      the POST /auth/verify-otp route and the POST /auth/phone-login route.
+//   2. Restore the OTP verification UIs in central-command/admin, 
+//      ogbenjuwa-beacon-network and user-apps (see "2FA (OTP) DISABLED"
+//      notes in their useAuth hooks / Login pages).
+// const otpSchema = z.object({
+//   phone: z.string().min(1),
+//   otp: z.string().length(6),
+// });
 
 const refreshSchema = z.object({
   refreshToken: z.string().min(1),
@@ -46,13 +54,14 @@ function generateTokens(user: { id: string; email: string; role: string; lgaId?:
   return { accessToken, refreshToken };
 }
 
-function generateOtp(): string {
-  return String(Math.floor(100000 + Math.random() * 900000));
-}
-
 function isAdmin(role: string): boolean {
   return ADMIN_ROLES.includes(role);
 }
+
+// 2FA (OTP) DISABLED — see note above. OTP generation helper removed:
+// function generateOtp(): string {
+//   return String(Math.floor(100000 + Math.random() * 900000));
+// }
 
 // POST /auth/login — email/username + password, returns tokens or requires OTP
 router.post('/login', authRateLimit, validate(loginSchema), async (req, res, next) => {
@@ -103,68 +112,10 @@ router.post('/login', authRateLimit, validate(loginSchema), async (req, res, nex
       return;
     }
 
-    // Admins & super_admin: require OTP verification
-    const otp = generateOtp();
-    const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
-
-    await db.update(users)
-      .set({ otpCode: otp, otpExpiresAt })
-      .where(eq(users.id, user.id));
-
-    // In dev mode, log OTP to console for testing
-    console.log(`[OTP] ${user.name} (${user.role}): ${otp}`);
-
-    res.json({
-      requiresOtp: true,
-      phone: user.phone || '',
-      message: 'OTP sent to your registered phone number',
-    });
-  } catch (err) {
-    console.error('[AUTH DEBUG] Login error:', err);
-    if (err instanceof Error) {
-      console.error('[AUTH DEBUG] Stack:', err.stack);
-      console.error('[AUTH DEBUG] Message:', err.message);
-    }
-    next(err);
-  }
-});
-
-// POST /auth/verify-otp — verify OTP and return tokens (admin flow)
-router.post('/verify-otp', authRateLimit, validate(otpSchema), async (req, res, next) => {
-  try {
-    const { phone, otp } = req.body;
-
-    const normalised = phone.trim().replace(/\s+/g, '');
-    const fullPhone = normalised.startsWith('+') ? normalised : `+${normalised}`;
-
-    const [user] = await db.select().from(users).where(eq(users.phone, fullPhone));
-    if (!user) {
-      res.status(401).json({ error: { code: 'PHONE_NOT_FOUND', message: 'No account found with this phone number' } });
-      return;
-    }
-
-    if (!user.isActive) {
-      res.status(403).json({ error: { code: 'ACCOUNT_DISABLED', message: 'Account has been disabled' } });
-      return;
-    }
-
-    // Dev mode: any 6-digit OTP accepted; prod mode: verify stored OTP
-    const isValidOtp = env.NODE_ENV === 'production'
-      ? (user.otpCode === otp && user.otpExpiresAt && new Date() < user.otpExpiresAt)
-      : /^\d{6}$/.test(otp);
-
-    if (!isValidOtp) {
-      res.status(401).json({ error: { code: 'INVALID_OTP', message: 'Invalid or expired OTP' } });
-      return;
-    }
-
-    // Clear OTP
-    await db.update(users)
-      .set({ otpCode: null, otpExpiresAt: null })
-      .where(eq(users.id, user.id));
-
+    // 2FA (OTP) DISABLED — admins now receive tokens directly, same as residents.
+    // Previously: generated an OTP, stored it on the user row, and responded
+    // with requiresOtp so the client could call /auth/verify-otp.
     const tokens = generateTokens(user);
-
     await db.insert(sessions).values({
       userId: user.id,
       refreshToken: tokens.refreshToken,
@@ -185,49 +136,112 @@ router.post('/verify-otp', authRateLimit, validate(otpSchema), async (req, res, 
       ...tokens,
     });
   } catch (err) {
+    console.error('[AUTH DEBUG] Login error:', err);
+    if (err instanceof Error) {
+      console.error('[AUTH DEBUG] Stack:', err.stack);
+      console.error('[AUTH DEBUG] Message:', err.message);
+    }
     next(err);
   }
 });
 
-// POST /auth/phone-login — phone + OTP login (legacy, redirects to verify-otp)
-router.post('/phone-login', authRateLimit, validate(otpSchema), async (req, res, next) => {
-  try {
-    const { phone, otp } = req.body;
+// 2FA (OTP) DISABLED — OTP verification endpoint. See note at top of file.
+// router.post('/verify-otp', authRateLimit, validate(otpSchema), async (req, res, next) => {
+//   try {
+//     const { phone, otp } = req.body;
+//
+//     const normalised = phone.trim().replace(/\s+/g, '');
+//     const fullPhone = normalised.startsWith('+') ? normalised : `+${normalised}`;
+//
+//     const [user] = await db.select().from(users).where(eq(users.phone, fullPhone));
+//     if (!user) {
+//       res.status(401).json({ error: { code: 'PHONE_NOT_FOUND', message: 'No account found with this phone number' } });
+//       return;
+//     }
+//
+//     if (!user.isActive) {
+//       res.status(403).json({ error: { code: 'ACCOUNT_DISABLED', message: 'Account has been disabled' } });
+//       return;
+//     }
+//
+//     const isValidOtp = env.NODE_ENV === 'production'
+//       ? (user.otpCode === otp && user.otpExpiresAt && new Date() < user.otpExpiresAt)
+//       : /^\d{6}$/.test(otp);
+//
+//     if (!isValidOtp) {
+//       res.status(401).json({ error: { code: 'INVALID_OTP', message: 'Invalid or expired OTP' } });
+//       return;
+//     }
+//
+//     await db.update(users)
+//       .set({ otpCode: null, otpExpiresAt: null })
+//       .where(eq(users.id, user.id));
+//
+//     const tokens = generateTokens(user);
+//
+//     await db.insert(sessions).values({
+//       userId: user.id,
+//       refreshToken: tokens.refreshToken,
+//       deviceInfo: req.headers['user-agent'] || null,
+//       ipAddress: req.ip || null,
+//       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+//     });
+//
+//     res.json({
+//       user: {
+//         id: user.id,
+//         email: user.email,
+//         name: user.name,
+//         role: user.role,
+//         lgaId: user.lgaId,
+//         avatar: user.avatar,
+//       },
+//       ...tokens,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// });
 
-    const normalised = phone.trim().replace(/\s+/g, '');
-    const fullPhone = normalised.startsWith('+') ? normalised : `+${normalised}`;
-
-    const [user] = await db.select().from(users).where(eq(users.phone, fullPhone));
-    if (!user) {
-      res.status(401).json({ error: { code: 'PHONE_NOT_FOUND', message: 'No account found with this phone number' } });
-      return;
-    }
-
-    if (!user.isActive) {
-      res.status(403).json({ error: { code: 'ACCOUNT_DISABLED', message: 'Account has been disabled' } });
-      return;
-    }
-
-    if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
-      res.status(401).json({ error: { code: 'INVALID_OTP', message: 'Invalid OTP format' } });
-      return;
-    }
-
-    const tokens = generateTokens(user);
-
-    await db.insert(sessions).values({
-      userId: user.id,
-      refreshToken: tokens.refreshToken,
-      deviceInfo: req.headers['user-agent'] || null,
-      ipAddress: req.ip || null,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    });
-
-    res.json({ user: { id: user.id, email: user.email, name: user.name, role: user.role, lgaId: user.lgaId, avatar: user.avatar }, ...tokens });
-  } catch (err) {
-    next(err);
-  }
-});
+// 2FA (OTP) DISABLED — legacy phone-login endpoint. See note at top of file.
+// router.post('/phone-login', authRateLimit, validate(otpSchema), async (req, res, next) => {
+//   try {
+//     const { phone, otp } = req.body;
+//
+//     const normalised = phone.trim().replace(/\s+/g, '');
+//     const fullPhone = normalised.startsWith('+') ? normalised : `+${normalised}`;
+//
+//     const [user] = await db.select().from(users).where(eq(users.phone, fullPhone));
+//     if (!user) {
+//       res.status(401).json({ error: { code: 'PHONE_NOT_FOUND', message: 'No account found with this phone number' } });
+//       return;
+//     }
+//
+//     if (!user.isActive) {
+//       res.status(403).json({ error: { code: 'ACCOUNT_DISABLED', message: 'Account has been disabled' } });
+//       return;
+//     }
+//
+//     if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+//       res.status(401).json({ error: { code: 'INVALID_OTP', message: 'Invalid OTP format' } });
+//       return;
+//     }
+//
+//     const tokens = generateTokens(user);
+//
+//     await db.insert(sessions).values({
+//       userId: user.id,
+//       refreshToken: tokens.refreshToken,
+//       deviceInfo: req.headers['user-agent'] || null,
+//       ipAddress: req.ip || null,
+//       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+//     });
+//
+//     res.json({ user: { id: user.id, email: user.email, name: user.name, role: user.role, lgaId: user.lgaId, avatar: user.avatar }, ...tokens });
+//   } catch (err) {
+//     next(err);
+//   }
+// });
 
 router.post('/refresh', validate(refreshSchema), async (req, res, next) => {
   try {
