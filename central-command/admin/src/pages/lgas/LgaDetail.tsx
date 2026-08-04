@@ -1,9 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Circle, CircleMarker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { MapPin, Plus, Trash2, Pencil, Save, Check } from 'lucide-react';
+import { MapPin, Plus, Trash2, Pencil, Save, Check, Power } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { useApi } from '../../hooks/useApi';
@@ -33,6 +33,7 @@ function MapClickHandler({ onSelect }: { onSelect: (lat: number, lng: number) =>
 
 export default function LgaDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { data: lga, loading, refetch } = useApi<Lga & { wards: { id: string; name: string }[] }>(`/lgas/${id}`);
 
   // LGA coverage fields
@@ -42,6 +43,9 @@ export default function LgaDetail() {
 
   // Village form
   const [villageForm, setVillageForm] = useState({ id: '', name: '', wardId: '', lat: '', lng: '', population: '0' });
+
+  // Ward form
+  const [wardName, setWardName] = useState('');
 
   const [mode, setMode] = useState<'center' | 'village'>('center');
   const [saving, setSaving] = useState(false);
@@ -146,6 +150,61 @@ export default function LgaDetail() {
     }
   }
 
+  async function handleAddWard(e: FormEvent) {
+    e.preventDefault();
+    if (!wardName.trim()) return;
+    setError('');
+    setNotice('');
+    setSaving(true);
+    try {
+      await api.post('/wards', { name: wardName.trim(), lgaId: currentLga.id });
+      setWardName('');
+      setNotice('Ward added');
+      refetch();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : 'Failed to add ward');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDeleteWard(w: { id: string; name: string }) {
+    if (!window.confirm(`Delete ward "${w.name}"?`)) return;
+    setError('');
+    setNotice('');
+    try {
+      await api.delete(`/lgas/${currentLga.id}/wards/${w.id}`);
+      setNotice('Ward deleted');
+      refetch();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : 'Failed to delete ward');
+    }
+  }
+
+  async function handleToggleActive() {
+    setError('');
+    setNotice('');
+    try {
+      await api.put(`/lgas/${currentLga.id}`, { isActive: !currentLga.isActive });
+      setNotice(currentLga.isActive ? 'LGA deactivated' : 'LGA activated');
+      refetch();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : 'Failed to update LGA');
+    }
+  }
+
+  async function handleDeleteLga() {
+    if (!window.confirm(`Delete LGA "${currentLga.name}"? This also deletes its wards and villages.`)) return;
+    setError('');
+    setNotice('');
+    try {
+      await api.delete(`/lgas/${currentLga.id}`);
+      navigate('/lgas');
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : 'Failed to delete LGA');
+    }
+  }
+
   return (
     <div className="max-w-4xl">
       <div className="flex items-center justify-between mb-6">
@@ -155,9 +214,19 @@ export default function LgaDetail() {
             {lga.code} · {lga.state} · {lga.region}
           </p>
         </div>
-        <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
-          {lga.coverageTarget}% coverage target
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
+            {lga.coverageTarget}% coverage target
+          </span>
+          <Button variant={lga.isActive ? 'outline' : 'primary'} size="sm" onClick={handleToggleActive}>
+            <Power className="w-4 h-4 mr-1.5" />
+            {lga.isActive ? 'Deactivate' : 'Activate'}
+          </Button>
+          <Button variant="danger" size="sm" onClick={handleDeleteLga}>
+            <Trash2 className="w-4 h-4 mr-1.5" />
+            Delete LGA
+          </Button>
+        </div>
       </div>
 
       {error && <p className="text-sm text-accent mb-4 p-3 rounded-md bg-accent/10">{error}</p>}
@@ -316,12 +385,31 @@ export default function LgaDetail() {
         <Card>
           <CardHeader><CardTitle>Wards ({wards.length})</CardTitle></CardHeader>
           <CardContent>
+            <form onSubmit={handleAddWard} className="flex gap-3 mb-4">
+              <div className="flex-1">
+                <input
+                  className={inputCls}
+                  value={wardName}
+                  onChange={(e) => setWardName(e.target.value)}
+                  placeholder="Ward name"
+                  required
+                />
+              </div>
+              <Button type="submit" size="sm" disabled={saving}>
+                <Plus className="w-4 h-4 mr-1.5" /> Add Ward
+              </Button>
+            </form>
             {wards.length === 0 ? (
               <p className="text-sm text-muted-foreground">No wards configured</p>
             ) : (
               <ul className="space-y-2">
                 {wards.map((w) => (
-                  <li key={w.id} className="text-sm py-1 border-b border-border last:border-0">{w.name}</li>
+                  <li key={w.id} className="text-sm py-2 px-3 rounded-md border border-border flex items-center justify-between">
+                    <span className="font-medium">{w.name}</span>
+                    <button className="p-1.5 rounded-md hover:bg-accent/10 text-accent" onClick={() => handleDeleteWard(w)} title="Delete">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </li>
                 ))}
               </ul>
             )}

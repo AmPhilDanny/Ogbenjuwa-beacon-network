@@ -18,6 +18,7 @@ const createLgaSchema = z.object({
   lat: z.coerce.number().optional(),
   lng: z.coerce.number().optional(),
   radius: z.coerce.number().min(0).optional(),
+  isActive: z.boolean().optional(),
 });
 
 const updateLgaSchema = createLgaSchema.partial();
@@ -108,6 +109,45 @@ router.post('/wards', requireRole('super_admin', 'lga_coordinator'), validate(cr
   try {
     const [ward] = await db.insert(wards).values(req.body).returning();
     res.status(201).json(ward);
+  } catch (err) {
+    next(err);
+  }
+});
+
+const updateWardSchema = z.object({
+  name: z.string().min(1).optional(),
+  isActive: z.boolean().optional(),
+}).refine((v) => v.name !== undefined || v.isActive !== undefined, {
+  message: 'At least one of name or isActive is required',
+});
+
+router.put('/:id/wards/:wardId', requireRole('super_admin'), validate(updateWardSchema), async (req, res, next) => {
+  try {
+    const [ward] = await db.update(wards)
+      .set(req.body)
+      .where(eq(wards.id, req.params.wardId as string))
+      .returning();
+    if (!ward) {
+      res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ward not found' } });
+      return;
+    }
+    res.json(ward);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete('/:id/wards/:wardId', requireRole('super_admin'), async (req, res, next) => {
+  try {
+    const [ward] = await db.select().from(wards).where(eq(wards.id, req.params.wardId as string));
+    if (!ward) {
+      res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ward not found' } });
+      return;
+    }
+    // Detach villages from the ward before deleting it
+    await db.update(villages).set({ wardId: null }).where(eq(villages.wardId, ward.id));
+    await db.delete(wards).where(eq(wards.id, ward.id));
+    res.json({ message: 'Ward deleted' });
   } catch (err) {
     next(err);
   }
