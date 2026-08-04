@@ -1,14 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
+import { api } from '../lib/api';
 import { Sun, Moon, Bell, Search, LogOut, Menu } from 'lucide-react';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const { theme, toggle } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    api.get<{ siteName?: string; tagline?: string; faviconUrl?: string | null }>('/settings', { skipAuth: true })
+      .then(s => {
+        document.title = s.siteName ? `${s.siteName} Central Command` : 'Central Command';
+        if (s.faviconUrl) {
+          let link = document.querySelector<HTMLLinkElement>('link[rel*="icon"]');
+          if (!link) {
+            link = document.createElement('link');
+            link.rel = 'icon';
+            document.head.appendChild(link);
+          }
+          link.href = s.faviconUrl;
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="flex h-screen bg-background">

@@ -8,6 +8,7 @@ import { requirePermission } from '../middleware/rbac.js';
 import { validate } from '../middleware/validate.js';
 import { broadcast } from '../ws/index.js';
 import { recordAudit } from '../lib/audit.js';
+import { loadUserPrefs, shouldNotify } from '../lib/notify-policy.js';
 
 const router = Router();
 
@@ -77,19 +78,24 @@ router.post('/', requirePermission('alerts', 'create'), validate(createAlertSche
 
     broadcast('alert:new', alert);
 
-    // Insert in-app notification for all users in the same LGA
+    // Insert in-app notification for all users in the same LGA (respecting their preferences)
     try {
       const targetUsers = await db.select({ id: users.id }).from(users)
         .where(eq(users.lgaId, req.body.lgaId));
-      for (const u of targetUsers) {
-        await db.insert(notifications).values({
-          userId: u.id,
-          type: 'alert',
-          title: alert.title,
-          body: `[${alert.severity.toUpperCase()}] ${alert.description || alert.title}`,
-          resourceType: 'alert',
-          resourceId: alert.id,
-        }).execute();
+      if (targetUsers.length > 0) {
+        const prefs = await loadUserPrefs(targetUsers.map(u => u.id));
+        const isCritical = req.body.severity === 'critical';
+        for (const u of targetUsers) {
+          if (!shouldNotify(prefs.get(u.id), { isCritical })) continue;
+          await db.insert(notifications).values({
+            userId: u.id,
+            type: 'alert',
+            title: alert.title,
+            body: `[${alert.severity.toUpperCase()}] ${alert.description || alert.title}`,
+            resourceType: 'alert',
+            resourceId: alert.id,
+          }).execute();
+        }
       }
     } catch {
       // Notification insert is non-critical — don't fail the request

@@ -44,8 +44,12 @@ const updateSettingsSchema = z.object({
 });
 
 // Public — no auth required
-router.get('/', async (_req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
+    const origin = `${req.protocol}://${req.get('host')}`;
+    const absolute = (url: string | null | undefined): string | null =>
+      url && url.startsWith('/') ? `${origin}${url}` : url || null;
+
     const [settings] = await db.select().from(siteSettings).limit(1);
     if (!settings) {
       res.json({
@@ -58,8 +62,8 @@ router.get('/', async (_req, res, next) => {
     res.json({
       siteName: settings.siteName,
       tagline: settings.tagline,
-      logoUrl: settings.logoUrl,
-      faviconUrl: settings.faviconUrl,
+      logoUrl: absolute(settings.logoUrl),
+      faviconUrl: absolute(settings.faviconUrl),
       primaryColor: settings.primaryColor,
       secondaryColor: settings.secondaryColor,
       accentColor: settings.accentColor,
@@ -79,7 +83,7 @@ router.get('/', async (_req, res, next) => {
       metaKeywords: settings.metaKeywords,
       ogTitle: settings.ogTitle,
       ogDescription: settings.ogDescription,
-      ogImage: settings.ogImage,
+      ogImage: absolute(settings.ogImage),
       footerText: settings.footerText,
     });
   } catch (err) {

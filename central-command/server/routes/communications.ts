@@ -9,6 +9,7 @@ import { requireRole } from '../middleware/rbac.js';
 import { validate } from '../middleware/validate.js';
 import { broadcast, sendToUser } from '../ws/index.js';
 import { recordAudit } from '../lib/audit.js';
+import { loadUserPrefs, shouldNotify } from '../lib/notify-policy.js';
 
 const router = Router();
 
@@ -351,8 +352,13 @@ async function fanOutAnnouncement(announcement: { id: string; title: string; bod
   const targetUsers = await db.select({ id: users.id }).from(users).where(eq(users.isActive, true));
   if (targetUsers.length === 0) return 0;
 
+  const prefs = await loadUserPrefs(targetUsers.map(u => u.id));
+  const recipients = targetUsers.filter(u => shouldNotify(prefs.get(u.id), { isCritical: false }));
+
+  if (recipients.length === 0) return 0;
+
   await db.insert(notifications).values(
-    targetUsers.map((u) => ({
+    recipients.map((u) => ({
       userId: u.id,
       type: 'announcement',
       title: announcement.title,
@@ -362,7 +368,7 @@ async function fanOutAnnouncement(announcement: { id: string; title: string; bod
     })),
   ).execute();
 
-  return targetUsers.length;
+  return recipients.length;
 }
 
 export { router as communicationsRouter };

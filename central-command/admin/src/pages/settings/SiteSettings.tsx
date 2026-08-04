@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { useApi } from '../../hooks/useApi';
 import { api } from '../../lib/api';
-import { Save, Upload, Palette, Globe, Link as LinkIcon, Settings, Image, Search, Layout } from 'lucide-react';
+import { uploadFile } from '../../lib/upload';
+import { toast } from 'sonner';
+import { Save, Upload, Palette, Globe, Link as LinkIcon, Settings, Image, Search, Layout, Trash2, Loader2 } from 'lucide-react';
 
 interface SiteSettingData {
   siteName?: string;
@@ -54,6 +56,24 @@ export default function SiteSettings() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState('branding');
+  const [uploading, setUploading] = useState<string | null>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const faviconInputRef = useRef<HTMLInputElement>(null);
+  const ogInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (file: File | undefined, field: 'logoUrl' | 'faviconUrl' | 'ogImage') => {
+    if (!file) return;
+    setUploading(field);
+    try {
+      const url = await uploadFile(file, 'branding');
+      handleChange(field, url);
+      toast.success('Uploaded successfully. Click Save Changes to apply.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploading(null);
+    }
+  };
 
   useEffect(() => {
     if (settingsData) setForm(settingsData);
@@ -197,13 +217,33 @@ export default function SiteSettings() {
             <CardHeader><CardTitle>Site Logo</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-6">
-                <div className="w-24 h-24 rounded-xl border-2 border-dashed flex items-center justify-center bg-muted/30">
-                  {form.logoUrl ? <img src={form.logoUrl} alt="Logo" className="max-w-full max-h-full rounded-lg" /> : <Upload className="w-8 h-8 text-muted-foreground/40" />}
+                <div className="w-24 h-24 rounded-xl border-2 border-dashed flex items-center justify-center bg-muted/30 overflow-hidden">
+                  {form.logoUrl ? <img src={form.logoUrl} alt="Logo" className="max-w-full max-h-full rounded-lg object-contain" /> : <Upload className="w-8 h-8 text-muted-foreground/40" />}
                 </div>
                 <div className="space-y-2 flex-1">
-                  <p className="text-sm font-medium">Logo URL</p>
-                  <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder="https://example.com/logo.png" value={form.logoUrl || ''} onChange={e => handleChange('logoUrl', e.target.value)} />
-                  <p className="text-xs text-muted-foreground">PNG, JPG, or WebP recommended. Max 2MB.</p>
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                    className="hidden"
+                    onChange={e => { handleUpload(e.target.files?.[0], 'logoUrl'); e.target.value = ''; }}
+                  />
+                  <Button size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploading === 'logoUrl'}>
+                    {uploading === 'logoUrl' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+                    {form.logoUrl ? 'Replace Logo' : 'Upload Logo'}
+                  </Button>
+                  <p className="text-xs text-muted-foreground">PNG, JPG, WebP or SVG. Max 10MB.</p>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Logo URL</label>
+                <div className="flex gap-2">
+                  <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono" placeholder="Uploaded file or https://..." value={form.logoUrl || ''} onChange={e => handleChange('logoUrl', e.target.value)} />
+                  {form.logoUrl && (
+                    <Button variant="outline" size="sm" title="Clear logo" onClick={() => handleChange('logoUrl', null)}>
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -212,12 +252,32 @@ export default function SiteSettings() {
             <CardHeader><CardTitle>Favicon</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-6">
-                <div className="w-10 h-10 rounded-lg border-2 border-dashed flex items-center justify-center bg-muted/30">
-                  {form.faviconUrl ? <img src={form.faviconUrl} alt="Favicon" className="max-w-full max-h-full rounded" /> : <Upload className="w-4 h-4 text-muted-foreground/40" />}
+                <div className="w-10 h-10 rounded-lg border-2 border-dashed flex items-center justify-center bg-muted/30 overflow-hidden">
+                  {form.faviconUrl ? <img src={form.faviconUrl} alt="Favicon" className="max-w-full max-h-full rounded object-contain" /> : <Upload className="w-4 h-4 text-muted-foreground/40" />}
                 </div>
                 <div className="space-y-2 flex-1">
-                  <p className="text-sm font-medium">Favicon URL</p>
-                  <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder="https://example.com/favicon.ico" value={form.faviconUrl || ''} onChange={e => handleChange('faviconUrl', e.target.value)} />
+                  <input
+                    ref={faviconInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,image/x-icon"
+                    className="hidden"
+                    onChange={e => { handleUpload(e.target.files?.[0], 'faviconUrl'); e.target.value = ''; }}
+                  />
+                  <Button size="sm" variant="outline" onClick={() => faviconInputRef.current?.click()} disabled={uploading === 'faviconUrl'}>
+                    {uploading === 'faviconUrl' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+                    {form.faviconUrl ? 'Replace Favicon' : 'Upload Favicon'}
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Favicon URL</label>
+                <div className="flex gap-2">
+                  <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono" placeholder="Uploaded file or https://..." value={form.faviconUrl || ''} onChange={e => handleChange('faviconUrl', e.target.value)} />
+                  {form.faviconUrl && (
+                    <Button variant="outline" size="sm" title="Clear favicon" onClick={() => handleChange('faviconUrl', null)}>
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -303,8 +363,21 @@ export default function SiteSettings() {
                 <p className="text-xs text-muted-foreground">Description shown when shared on social media. Falls back to meta description if empty.</p>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">OG Image URL</label>
-                <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.ogImage || ''} onChange={e => handleChange('ogImage', e.target.value)} placeholder="https://example.com/og-image.png" />
+                <label className="text-sm font-medium">OG Image</label>
+                <input
+                  ref={ogInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={e => { handleUpload(e.target.files?.[0], 'ogImage'); e.target.value = ''; }}
+                />
+                <div className="flex gap-2">
+                  <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono" value={form.ogImage || ''} onChange={e => handleChange('ogImage', e.target.value)} placeholder="https://example.com/og-image.png" />
+                  <Button variant="outline" size="sm" onClick={() => ogInputRef.current?.click()} disabled={uploading === 'ogImage'}>
+                    {uploading === 'ogImage' ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Upload className="w-4 h-4 mr-1" />}
+                    Upload
+                  </Button>
+                </div>
                 <p className="text-xs text-muted-foreground">Image shown when shared. Recommended: 1200x630px.</p>
               </div>
             </CardContent>
