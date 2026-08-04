@@ -1,12 +1,14 @@
 import { pgTable, uuid, text, integer, boolean, timestamp, numeric } from 'drizzle-orm/pg-core';
 import { users } from './users';
-import { lgas } from './lgas';
+import { lgas, wards } from './lgas';
+import { villages } from './villages';
 
 export const patrolTeams = pgTable('patrol_teams', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   lgaId: uuid('lga_id').notNull().references(() => lgas.id),
-  wardId: uuid('ward_id'),
+  wardId: uuid('ward_id').references(() => wards.id),
+  villageId: uuid('village_id').references(() => villages.id),
   leaderId: uuid('leader_id').notNull().references(() => users.id),
   memberCount: integer('member_count').default(0).notNull(),
   isActive: boolean('is_active').default(true).notNull(),

@@ -112,12 +112,18 @@ export interface PatrolTeam {
   id: string;
   name: string;
   lgaId: string;
-  wardId?: string;
+  wardId?: string | null;
+  villageId?: string | null;
   leaderId: string;
   memberCount: number;
   isActive: boolean;
+  lgaName?: string;
+  leaderName?: string;
+  wardName?: string;
+  villageName?: string;
   members?: PatrolMember[];
   shifts?: PatrolShift[];
+  createdAt?: string;
 }
 
 export interface PatrolMember {
@@ -125,6 +131,8 @@ export interface PatrolMember {
   teamId: string;
   userId: string;
   joinedAt: string;
+  name?: string;
+  role?: string;
 }
 
 export interface PatrolShift {
@@ -136,6 +144,16 @@ export interface PatrolShift {
   status: PatrolStatus;
   notes?: string;
   createdBy: string;
+  createdAt?: string;
+}
+
+export interface PatrolCheckin {
+  memberId: string;
+  memberName?: string;
+  lat: string;
+  lng: string;
+  timestamp: string;
+  shiftId: string;
 }
 
 export interface AuthResponse {

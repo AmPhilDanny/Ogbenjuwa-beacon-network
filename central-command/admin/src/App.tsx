@@ -16,6 +16,8 @@ import AlertDetail from './pages/alerts/AlertDetail';
 import IncidentList from './pages/incidents/IncidentList';
 import IncidentDetail from './pages/incidents/IncidentDetail';
 import PatrolList from './pages/patrols/PatrolList';
+import PatrolForm from './pages/patrols/PatrolForm';
+import PatrolDetail from './pages/patrols/PatrolDetail';
 import Communications from './pages/communications/Communications';
 import Analytics from './pages/Analytics';
 import AuditLog from './pages/AuditLog';
@@ -46,6 +48,9 @@ export default function App() {
             <Route path="incidents" element={<IncidentList />} />
             <Route path="incidents/:id" element={<IncidentDetail />} />
             <Route path="patrols" element={<PatrolList />} />
+            <Route path="patrols/new" element={<PatrolForm />} />
+            <Route path="patrols/:id" element={<PatrolDetail />} />
+            <Route path="patrols/:id/edit" element={<PatrolForm />} />
             <Route path="communications" element={<Communications />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="audit-logs" element={<AuditLog />} />
