@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
 import helmet from 'helmet';
+import compression from 'compression';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import { corsOrigins } from './config/env.js';
@@ -60,6 +61,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(morgan('dev'));
+app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -76,7 +78,16 @@ try {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const adminDist = path.join(__dirname, '..', 'admin', 'dist');
   if (fs.existsSync(adminDist)) {
-    app.use(express.static(adminDist));
+    app.use(express.static(adminDist, {
+      maxAge: '1h',
+      setHeaders: (res, filePath) => {
+        if (filePath.includes(`${path.sep}assets${path.sep}`)) {
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        } else if (filePath.endsWith('.html')) {
+          res.setHeader('Cache-Control', 'no-cache');
+        }
+      },
+    }));
 
     // Serve index.html for non-API routes (SPA fallback)
     app.get('*', (req, res, next) => {
