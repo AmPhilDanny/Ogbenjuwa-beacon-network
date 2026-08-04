@@ -153,6 +153,15 @@ export interface PaginatedResponse<T> {
   };
 }
 
+export interface DashboardStats {
+  activeAlerts: number;
+  totalUsers: number;
+  totalLgas: number;
+  activePatrols: number;
+  activeSosSignals: number;
+  openIncidents: number;
+}
+
 export interface ApiError {
   error: {
     code: string;

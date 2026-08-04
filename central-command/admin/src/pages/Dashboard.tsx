@@ -4,11 +4,16 @@ import StatusBadge from '../components/StatusBadge';
 import { AlertTriangle, Users, MapPin, Siren, Activity } from 'lucide-react';
 import { useApi } from '../hooks/useApi';
 import { formatRelativeTime } from '../lib/utils';
-import type { Alert } from '../lib/types';
+import type { Alert, DashboardStats, Lga } from '../lib/types';
 
 export default function Dashboard() {
+  const { data: stats } = useApi<DashboardStats>('/dashboard/stats');
   const { data: alertsData } = useApi<{ data: Alert[] }>('/alerts?limit=5');
+  const { data: lgasData } = useApi<{ data: Lga[] }>('/lgas');
+
   const alerts = alertsData?.data || [];
+  const lgas = lgasData?.data || [];
+  const activeLgas = lgas.filter((l) => l.isActive).length;
 
   return (
     <div className="space-y-6">
@@ -18,10 +23,10 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <StatsCard icon={AlertTriangle} label="Active Alerts" value="0" subtext="Across all LGAs" />
-        <StatsCard icon={Users} label="Operators" value="0" subtext="Registered personnel" />
-        <StatsCard icon={MapPin} label="LGAs Covered" value="0" subtext="of 23 active" />
-        <StatsCard icon={Siren} label="Active Patrols" value="0" subtext="Currently deployed" />
+        <StatsCard icon={AlertTriangle} label="Active Alerts" value={stats?.activeAlerts ?? 0} subtext="Across all LGAs" />
+        <StatsCard icon={Users} label="Operators" value={stats?.totalUsers ?? 0} subtext="Registered personnel" />
+        <StatsCard icon={MapPin} label="LGAs Covered" value={activeLgas} subtext={`of ${lgas.length} configured`} />
+        <StatsCard icon={Siren} label="Active Patrols" value={stats?.activePatrols ?? 0} subtext="Currently deployed" />
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
@@ -59,7 +64,24 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground py-8 text-center">Coverage data will appear once LGAs are configured</p>
+            {lgas.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-8 text-center">No LGAs configured yet</p>
+            ) : (
+              <ul className="space-y-2">
+                {lgas.map((l) => (
+                  <li key={l.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{l.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {l.code} · {l.coverageTarget}% target
+                        {l.lat != null && l.lng != null ? ' · mapped' : ' · not mapped'}
+                      </p>
+                    </div>
+                    <StatusBadge status={l.isActive ? 'active' : 'inactive'} />
+                  </li>
+                ))}
+              </ul>
+            )}
           </CardContent>
         </Card>
       </div>
