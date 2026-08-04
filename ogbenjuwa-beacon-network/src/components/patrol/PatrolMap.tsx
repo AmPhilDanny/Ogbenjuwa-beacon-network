@@ -1,6 +1,7 @@
 import { MapContainer, TileLayer, Marker, Circle, CircleMarker, Popup, LayersControl } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import type { PatrolMember } from '@/lib/types';
 
 const IDOMA_CENTRE: [number, number] = [7.15, 8.13];
 const IDOMA_ZOOM = 9;
@@ -55,16 +56,6 @@ interface Lga {
   lat?: string | number | null;
   lng?: string | number | null;
   radius?: string | number | null;
-}
-
-interface PatrolMember {
-  id: number;
-  name: string;
-  role: string;
-  lat: number;
-  lng: number;
-  active: boolean;
-  lastSeen: string;
 }
 
 interface Resource {

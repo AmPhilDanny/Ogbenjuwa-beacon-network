@@ -1,20 +1,11 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Users, Radio, Shield, Circle } from 'lucide-react';
+import { MapPin, Users, Radio, Shield, Circle, MapPin as MapPinIcon, Clock } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { api } from '@/lib/api';
 import { PatrolMap } from '@/components/patrol/PatrolMap';
 import { cn } from '@/lib/utils';
-
-interface PatrolMember {
-  id: number;
-  name: string;
-  role: string;
-  lat: number;
-  lng: number;
-  active: boolean;
-  lastSeen: string;
-}
+import type { PatrolMember } from '@/lib/types';
 
 interface Resource {
   type: string;
@@ -35,19 +26,12 @@ interface Village {
 }
 
 interface Lga {
+  id: string;
   name: string;
   lat?: string | number | null;
   lng?: string | number | null;
   radius?: string | number | null;
 }
-
-const MEMBER_COLORS: Record<number, string> = {
-  1: '#2D9B57',
-  2: '#3B82F6',
-  3: '#8B5CF6',
-  4: '#F59E0B',
-  5: '#EF4444',
-};
 
 export default function Patrol() {
   const [mapView, setMapView] = useState<'patrol' | 'coverage' | 'resources'>('patrol');
@@ -59,12 +43,12 @@ export default function Patrol() {
 
   useEffect(() => {
     Promise.all([
-      api.get<{ data: any[] }>('/patrols/teams').catch(() => ({ data: [] })),
+      api.get<{ data: PatrolMember[] }>('/patrols/teams').catch(() => ({ data: [] })),
       api.get<{ data: Village[] }>('/villages').catch(() => ({ data: [] })),
       api.get<{ data: Resource[] }>('/resources').catch(() => ({ data: [] })),
       api.get<{ data: Lga[] }>('/lgas').catch(() => ({ data: [] })),
     ]).then(([membersRes, villagesRes, resourcesRes, lgasRes]) => {
-      setMembers(membersRes.data as any);
+      setMembers(membersRes.data);
       setVillages(villagesRes.data);
       setResources(resourcesRes.data);
       setLgas(lgasRes.data);
@@ -78,7 +62,7 @@ export default function Patrol() {
     <div className="space-y-6">
       <header>
         <h1 className="text-3xl font-bold tracking-tight">Patrol Map</h1>
-        <p className="text-muted-foreground">Live patrol tracking for Otukpo and surrounding wards.</p>
+        <p className="text-muted-foreground">Live patrol tracking across Idoma Local Government Areas.</p>
       </header>
 
       {/* Stats */}
@@ -106,7 +90,7 @@ export default function Patrol() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Resources</CardTitle>
-            <MapPin className="h-4 w-4 text-amber-500" />
+            <MapPinIcon className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{loading ? '...' : resources.length}</div>
@@ -116,11 +100,11 @@ export default function Patrol() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Response Ready</CardTitle>
-            <Users className="h-4 w-4 text-blue-500" />
+            <Clock className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-500">4.2m</div>
-            <p className="text-xs text-muted-foreground">Avg. response time</p>
+            <div className="text-2xl font-bold text-blue-500">{loading ? '...' : activeMembers.length > 0 ? 'Active' : 'Standby'}</div>
+            <p className="text-xs text-muted-foreground">Patrol teams on duty</p>
           </CardContent>
         </Card>
       </div>
@@ -181,7 +165,7 @@ export default function Patrol() {
                   >
                     <div
                       className="h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-white text-sm font-bold"
-                      style={{ backgroundColor: MEMBER_COLORS[m.id] || MEMBER_COLORS[idx + 1] || '#6B7280' }}
+                      style={{ backgroundColor: getMemberColor(m.id, idx) }}
                     >
                       {m.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                     </div>
@@ -233,4 +217,10 @@ export default function Patrol() {
       </div>
     </div>
   );
+}
+
+function getMemberColor(id: string | number, idx: number): string {
+  const colors = ['#2D9B57', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444', '#14B8A6', '#F97316', '#EC4899'];
+  const num = typeof id === 'number' ? id : idx;
+  return colors[num % colors.length] || '#6B7280';
 }

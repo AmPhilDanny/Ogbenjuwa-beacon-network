@@ -16,7 +16,7 @@ export interface Contact {
 }
 
 export interface PatrolMember {
-  id: number;
+  id: string;
   name: string;
   role: PatrolRole;
   lat: number;
