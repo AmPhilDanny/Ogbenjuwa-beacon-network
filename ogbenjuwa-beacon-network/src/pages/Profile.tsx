@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { User, Shield, Bell, Lock, LogOut, ChevronRight } from 'lucide-react';
+import { User, Shield, Bell, Lock, LogOut, ChevronRight, Mail, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,6 +11,25 @@ import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
+interface InboxMessage {
+  id: string;
+  senderName?: string | null;
+  senderRole?: string | null;
+  subject: string;
+  body: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+interface InboxNotification {
+  id: string;
+  type: string;
+  title: string;
+  body?: string | null;
+  isRead: boolean;
+  createdAt: string;
+}
+
 export default function Profile() {
   const { session, logout } = useAuth();
   const navigate = useNavigate();
@@ -18,6 +37,18 @@ export default function Profile() {
   const [phone, setPhone] = useState('');
   const [pushEnabled, setPushEnabled] = useState(true);
   const [smsEnabled, setSmsEnabled] = useState(true);
+  const [messages, setMessages] = useState<InboxMessage[]>([]);
+  const [notifications, setNotifications] = useState<InboxNotification[]>([]);
+  const [inboxTab, setInboxTab] = useState<'messages' | 'notifications'>('messages');
+
+  const fetchInbox = () => {
+    api.get<{ data: InboxMessage[] }>('/communications/messages?folder=inbox')
+      .then(res => setMessages(res.data))
+      .catch(() => {});
+    api.get<{ data: InboxNotification[] }>('/communications/notifications')
+      .then(res => setNotifications(res.data))
+      .catch(() => {});
+  };
 
   useEffect(() => {
     api.get<{ id: string; name: string; phone: string; email: string; role: string; lgaId: string }>('/auth/me')
@@ -32,7 +63,24 @@ export default function Profile() {
         setSmsEnabled(prefs.smsAlerts ?? true);
       })
       .catch(() => {});
+    fetchInbox();
   }, []);
+
+  const markMessageRead = async (id: string) => {
+    try {
+      await api.put(`/communications/messages/${id}/read`);
+      setMessages(prev => prev.map(m => m.id === id ? { ...m, isRead: true } : m));
+    } catch {
+    }
+  };
+
+  const markNotificationRead = async (id: string) => {
+    try {
+      await api.put(`/communications/notifications/${id}/read`);
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+    } catch {
+    }
+  };
 
   const handleSave = async () => {
     try {
@@ -107,6 +155,73 @@ export default function Profile() {
             </div>
             <Switch checked={smsEnabled} onCheckedChange={setSmsEnabled} />
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Mail className="h-5 w-5 text-primary" />
+            Inbox
+            <span className="text-xs font-normal text-muted-foreground">
+              {messages.filter(m => !m.isRead).length + notifications.filter(n => !n.isRead).length > 0
+                ? `(${messages.filter(m => !m.isRead).length + notifications.filter(n => !n.isRead).length} unread)`
+                : ''}
+            </span>
+          </CardTitle>
+          <div className="flex gap-1">
+            <button onClick={() => setInboxTab('messages')}
+              className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${inboxTab === 'messages' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}>
+              Messages
+            </button>
+            <button onClick={() => setInboxTab('notifications')}
+              className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${inboxTab === 'notifications' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}>
+              Notifications
+            </button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3 max-h-80 overflow-y-auto">
+          {inboxTab === 'messages' && (
+            messages.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">No private messages yet</p>
+            ) : (
+              messages.map(m => (
+                <div key={m.id} className="flex items-start justify-between gap-3 border-b border-border pb-3 last:border-0 last:pb-0">
+                  <div className="min-w-0">
+                    <p className={`text-sm ${m.isRead ? 'font-medium' : 'font-semibold'}`}>{m.subject}</p>
+                    {m.senderName && <p className="text-xs text-muted-foreground">{m.senderName}</p>}
+                    <p className="text-sm text-muted-foreground line-clamp-2">{m.body}</p>
+                    <p className="text-xs text-muted-foreground/60 mt-0.5">{new Date(m.createdAt).toLocaleString()}</p>
+                  </div>
+                  {!m.isRead && (
+                    <button onClick={() => markMessageRead(m.id)} className="p-1.5 rounded hover:bg-muted shrink-0" title="Mark as read">
+                      <Check className="w-4 h-4 text-primary" />
+                    </button>
+                  )}
+                </div>
+              ))
+            )
+          )}
+          {inboxTab === 'notifications' && (
+            notifications.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">No notifications yet</p>
+            ) : (
+              notifications.map(n => (
+                <div key={n.id} className="flex items-start justify-between gap-3 border-b border-border pb-3 last:border-0 last:pb-0">
+                  <div className="min-w-0">
+                    <p className={`text-sm ${n.isRead ? 'font-medium' : 'font-semibold'}`}>{n.title}</p>
+                    {n.body && <p className="text-sm text-muted-foreground line-clamp-2">{n.body}</p>}
+                    <p className="text-xs text-muted-foreground/60 mt-0.5 capitalize">{n.type} • {new Date(n.createdAt).toLocaleString()}</p>
+                  </div>
+                  {!n.isRead && (
+                    <button onClick={() => markNotificationRead(n.id)} className="p-1.5 rounded hover:bg-muted shrink-0" title="Mark as read">
+                      <Check className="w-4 h-4 text-primary" />
+                    </button>
+                  )}
+                </div>
+              ))
+            )
+          )}
         </CardContent>
       </Card>
 

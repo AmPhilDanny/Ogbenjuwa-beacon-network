@@ -20,13 +20,13 @@ export default function Home() {
     api.get<{ activeAlerts: number; totalUsers: number; openIncidents: number }>('/dashboard/stats')
       .then(setStats)
       .catch(() => {});
-    api.get<{ data: any[] }>('/communications?type=announcement')
+    api.get<{ data: any[] }>('/communications/announcements/public')
       .then(res => {
         setActivities((res.data || []).slice(0, 3).map((a: any) => ({
           type: 'info',
           title: a.title || 'Announcement',
           time: a.createdAt ? new Date(a.createdAt).toLocaleDateString() : 'recent',
-          desc: a.content || a.message || '',
+          desc: a.body || '',
         })));
       })
       .catch(() => {});

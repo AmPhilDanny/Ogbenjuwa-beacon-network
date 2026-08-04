@@ -194,6 +194,51 @@ export interface DashboardStats {
   openIncidents: number;
 }
 
+export interface Announcement {
+  id: string;
+  title: string;
+  body: string;
+  lgaId?: string | null;
+  targetRole?: string | null;
+  createdBy: string;
+  creatorName?: string | null;
+  isPublished: boolean;
+  publishedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  recipientCount?: number;
+}
+
+export interface MessageItem {
+  id: string;
+  senderId: string;
+  senderName?: string | null;
+  senderRole?: Role | null;
+  receiverId: string;
+  receiverName?: string | null;
+  receiverRole?: Role | null;
+  subject: string;
+  body: string;
+  isRead: boolean;
+  readAt?: string | null;
+  createdAt: string;
+}
+
+export interface NotificationItem {
+  id: string;
+  userId: string;
+  userName?: string | null;
+  userEmail?: string | null;
+  userRole?: Role | null;
+  type: string;
+  title: string;
+  body?: string | null;
+  resourceType?: string | null;
+  resourceId?: string | null;
+  isRead: boolean;
+  createdAt: string;
+}
+
 export interface ApiError {
   error: {
     code: string;

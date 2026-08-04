@@ -135,6 +135,22 @@ function handleMessage(msg: WsMessage) {
       });
       break;
     }
+    case 'announcement:new': {
+      const ann = msg.data as { title?: string; body?: string };
+      toast(`📢 ${ann?.title || 'New Announcement'}`, {
+        description: ann?.body || '',
+        duration: 8000,
+      });
+      break;
+    }
+    case 'message:new': {
+      const pm = msg.data as { subject?: string; body?: string };
+      toast(`✉️ ${pm?.subject || 'New Message'}`, {
+        description: pm?.body || '',
+        duration: 8000,
+      });
+      break;
+    }
     case 'connected':
     case 'subscribed':
     case 'pong':

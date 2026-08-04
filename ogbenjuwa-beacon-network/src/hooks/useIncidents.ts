@@ -45,7 +45,7 @@ export function useIncidents() {
   useEffect(() => {
     Promise.all([
       api.get<{ data: any[] }>('/alerts').catch(() => ({ data: [] })),
-      api.get<{ data: any[] }>('/communications?type=announcement').catch(() => ({ data: [] })),
+      api.get<{ data: any[] }>('/communications/announcements/public').catch(() => ({ data: [] })),
     ]).then(([alertsRes, announcementsRes]) => {
       const mapped: Incident[] = [
         ...(alertsRes.data || []).map(mapAlertToIncident),
@@ -53,10 +53,10 @@ export function useIncidents() {
           id: a.id,
           type: 'announcement' as const,
           title: a.title || 'Announcement',
-          author: a.createdBy || 'Admin',
-          location: a.lgaId || 'All LGAs',
+          author: a.creatorName || 'Command Centre',
+          location: a.lgaId ? 'Specific LGA' : 'All communities',
           time: a.createdAt ? formatTimeAgo(new Date(a.createdAt)) : 'recently',
-          content: a.content || a.message || '',
+          content: a.body || '',
           severity: 'low' as const,
           createdAt: a.createdAt ? new Date(a.createdAt).getTime() : Date.now(),
         })),

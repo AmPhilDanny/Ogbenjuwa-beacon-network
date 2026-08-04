@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
-import { eq } from 'drizzle-orm';
+import { eq, desc, or, ilike } from 'drizzle-orm';
 import db from '../config/db.js';
 import { users } from '../db/schema/index.js';
 import { authenticate } from '../middleware/auth.js';
@@ -39,10 +39,13 @@ router.use(authenticate);
 router.get('/', requireRole('super_admin', 'state_observer', 'lga_coordinator'), async (req, res, next) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
     const offset = (page - 1) * limit;
 
-    const allUsers = await db.select({
+    const search = ((req.query.search as string) || '').trim();
+    const role = req.query.role as string | undefined;
+
+    let query = db.select({
       id: users.id,
       email: users.email,
       name: users.name,
@@ -55,7 +58,18 @@ router.get('/', requireRole('super_admin', 'state_observer', 'lga_coordinator'),
       lastLoginAt: users.lastLoginAt,
       createdAt: users.createdAt,
     })
-      .from(users)
+      .from(users);
+
+    if (search) {
+      const pattern = `%${search}%`;
+      query = query.where(or(ilike(users.name, pattern), ilike(users.email, pattern))) as typeof query;
+    }
+    if (role) {
+      query = query.where(eq(users.role, role as unknown as typeof users.role)) as typeof query;
+    }
+
+    const allUsers = await query
+      .orderBy(desc(users.createdAt))
       .limit(limit)
       .offset(offset);
 
