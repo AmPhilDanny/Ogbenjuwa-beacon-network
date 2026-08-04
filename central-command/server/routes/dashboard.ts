@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { eq, desc, sql, and } from 'drizzle-orm';
 
-interface SqlResult { rows: Record<string, unknown>[] }
 import db from '../config/db.js';
 import { alerts, incidents, patrolTeams, patrolShifts, lgas, users, sosSignals } from '../db/schema/index.js';
 import { authenticate } from '../middleware/auth.js';
@@ -65,7 +64,7 @@ router.get('/incidents-by-lga', authenticate, async (_req, res, next) => {
       ORDER BY count DESC
     `);
 
-    res.json({ data: (result as unknown as SqlResult).rows });
+    res.json({ data: result });
   } catch (err) {
     next(err);
   }
@@ -97,9 +96,9 @@ router.get('/trends', authenticate, async (_req, res, next) => {
     `);
 
     // Flatten: { date, critical, high, medium, low, total }
-    const rows = (result as unknown as SqlResult).rows;
+    const rows = result as any[];
     const map = new Map<string, Record<string, number>>();
-    for (const row of rows as any[]) {
+    for (const row of rows) {
       const dateStr = (row.date instanceof Date ? row.date : new Date(row.date)).toISOString().slice(0, 10);
       if (!map.has(dateStr)) {
         map.set(dateStr, { critical: 0, high: 0, medium: 0, low: 0, total: 0 });
@@ -126,7 +125,7 @@ router.get('/severity-breakdown', authenticate, async (_req, res, next) => {
       GROUP BY severity
       ORDER BY count DESC
     `);
-    res.json({ data: (result as unknown as SqlResult).rows });
+    res.json({ data: result });
   } catch (err) {
     next(err);
   }
