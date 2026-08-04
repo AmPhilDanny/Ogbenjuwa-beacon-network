@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import db from '../config/db.js';
-import { lgas, wards } from '../db/schema/index.js';
+import { lgas, wards, villages } from '../db/schema/index.js';
 import { authenticate } from '../middleware/auth.js';
 import { requireRole } from '../middleware/rbac.js';
 import { validate } from '../middleware/validate.js';
@@ -15,7 +15,12 @@ const createLgaSchema = z.object({
   state: z.string().default('Benue'),
   region: z.string().default('Idoma'),
   coverageTarget: z.number().min(0).max(100).default(80),
+  lat: z.coerce.number().optional(),
+  lng: z.coerce.number().optional(),
+  radius: z.coerce.number().min(0).optional(),
 });
+
+const updateLgaSchema = createLgaSchema.partial();
 
 const createWardSchema = z.object({
   name: z.string().min(1),
@@ -41,7 +46,8 @@ router.get('/:id', async (req, res, next) => {
       return;
     }
     const lgaWards = await db.select().from(wards).where(eq(wards.lgaId, lga.id));
-    res.json({ ...lga, wards: lgaWards });
+    const lgaVillages = await db.select().from(villages).where(eq(villages.lgaId, lga.id));
+    res.json({ ...lga, wards: lgaWards, villages: lgaVillages });
   } catch (err) {
     next(err);
   }
@@ -51,6 +57,39 @@ router.post('/', requireRole('super_admin'), validate(createLgaSchema), async (r
   try {
     const [lga] = await db.insert(lgas).values(req.body).returning();
     res.status(201).json(lga);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.put('/:id', requireRole('super_admin'), validate(updateLgaSchema), async (req, res, next) => {
+  try {
+    const [lga] = await db.update(lgas)
+      .set({ ...req.body, updatedAt: new Date() })
+      .where(eq(lgas.id, req.params.id as string))
+      .returning();
+    if (!lga) {
+      res.status(404).json({ error: { code: 'NOT_FOUND', message: 'LGA not found' } });
+      return;
+    }
+    res.json(lga);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete('/:id', requireRole('super_admin'), async (req, res, next) => {
+  try {
+    const [lga] = await db.select().from(lgas).where(eq(lgas.id, req.params.id as string));
+    if (!lga) {
+      res.status(404).json({ error: { code: 'NOT_FOUND', message: 'LGA not found' } });
+      return;
+    }
+    // Cascade delete children first (villages then wards) since villages FK is not ON DELETE CASCADE
+    await db.delete(villages).where(eq(villages.lgaId, lga.id));
+    await db.delete(wards).where(eq(wards.lgaId, lga.id));
+    await db.delete(lgas).where(eq(lgas.id, lga.id));
+    res.json({ message: 'LGA deleted' });
   } catch (err) {
     next(err);
   }

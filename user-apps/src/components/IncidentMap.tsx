@@ -19,6 +19,13 @@ interface Village {
   lgaId: string;
 }
 
+interface Lga {
+  name: string;
+  lat?: string | number | null;
+  lng?: string | number | null;
+  radius?: string | number | null;
+}
+
 const IDOMA_CENTRE = { lat: 7.15, lng: 8.13 };
 
 const SEVERITY_COLORS: Record<string, string> = {
@@ -35,9 +42,11 @@ export function IncidentMap() {
   const mapInstanceRef = useRef<ReturnType<LeafletInstance['map']> | null>(null);
   const LRef = useRef<LeafletInstance | null>(null);
   const markersRef = useRef<ReturnType<LeafletInstance['marker']>[]>([]);
+  const layersRef = useRef<Array<ReturnType<LeafletInstance['circle']> | ReturnType<LeafletInstance['circleMarker']>>>([]);
   const [loaded, setLoaded] = useState(false);
   const [incidents, setIncidents] = useState<IncidentMarker[]>([]);
   const [villages, setVillages] = useState<Village[]>([]);
+  const [lgas, setLgas] = useState<Lga[]>([]);
 
   useEffect(() => {
     // Load Leaflet from CDN
@@ -57,9 +66,11 @@ export function IncidentMap() {
     Promise.all([
       api.get<{ data: IncidentMarker[] }>('/alerts').catch(() => ({ data: [] })),
       api.get<{ data: Village[] }>('/villages').catch(() => ({ data: [] })),
-    ]).then(([alertsRes, villagesRes]) => {
+      api.get<{ data: Lga[] }>('/lgas').catch(() => ({ data: [] })),
+    ]).then(([alertsRes, villagesRes, lgasRes]) => {
       setIncidents(alertsRes.data.filter(a => a.status === 'active' || a.status === 'investigating'));
       setVillages(villagesRes.data);
+      setLgas(lgasRes.data);
     });
 
     return () => {
@@ -100,11 +111,53 @@ export function IncidentMap() {
     // Clear existing markers
     markersRef.current.forEach(m => m.remove());
     markersRef.current = [];
+    layersRef.current.forEach(l => l.remove());
+    layersRef.current = [];
 
     // Build village coordinate lookup
     const villageCoords: Record<string, { lat: number; lng: number }> = {};
     villages.forEach(v => {
       villageCoords[v.name.toLowerCase()] = { lat: v.lat, lng: v.lng };
+    });
+
+    // Render LGA coverage circles (radius configured in km → Leaflet meters)
+    lgas.forEach(l => {
+      if (l.lat == null || l.lng == null) return;
+      const lat = Number(l.lat);
+      const lng = Number(l.lng);
+      const radiusKm = Number(l.radius) || 0;
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+      const circle = L.circle([lat, lng], {
+        radius: radiusKm * 1000,
+        color: '#1D4ED8',
+        fillColor: '#1D4ED8',
+        fillOpacity: 0.06,
+        weight: 1.5,
+        opacity: 0.5,
+      }).addTo(map).bindPopup(`
+        <div style="font-family:sans-serif;font-size:13px;">
+          <strong>${l.name}</strong><br/>
+          <span style="color:#666;">Coverage: ${radiusKm} km</span>
+        </div>
+      `);
+      layersRef.current.push(circle);
+    });
+
+    // Render village markers
+    villages.forEach(v => {
+      if (v.lat == null || v.lng == null) return;
+      const cm = L.circleMarker([v.lat, v.lng], {
+        radius: 4,
+        color: '#2D9B57',
+        fillColor: '#2D9B57',
+        fillOpacity: 0.8,
+        weight: 1,
+      }).addTo(map).bindPopup(`
+        <div style="font-family:sans-serif;font-size:13px;">
+          <strong>${v.name}</strong>
+        </div>
+      `);
+      layersRef.current.push(cm);
     });
 
     // Add incident markers
@@ -139,7 +192,7 @@ export function IncidentMap() {
       const group = L.featureGroup(markersRef.current);
       map.fitBounds(group.getBounds().pad(0.1));
     }
-  }, [incidents, villages, loaded]);
+  }, [incidents, villages, lgas, loaded]);
 
   return (
     <div ref={mapRef} className="h-full w-full" style={{ minHeight: '400px' }} />

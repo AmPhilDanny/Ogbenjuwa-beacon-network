@@ -37,6 +37,13 @@ interface Village {
   lgaId: string;
 }
 
+interface Lga {
+  name: string;
+  lat?: string | number | null;
+  lng?: string | number | null;
+  radius?: string | number | null;
+}
+
 interface Contact {
   name: string;
   initials: string;
@@ -151,6 +158,7 @@ export default function Alert() {
   const { lang } = useLanguage();
   const [alertTypes, setAlertTypes] = useState<AlertType[]>([]);
   const [villages, setVillages] = useState<Village[]>([]);
+  const [lgas, setLgas] = useState<Lga[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -191,6 +199,7 @@ export default function Alert() {
 
       const lgaMap: Record<string, string> = {};
       lgasRes.data.forEach((l: any) => { lgaMap[l.name] = l.id; });
+      setLgas(lgasRes.data as Lga[]);
 
       const mappedVillages: Village[] = villagesRes.data.map((v: any) => ({
         name: v.name,
@@ -525,7 +534,7 @@ export default function Alert() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="h-[400px] w-full">
-                <AlertMap villages={villages}>
+                <AlertMap villages={villages} lgas={lgas}>
                   <AlertMapController
                     epicentre={epicentre}
                     isAlerting={isAlerting}

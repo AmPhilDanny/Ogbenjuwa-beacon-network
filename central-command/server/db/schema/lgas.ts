@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, boolean, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, integer, boolean, timestamp, numeric } from 'drizzle-orm/pg-core';
 
 export const lgas = pgTable('lgas', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -7,6 +7,9 @@ export const lgas = pgTable('lgas', {
   state: text('state').default('Benue').notNull(),
   region: text('region').default('Idoma').notNull(),
   coverageTarget: integer('coverage_target').default(80),
+  lat: numeric('lat'),
+  lng: numeric('lng'),
+  radius: numeric('radius', { precision: 6, scale: 2 }).default('10'),
   isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),

@@ -75,4 +75,19 @@ router.put('/:id', authenticate, requireRole('super_admin', 'lga_coordinator'), 
   }
 });
 
+router.delete('/:id', authenticate, requireRole('super_admin', 'lga_coordinator'), async (req, res, next) => {
+  try {
+    const [village] = await db.delete(villages)
+      .where(eq(villages.id, req.params.id as string))
+      .returning();
+    if (!village) {
+      res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Village not found' } });
+      return;
+    }
+    res.json({ message: 'Village deleted' });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export { router as villageRouter };

@@ -1,5 +1,4 @@
 import postgres from 'postgres';
-import { env } from './config/env.js';
 
 /**
  * Ensures the `users` and `sessions` tables exist.

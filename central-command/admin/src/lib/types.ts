@@ -27,8 +27,25 @@ export interface Lga {
   state: string;
   region: string;
   coverageTarget: number;
+  lat?: string | number | null;
+  lng?: string | number | null;
+  radius?: string | number | null;
   isActive: boolean;
   wards?: Ward[];
+  villages?: Village[];
+}
+
+export interface Village {
+  id: string;
+  name: string;
+  lgaId: string;
+  wardId?: string | null;
+  lat?: string | number | null;
+  lng?: string | number | null;
+  population: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Ward {

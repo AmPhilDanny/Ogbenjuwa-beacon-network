@@ -51,6 +51,9 @@ const translations: Record<string, TranslationEntry> = {
   'community.high':           { en: 'High',                   idoma: 'High' },
   'community.medium':         { en: 'Medium',                 idoma: 'Medium' },
   'community.low':            { en: 'Low',                    idoma: 'Low' },
+  'community.lga_monitored':  { en: 'LGAs Monitored',         idoma: 'LGAs Monitored' },
+  'community.live_map':       { en: 'Live Incident Map',      idoma: 'Live Incident Map' },
+  'community.stats_title':    { en: 'Community Stats',        idoma: 'Community Stats' },
   'community.announcements':  { en: 'Community Announcements', idoma: 'Community Announcements' },
   'community.safety_tips':    { en: 'Safety Tips',            idoma: 'Safety Tips' },
   'community.tip_1':          { en: 'Stay alert and report suspicious activity immediately', idoma: 'Stay alert and report suspicious activity immediately' },
@@ -131,6 +134,7 @@ const translations: Record<string, TranslationEntry> = {
   'general.welcome':          { en: 'Welcome',                idoma: 'Welcome' },
   'general.all':              { en: 'All',                    idoma: 'All' },
   'general.cancel':           { en: 'Cancel',                 idoma: 'Cancel' },
+  'general.no_data':          { en: 'No announcements',       idoma: 'No announcements' },
 };
 
 export function t(key: string, lang: Language): string {

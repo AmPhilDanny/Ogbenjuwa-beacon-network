@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, CircleMarker, Popup, LayersControl } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Circle, CircleMarker, Popup, LayersControl } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -50,6 +50,13 @@ interface Village {
   pop: number;
 }
 
+interface Lga {
+  name: string;
+  lat?: string | number | null;
+  lng?: string | number | null;
+  radius?: string | number | null;
+}
+
 interface PatrolMember {
   id: number;
   name: string;
@@ -74,6 +81,7 @@ interface PatrolMapProps {
   villages?: Village[];
   members?: PatrolMember[];
   resources?: Resource[];
+  lgas?: Lga[];
 }
 
 const MEMBER_COLORS: Record<number, string> = {
@@ -84,7 +92,7 @@ const MEMBER_COLORS: Record<number, string> = {
   5: '#EF4444',
 };
 
-export function PatrolMap({ villages = [], members = [], resources = [] }: PatrolMapProps) {
+export function PatrolMap({ villages = [], members = [], resources = [], lgas = [] }: PatrolMapProps) {
   return (
     <MapContainer
       center={IDOMA_CENTRE}
@@ -99,6 +107,35 @@ export function PatrolMap({ villages = [], members = [], resources = [] }: Patro
       />
 
       <LayersControl position="topright">
+        <LayersControl.Overlay checked name="LGA Coverage">
+          <>
+            {lgas
+              .filter((l) => l.lat != null && l.lng != null)
+              .map((l) => {
+                const lat = Number(l.lat);
+                const lng = Number(l.lng);
+                const radiusKm = Number(l.radius) || 0;
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+                return (
+                  <Circle
+                    key={`lga-${l.name}`}
+                    center={[lat, lng]}
+                    radius={radiusKm * 1000}
+                    pathOptions={{ color: '#1D4ED8', fillColor: '#1D4ED8', fillOpacity: 0.06, weight: 1.5, opacity: 0.5 }}
+                  >
+                    <Popup>
+                      <div className="font-sans">
+                        <strong className="text-base">{l.name}</strong>
+                        <br />
+                        <span className="text-sm text-muted-foreground">Coverage: {radiusKm} km</span>
+                      </div>
+                    </Popup>
+                  </Circle>
+                );
+              })}
+          </>
+        </LayersControl.Overlay>
+
         <LayersControl.Overlay checked name="Coverage Zones">
           <>
             {villages.map((v) => (

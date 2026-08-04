@@ -34,6 +34,13 @@ interface Village {
   pop: number;
 }
 
+interface Lga {
+  name: string;
+  lat?: string | number | null;
+  lng?: string | number | null;
+  radius?: string | number | null;
+}
+
 const MEMBER_COLORS: Record<number, string> = {
   1: '#2D9B57',
   2: '#3B82F6',
@@ -46,6 +53,7 @@ export default function Patrol() {
   const [mapView, setMapView] = useState<'patrol' | 'coverage' | 'resources'>('patrol');
   const [members, setMembers] = useState<PatrolMember[]>([]);
   const [villages, setVillages] = useState<Village[]>([]);
+  const [lgas, setLgas] = useState<Lga[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -54,10 +62,12 @@ export default function Patrol() {
       api.get<{ data: any[] }>('/patrols/teams').catch(() => ({ data: [] })),
       api.get<{ data: Village[] }>('/villages').catch(() => ({ data: [] })),
       api.get<{ data: Resource[] }>('/resources').catch(() => ({ data: [] })),
-    ]).then(([membersRes, villagesRes, resourcesRes]) => {
+      api.get<{ data: Lga[] }>('/lgas').catch(() => ({ data: [] })),
+    ]).then(([membersRes, villagesRes, resourcesRes, lgasRes]) => {
       setMembers(membersRes.data as any);
       setVillages(villagesRes.data);
       setResources(resourcesRes.data);
+      setLgas(lgasRes.data);
     }).finally(() => setLoading(false));
   }, []);
 
@@ -139,7 +149,7 @@ export default function Patrol() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="h-[500px] w-full">
-                <PatrolMap villages={villages} members={members} resources={resources} />
+                <PatrolMap villages={villages} members={members} resources={resources} lgas={lgas} />
               </div>
             </CardContent>
           </Card>

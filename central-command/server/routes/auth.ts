@@ -3,7 +3,6 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { eq, or } from 'drizzle-orm';
-import crypto from 'crypto';
 import db from '../config/db.js';
 import { users, sessions } from '../db/schema/index.js';
 import { env } from '../config/env.js';
@@ -150,7 +149,7 @@ router.post('/verify-otp', authRateLimit, validate(otpSchema), async (req, res, 
     }
 
     // Dev mode: any 6-digit OTP accepted; prod mode: verify stored OTP
-    const isValidOtp = import.meta.env.PROD
+    const isValidOtp = env.NODE_ENV === 'production'
       ? (user.otpCode === otp && user.otpExpiresAt && new Date() < user.otpExpiresAt)
       : /^\d{6}$/.test(otp);
 
