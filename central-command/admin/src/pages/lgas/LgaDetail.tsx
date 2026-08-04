@@ -47,6 +47,10 @@ export default function LgaDetail() {
   // Ward form
   const [wardName, setWardName] = useState('');
 
+  // LGA name editing
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState('');
+
   const [mode, setMode] = useState<'center' | 'village'>('center');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -205,11 +209,53 @@ export default function LgaDetail() {
     }
   }
 
+  async function handleRename(e: FormEvent) {
+    e.preventDefault();
+    const trimmed = nameDraft.trim();
+    if (!trimmed) return;
+    setError('');
+    setNotice('');
+    try {
+      await api.put(`/lgas/${currentLga.id}`, { name: trimmed });
+      setEditingName(false);
+      setNotice('LGA name updated');
+      refetch();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : 'Failed to update LGA name');
+    }
+  }
+
   return (
     <div className="max-w-4xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-serif font-bold">{lga.name}</h1>
+          <div className="flex items-center gap-2">
+            {editingName ? (
+              <form onSubmit={handleRename} className="flex items-center gap-2">
+                <input
+                  className={inputCls}
+                  value={nameDraft}
+                  onChange={(e) => setNameDraft(e.target.value)}
+                  placeholder="LGA name"
+                  autoFocus
+                  required
+                />
+                <Button type="submit" size="sm">Save</Button>
+                <Button type="button" size="sm" variant="outline" onClick={() => setEditingName(false)}>Cancel</Button>
+              </form>
+            ) : (
+              <>
+                <h1 className="text-2xl font-serif font-bold">{lga.name}</h1>
+                <button
+                  className="p-1.5 rounded-md hover:bg-muted"
+                  onClick={() => { setNameDraft(lga.name); setEditingName(true); }}
+                  title="Rename LGA"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+              </>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground mt-0.5">
             {lga.code} · {lga.state} · {lga.region}
           </p>
