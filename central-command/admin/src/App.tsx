@@ -42,6 +42,7 @@ export default function App() {
             <Route path="alerts" element={<AlertList />} />
             <Route path="alerts/new" element={<AlertForm />} />
             <Route path="alerts/:id" element={<AlertDetail />} />
+            <Route path="alerts/:id/edit" element={<AlertForm />} />
             <Route path="incidents" element={<IncidentList />} />
             <Route path="incidents/:id" element={<IncidentDetail />} />
             <Route path="patrols" element={<PatrolList />} />

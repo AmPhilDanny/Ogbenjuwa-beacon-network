@@ -75,6 +75,19 @@ export interface Alert {
   updatedAt: string;
 }
 
+export interface AlertType {
+  id: string;
+  key: string;
+  label: string;
+  labelIdoma?: string | null;
+  icon?: string | null;
+  color?: string | null;
+  smsTemplate?: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Incident {
   id: string;
   alertId?: string;

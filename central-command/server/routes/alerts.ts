@@ -22,9 +22,13 @@ const createAlertSchema = z.object({
 });
 
 const updateAlertSchema = z.object({
+  type: z.string().min(1).optional(),
   severity: z.enum(['critical', 'high', 'medium', 'low']).optional(),
   title: z.string().min(1).optional(),
   description: z.string().optional(),
+  lgaId: z.string().uuid().optional(),
+  wardId: z.string().uuid().nullable().optional(),
+  location: z.string().optional(),
   status: z.enum(['active', 'investigating', 'resolved', 'false_alarm']).optional(),
   assignedTo: z.string().uuid().nullable().optional(),
   isPublic: z.boolean().optional(),
@@ -129,6 +133,21 @@ router.post('/:id/resolve', requirePermission('alerts', 'resolve'), async (req, 
 
     broadcast('alert:resolved', alert);
     res.json(alert);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete('/:id', requirePermission('alerts', 'delete'), async (req, res, next) => {
+  try {
+    const [alert] = await db.select().from(alerts).where(eq(alerts.id, req.params.id as string));
+    if (!alert) {
+      res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Alert not found' } });
+      return;
+    }
+    await db.delete(alerts).where(eq(alerts.id, alert.id));
+    broadcast('alert:deleted', { id: alert.id });
+    res.json({ message: 'Alert deleted' });
   } catch (err) {
     next(err);
   }
