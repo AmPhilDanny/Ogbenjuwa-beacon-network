@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, MapPin, Camera, Info, ShieldAlert } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,12 +10,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
 
+interface LgaOption {
+  id: string;
+  name: string;
+}
+
 export default function Report() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState('suspicious');
+  const [lgaId, setLgaId] = useState('');
+  const [lgas, setLgas] = useState<LgaOption[]>([]);
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
+
+  useEffect(() => {
+    api.get<{ data: LgaOption[] }>('/lgas')
+      .then((res) => setLgas(res.data || []))
+      .catch(() => setLgas([]));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +41,8 @@ export default function Report() {
         severity: category === 'theft' || category === 'hazard' ? 'high' : 'medium',
         description,
         location,
-        status: 'active',
+        lgaId,
+        isPublic: true,
       });
       toast.success('Incident reported successfully. Neighbors notified.');
       navigate('/feed');
@@ -72,6 +86,20 @@ export default function Report() {
                   <SelectItem value="disturbance">Noise/Disturbance</SelectItem>
                   <SelectItem value="hazard">Safety Hazard</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="lga">Local Government Area</Label>
+              <Select value={lgaId || undefined} onValueChange={setLgaId} required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select LGA" />
+                </SelectTrigger>
+                <SelectContent>
+                  {lgas.map((l) => (
+                    <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
