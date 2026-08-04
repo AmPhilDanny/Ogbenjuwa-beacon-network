@@ -7,6 +7,7 @@ import { users } from '../db/schema/index.js';
 import { authenticate } from '../middleware/auth.js';
 import { requireRole } from '../middleware/rbac.js';
 import { validate } from '../middleware/validate.js';
+import { recordAudit } from '../lib/audit.js';
 
 const router = Router();
 
@@ -108,6 +109,7 @@ router.post('/', requireRole('super_admin', 'lga_coordinator'), validate(createU
     }).returning();
 
     const { passwordHash: _, ...safe } = user;
+    await recordAudit({ userId: req.user!.id, action: 'CREATE', resource: 'user', resourceId: user.id, details: { email: user.email, role: user.role }, ipAddress: req.ip || null });
     res.status(201).json(safe);
   } catch (err) {
     next(err);
@@ -132,6 +134,7 @@ router.put('/:id', requireRole('super_admin', 'lga_coordinator'), validate(updat
     }
 
     const { passwordHash, ...safe } = user;
+    await recordAudit({ userId: req.user!.id, action: 'UPDATE', resource: 'user', resourceId: user.id, details: { email: user.email, role: user.role }, ipAddress: req.ip || null });
     res.json(safe);
   } catch (err) {
     next(err);
@@ -150,6 +153,7 @@ router.delete('/:id', requireRole('super_admin'), async (req, res, next) => {
       return;
     }
 
+    await recordAudit({ userId: req.user!.id, action: 'DELETE', resource: 'user', resourceId: user.id, details: { email: user.email }, ipAddress: req.ip || null });
     res.json({ message: 'User deactivated' });
   } catch (err) {
     next(err);

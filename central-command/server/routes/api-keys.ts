@@ -8,6 +8,7 @@ import { apiKeys } from '../db/schema/index.js';
 import { authenticate } from '../middleware/auth.js';
 import { requireRole } from '../middleware/rbac.js';
 import { validate } from '../middleware/validate.js';
+import { recordAudit } from '../lib/audit.js';
 
 const router = Router();
 
@@ -64,6 +65,7 @@ router.post('/', validate(createKeySchema), async (req, res, next) => {
     }).returning();
 
     // Return the full key only once on creation
+    await recordAudit({ userId: req.user!.id, action: 'CREATE', resource: 'api_key', resourceId: key.id, details: { name: key.name, layer: key.layer }, ipAddress: req.ip || null });
     res.status(201).json({
       id: key.id,
       name: key.name,
@@ -99,6 +101,7 @@ router.put('/:id', validate(updateKeySchema), async (req, res, next) => {
 router.delete('/:id', async (req, res, next) => {
   try {
     await db.delete(apiKeys).where(eq(apiKeys.id, req.params.id as string));
+    await recordAudit({ userId: req.user!.id, action: 'DELETE', resource: 'api_key', resourceId: req.params.id as string, ipAddress: req.ip || null });
     res.json({ message: 'API key revoked' });
   } catch (err) {
     next(err);

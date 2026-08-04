@@ -7,6 +7,7 @@ import { authenticate } from '../middleware/auth.js';
 import { requirePermission } from '../middleware/rbac.js';
 import { validate } from '../middleware/validate.js';
 import { broadcast } from '../ws/index.js';
+import { recordAudit } from '../lib/audit.js';
 
 const router = Router();
 
@@ -94,6 +95,7 @@ router.post('/', requirePermission('alerts', 'create'), validate(createAlertSche
       // Notification insert is non-critical — don't fail the request
     }
 
+    await recordAudit({ userId: req.user!.id, action: 'CREATE', resource: 'alert', resourceId: alert.id, details: { title: alert.title, severity: alert.severity, lgaId: alert.lgaId }, ipAddress: req.ip || null });
     res.status(201).json(alert);
   } catch (err) {
     next(err);
@@ -113,6 +115,7 @@ router.put('/:id', requirePermission('alerts', 'update'), validate(updateAlertSc
     }
 
     broadcast('alert:updated', alert);
+    await recordAudit({ userId: req.user!.id, action: 'UPDATE', resource: 'alert', resourceId: alert.id, details: { title: alert.title, status: alert.status }, ipAddress: req.ip || null });
     res.json(alert);
   } catch (err) {
     next(err);
@@ -132,6 +135,7 @@ router.post('/:id/resolve', requirePermission('alerts', 'resolve'), async (req, 
     }
 
     broadcast('alert:resolved', alert);
+    await recordAudit({ userId: req.user!.id, action: 'UPDATE', resource: 'alert', resourceId: alert.id, details: { title: alert.title, status: 'resolved' }, ipAddress: req.ip || null });
     res.json(alert);
   } catch (err) {
     next(err);
@@ -147,6 +151,7 @@ router.delete('/:id', requirePermission('alerts', 'delete'), async (req, res, ne
     }
     await db.delete(alerts).where(eq(alerts.id, alert.id));
     broadcast('alert:deleted', { id: alert.id });
+    await recordAudit({ userId: req.user!.id, action: 'DELETE', resource: 'alert', resourceId: alert.id, details: { title: alert.title }, ipAddress: req.ip || null });
     res.json({ message: 'Alert deleted' });
   } catch (err) {
     next(err);

@@ -9,6 +9,7 @@ import { env } from '../config/env.js';
 import { authenticate } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { rateLimit } from '../middleware/rate-limit.js';
+import { recordAudit } from '../lib/audit.js';
 
 const authRateLimit = rateLimit({ windowMs: 60_000, maxRequests: 10, keyGenerator: (req) => `auth:${req.ip || 'unknown'}` });
 
@@ -86,6 +87,14 @@ router.post('/login', authRateLimit, validate(loginSchema), async (req, res, nex
       res.status(403).json({ error: { code: 'ACCOUNT_DISABLED', message: 'Account has been disabled' } });
       return;
     }
+
+    await recordAudit({
+      userId: user.id,
+      action: 'LOGIN',
+      resource: 'auth',
+      details: { role: user.role },
+      ipAddress: req.ip || null,
+    });
 
     // Residents & regular users: direct token response
     if (!isAdmin(user.role)) {

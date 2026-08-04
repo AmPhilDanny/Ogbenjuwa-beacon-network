@@ -6,6 +6,7 @@ import { siteSettings } from '../db/schema/index.js';
 import { authenticate } from '../middleware/auth.js';
 import { requireRole } from '../middleware/rbac.js';
 import { validate } from '../middleware/validate.js';
+import { recordAudit } from '../lib/audit.js';
 
 const router = Router();
 
@@ -104,12 +105,14 @@ router.put('/', authenticate, requireRole('super_admin'), validate(updateSetting
         .set({ ...req.body, updatedBy: req.user!.id, updatedAt: new Date() })
         .where(eq(siteSettings.id, existing.id))
         .returning();
+      await recordAudit({ userId: req.user!.id, action: 'UPDATE', resource: 'settings', resourceId: existing.id, details: { siteName: updated.siteName, fields: Object.keys(req.body) }, ipAddress: req.ip || null });
       res.json(updated);
     } else {
       const [created] = await db.insert(siteSettings).values({
         ...req.body,
         updatedBy: req.user!.id,
       }).returning();
+      await recordAudit({ userId: req.user!.id, action: 'CREATE', resource: 'settings', resourceId: created.id, details: { siteName: created.siteName }, ipAddress: req.ip || null });
       res.status(201).json(created);
     }
   } catch (err) {

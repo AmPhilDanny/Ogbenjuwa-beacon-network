@@ -8,6 +8,7 @@ import { authenticate } from '../middleware/auth.js';
 import { requireRole } from '../middleware/rbac.js';
 import { validate } from '../middleware/validate.js';
 import { broadcast, sendToUser } from '../ws/index.js';
+import { recordAudit } from '../lib/audit.js';
 
 const router = Router();
 
@@ -112,6 +113,7 @@ router.post('/announcements', requireRole('super_admin', 'state_observer', 'lga_
       broadcast('announcement:new', { ...announcement, recipientCount: recipients });
     }
 
+    await recordAudit({ userId: req.user!.id, action: 'CREATE', resource: 'announcement', resourceId: announcement.id, details: { title: announcement.title, published: announcement.isPublished }, ipAddress: req.ip || null });
     res.status(201).json({ ...announcement, recipientCount: recipients });
   } catch (err) {
     next(err);
@@ -143,6 +145,7 @@ router.put('/announcements/:id', requireRole('super_admin', 'state_observer', 'l
       broadcast('announcement:new', { ...announcement, recipientCount: recipients });
     }
 
+    await recordAudit({ userId: req.user!.id, action: 'UPDATE', resource: 'announcement', resourceId: announcement.id, details: { title: announcement.title, published: announcement.isPublished }, ipAddress: req.ip || null });
     res.json({ ...announcement, recipientCount: recipients });
   } catch (err) {
     next(err);
@@ -151,12 +154,14 @@ router.put('/announcements/:id', requireRole('super_admin', 'state_observer', 'l
 
 router.delete('/announcements/:id', requireRole('super_admin'), async (req, res, next) => {
   try {
+    const [existing] = await db.select({ id: announcements.id, title: announcements.title }).from(announcements).where(eq(announcements.id, req.params.id as string));
     await db.delete(announcements).where(eq(announcements.id, req.params.id as string));
     // Clean up the fan-out notifications for this broadcast
     await db.delete(notifications).where(and(
       eq(notifications.resourceType, 'announcement'),
       eq(notifications.resourceId, req.params.id as string),
     ));
+    await recordAudit({ userId: req.user!.id, action: 'DELETE', resource: 'announcement', resourceId: req.params.id as string, details: { title: existing?.title ?? null }, ipAddress: req.ip || null });
     res.json({ message: 'Announcement deleted' });
   } catch (err) {
     next(err);

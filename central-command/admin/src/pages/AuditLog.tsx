@@ -6,13 +6,20 @@ import { ScrollText, ChevronDown, ChevronUp, X } from 'lucide-react';
 
 interface AuditEntry {
   id: string;
-  userId: string;
+  userId: string | null;
+  userName: string | null;
+  userRole: string | null;
   action: string;
   resource: string;
   resourceId: string | null;
   details: unknown;
-  ipAddress: string;
+  ipAddress: string | null;
   createdAt: string;
+}
+
+interface AuditResponse {
+  data: AuditEntry[];
+  pagination: { page: number; limit: number; offset: number; total: number };
 }
 
 const ACTION_COLORS: Record<string, string> = {
@@ -23,8 +30,20 @@ const ACTION_COLORS: Record<string, string> = {
   LOGOUT: 'bg-gray-100 text-gray-700',
 };
 
+const RESOURCE_OPTIONS = ['user', 'alert', 'announcement', 'settings', 'api_key'];
+
+const RESOURCE_LABELS: Record<string, string> = {
+  user: 'User',
+  alert: 'Alert',
+  announcement: 'Announcement',
+  settings: 'Settings',
+  api_key: 'API Key',
+  auth: 'Auth',
+};
+
 export default function AuditLog() {
   const [logs, setLogs] = useState<AuditEntry[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [filterAction, setFilterAction] = useState('');
@@ -33,26 +52,30 @@ export default function AuditLog() {
   const [dateTo, setDateTo] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchLogs();
-  }, [page, filterAction, filterResource, dateFrom, dateTo]);
-
-  const fetchLogs = async () => {
+  const fetchLogs = async (targetPage = page) => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ page: String(page), limit: '50' });
+      const params = new URLSearchParams({ page: String(targetPage), limit: '50' });
       if (filterAction) params.set('action', filterAction);
       if (filterResource) params.set('resource', filterResource);
       if (dateFrom) params.set('dateFrom', dateFrom);
       if (dateTo) params.set('dateTo', dateTo);
-      const res = await api.get<{ data: AuditEntry[] }>(`/audit-logs?${params}`);
+      const res = await api.get<AuditResponse>(`/audit-logs?${params}`);
       setLogs(res.data);
+      setTotal(res.pagination.total);
     } catch (err) {
       console.error('Failed to fetch audit logs', err);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchLogs(page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, filterAction, filterResource, dateFrom, dateTo]);
+
+  const totalPages = Math.max(1, Math.ceil(total / 50));
 
   return (
     <div>
@@ -88,12 +111,7 @@ export default function AuditLog() {
                 className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm"
               >
                 <option value="">All Resources</option>
-                <option value="user">User</option>
-                <option value="alert">Alert</option>
-                <option value="incident">Incident</option>
-                <option value="patrol">Patrol</option>
-                <option value="lga">LGA</option>
-                <option value="settings">Settings</option>
+                {RESOURCE_OPTIONS.map(r => <option key={r} value={r}>{RESOURCE_LABELS[r]}</option>)}
               </select>
             </div>
             <div className="space-y-1">
@@ -115,7 +133,7 @@ export default function AuditLog() {
               />
             </div>
             {(filterAction || filterResource || dateFrom || dateTo) && (
-              <Button variant="ghost" size="sm" onClick={() => { setFilterAction(''); setFilterResource(''); setDateFrom(''); setDateTo(''); setPage(1); }} className="mt-4">
+              <Button variant="ghost" size="sm" onClick={() => { setFilterAction(''); setFilterResource(''); setDateFrom(''); setDateTo(''); }} className="mt-4">
                 <X className="w-3 h-3 mr-1" /> Clear Filters
               </Button>
             )}
@@ -145,16 +163,19 @@ export default function AuditLog() {
                     </span>
                     <div className="min-w-0">
                       <p className="text-sm truncate">
-                        <span className="font-medium">{log.resource}</span>
+                        <span className="font-medium">{RESOURCE_LABELS[log.resource] || log.resource}</span>
                         {log.resourceId && <span className="text-muted-foreground"> / {log.resourceId.substring(0, 8)}...</span>}
                       </p>
                       <p className="text-xs text-muted-foreground/60">
-                        {new Date(log.createdAt).toLocaleString()} &middot; {log.ipAddress}
+                        {new Date(log.createdAt).toLocaleString()} {log.ipAddress ? ` · ${log.ipAddress}` : ''}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-xs text-muted-foreground font-mono">{log.userId.substring(0, 8)}...</span>
+                    <span className="text-xs text-muted-foreground">
+                      {log.userName || 'System'}
+                      {log.userRole ? <span className="text-muted-foreground/60"> ({log.userRole})</span> : null}
+                    </span>
                     <button
                       onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
                       className="p-1 rounded hover:bg-muted"
@@ -177,11 +198,11 @@ export default function AuditLog() {
       )}
 
       {/* Pagination */}
-      {logs.length > 0 && (
+      {total > 0 && (
         <div className="flex items-center justify-center gap-2 mt-4">
           <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Previous</Button>
-          <span className="text-sm text-muted-foreground px-2">Page {page}</span>
-          <Button variant="outline" size="sm" onClick={() => setPage(p => p + 1)}>Next</Button>
+          <span className="text-sm text-muted-foreground px-2">Page {page} of {totalPages} · {total} entries</span>
+          <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Next</Button>
         </div>
       )}
     </div>

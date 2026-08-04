@@ -1,7 +1,8 @@
 import { Router } from 'express';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and, gte, lte, count } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 import db from '../config/db.js';
-import { auditLogs } from '../db/schema/index.js';
+import { auditLogs, users } from '../db/schema/index.js';
 import { authenticate } from '../middleware/auth.js';
 import { requireRole } from '../middleware/rbac.js';
 
@@ -10,24 +11,52 @@ const router = Router();
 router.use(authenticate);
 router.use(requireRole('super_admin'));
 
+const actor = alias(users, 'actor');
+
 router.get('/', async (req, res, next) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 50;
     const offset = (page - 1) * limit;
 
-    const action = req.query.action as string;
-    const resource = req.query.resource as string;
-    const userId = req.query.userId as string;
+    const action = req.query.action as string | undefined;
+    const resource = req.query.resource as string | undefined;
+    const userId = req.query.userId as string | undefined;
+    const dateFrom = req.query.dateFrom as string | undefined;
+    const dateTo = req.query.dateTo as string | undefined;
 
-    let query = db.select().from(auditLogs).orderBy(desc(auditLogs.createdAt));
+    const conds: any[] = [];
+    if (action) conds.push(eq(auditLogs.action, action));
+    if (resource) conds.push(eq(auditLogs.resource, resource));
+    if (userId) conds.push(eq(auditLogs.userId, userId));
+    if (dateFrom) conds.push(gte(auditLogs.createdAt, new Date(`${dateFrom}T00:00:00`)));
+    if (dateTo) conds.push(lte(auditLogs.createdAt, new Date(`${dateTo}T23:59:59`)));
+    const where = conds.length ? and(...conds) : undefined;
 
-    if (action) query = query.where(eq(auditLogs.action, action)) as typeof query;
-    if (resource) query = query.where(eq(auditLogs.resource, resource)) as typeof query;
-    if (userId) query = query.where(eq(auditLogs.userId, userId)) as typeof query;
+    const [totalRow] = where
+      ? await db.select({ total: count() }).from(auditLogs).where(where)
+      : await db.select({ total: count() }).from(auditLogs);
 
+    let query = db.select({
+      id: auditLogs.id,
+      userId: auditLogs.userId,
+      userName: actor.name,
+      userRole: actor.role,
+      action: auditLogs.action,
+      resource: auditLogs.resource,
+      resourceId: auditLogs.resourceId,
+      details: auditLogs.details,
+      ipAddress: auditLogs.ipAddress,
+      createdAt: auditLogs.createdAt,
+    })
+      .from(auditLogs)
+      .leftJoin(actor, eq(actor.id, auditLogs.userId))
+      .orderBy(desc(auditLogs.createdAt));
+
+    if (where) query = query.where(where) as typeof query;
     const all = await query.limit(limit).offset(offset);
-    res.json({ data: all, pagination: { page, limit, offset } });
+
+    res.json({ data: all, pagination: { page, limit, offset, total: totalRow.total } });
   } catch (err) {
     next(err);
   }
