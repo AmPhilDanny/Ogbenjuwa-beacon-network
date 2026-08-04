@@ -36,6 +36,7 @@ export default function App() {
             <Route path="users" element={<UserList />} />
             <Route path="users/new" element={<UserForm />} />
             <Route path="users/:id" element={<UserDetail />} />
+            <Route path="users/:id/edit" element={<UserForm />} />
             <Route path="lgas" element={<LgaList />} />
             <Route path="lgas/:id" element={<LgaDetail />} />
             <Route path="alerts" element={<AlertList />} />

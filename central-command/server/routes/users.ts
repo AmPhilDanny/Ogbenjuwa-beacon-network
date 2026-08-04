@@ -14,20 +14,24 @@ const createUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   name: z.string().min(1),
+  username: z.string().min(3).optional(),
   phone: z.string().optional(),
   role: z.enum(['super_admin', 'state_observer', 'lga_coordinator', 'vigilante_leader', 'community_admin', 'resident']).default('community_admin'),
-  lgaId: z.string().uuid().optional(),
-  wardId: z.string().uuid().optional(),
+  lgaId: z.string().uuid().nullable().optional(),
+  wardId: z.string().uuid().nullable().optional(),
+  avatar: z.string().nullable().optional(),
 });
 
 const updateUserSchema = z.object({
   name: z.string().min(1).optional(),
+  username: z.string().min(3).optional(),
   phone: z.string().optional(),
   role: z.enum(['super_admin', 'state_observer', 'lga_coordinator', 'vigilante_leader', 'community_admin', 'resident']).optional(),
   lgaId: z.string().uuid().nullable().optional(),
   wardId: z.string().uuid().nullable().optional(),
   isActive: z.boolean().optional(),
   avatar: z.string().nullable().optional(),
+  password: z.string().min(8).optional(),
 });
 
 router.use(authenticate);
@@ -42,6 +46,7 @@ router.get('/', requireRole('super_admin', 'state_observer', 'lga_coordinator'),
       id: users.id,
       email: users.email,
       name: users.name,
+      username: users.username,
       phone: users.phone,
       role: users.role,
       lgaId: users.lgaId,
@@ -97,8 +102,13 @@ router.post('/', requireRole('super_admin', 'lga_coordinator'), validate(createU
 
 router.put('/:id', requireRole('super_admin', 'lga_coordinator'), validate(updateUserSchema), async (req, res, next) => {
   try {
+    const { password, ...fields } = req.body;
+    const updates: Record<string, unknown> = { ...fields, updatedAt: new Date() };
+    if (password) {
+      updates.passwordHash = await bcrypt.hash(password, 12);
+    }
     const [user] = await db.update(users)
-      .set({ ...req.body, updatedAt: new Date() })
+      .set(updates)
       .where(eq(users.id, req.params.id as string))
       .returning();
 
