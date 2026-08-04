@@ -18,6 +18,7 @@ export { villages } from './villages';
 export { alertTypes } from './alert-types';
 export { pushSubscriptions } from './push-subscriptions';
 export { notificationPreferences } from './notification-preferences';
+export { feedAcknowledgements, feedComments } from './feed';
 
 export type { User, NewUser } from './users';
 export type { Session, NewSession } from './users';
@@ -40,3 +41,4 @@ export type { AuditLog, NewAuditLog } from './audit';
 export type { SosSignal, NewSosSignal } from './sos';
 export type { PushSubscription, NewPushSubscription } from './push-subscriptions';
 export type { NotificationPreference, NewNotificationPreference } from './notification-preferences';
+export type { FeedAcknowledgement, NewFeedAcknowledgement, FeedComment, NewFeedComment } from './feed';

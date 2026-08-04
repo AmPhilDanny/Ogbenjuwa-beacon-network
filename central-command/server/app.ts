@@ -31,6 +31,7 @@ import { apiKeyRouter } from './routes/api-keys.js';
 import { dashboardRouter } from './routes/dashboard.js';
 import { pushSubscriptionRouter } from './routes/push-subscriptions.js';
 import { notificationPreferencesRouter } from './routes/notification-preferences.js';
+import { feedRouter } from './routes/feed.js';
 import { swaggerRouter } from './routes/swagger.js';
 
 const app = express();
@@ -116,6 +117,7 @@ app.use('/api/v1/alert-types', alertTypeRouter);
 app.use('/api/v1/audit-logs', auditRouter);
 app.use('/api/v1/api-keys', apiKeyRouter);
 app.use('/api/v1/dashboard', dashboardRouter);
+app.use('/api/v1/feed', feedRouter);
 app.use('/api/v1/push-subscriptions', pushSubscriptionRouter);
 app.use('/api/v1/notification-preferences', notificationPreferencesRouter);
 app.use('/api/v1/docs', swaggerRouter);

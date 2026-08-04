@@ -15,6 +15,13 @@
       "when": 1785858372353,
       "tag": "0001_broken_yellow_claw",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785862515506,
+      "tag": "0002_feed-interactions",
+      "breakpoints": true
     }
   ]
 }

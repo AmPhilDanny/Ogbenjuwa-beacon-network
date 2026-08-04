@@ -14,6 +14,7 @@ const Report = lazy(() => import('./pages/Report'));
 const Resources = lazy(() => import('./pages/Resources'));
 const Neighborhood = lazy(() => import('./pages/Neighborhood'));
 const Profile = lazy(() => import('./pages/Profile'));
+const Inbox = lazy(() => import('./pages/Inbox'));
 const Patrol = lazy(() => import('./pages/Patrol'));
 const AlertPage = lazy(() => import('./pages/Alert'));
 const Reunify = lazy(() => import('./pages/Reunify'));
@@ -49,6 +50,7 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/patrol" element={<Patrol />} />
                 <Route path="/neighborhood" element={<Neighborhood />} />
+                <Route path="/inbox" element={<Inbox />} />
                 <Route path="/profile" element={<Profile />} />
               </Route>
             </Route>

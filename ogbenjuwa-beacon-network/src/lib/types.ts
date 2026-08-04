@@ -84,6 +84,7 @@ export type PageId =
   | 'report'
   | 'resources'
   | 'neighborhood'
+  | 'inbox'
   | 'profile';
 
 export interface Session {
@@ -132,4 +133,32 @@ export interface LGASeverity {
   lga: string;
   count: number;
   severity: 'low' | 'medium' | 'high';
+}
+
+export interface Announcement {
+  id: string;
+  title: string;
+  body: string;
+  creatorName?: string | null;
+  createdAt: string;
+}
+
+export interface InboxMessage {
+  id: string;
+  senderId: string;
+  senderName?: string | null;
+  senderRole?: string | null;
+  subject: string;
+  body: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export interface InboxNotification {
+  id: string;
+  type: string;
+  title: string;
+  body?: string | null;
+  isRead: boolean;
+  createdAt: string;
 }

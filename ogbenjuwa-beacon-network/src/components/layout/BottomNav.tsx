@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Rss, AlertTriangle, Phone, User, Siren } from 'lucide-react';
+import { LayoutDashboard, Rss, AlertTriangle, Phone, User, Siren, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -17,8 +17,8 @@ const ALL_BOTTOM_ITEMS: NavItem[] = [
   { icon: LayoutDashboard, labelKey: 'nav.home', href: '/home', pageId: 'dashboard' },
   { icon: Siren, labelKey: 'nav.alert', href: '/alert', pageId: 'alert' },
   { icon: Rss, labelKey: 'nav.feed', href: '/feed', pageId: 'feed' },
+  { icon: Mail, labelKey: 'nav.inbox', href: '/inbox', pageId: 'inbox' },
   { icon: AlertTriangle, labelKey: 'nav.report', href: '/report', pageId: 'report' },
-  { icon: Phone, labelKey: 'nav.help', href: '/resources', pageId: 'resources' },
   { icon: User, labelKey: 'nav.profile', href: '/profile', pageId: 'profile' },
 ];
 

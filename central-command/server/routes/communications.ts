@@ -207,8 +207,24 @@ router.get('/messages', async (req, res, next) => {
   }
 });
 
-router.post('/messages', requireRole('super_admin', 'state_observer', 'lga_coordinator'), validate(sendMessageSchema), async (req, res, next) => {
+const COMMAND_ROLES = ['super_admin', 'state_observer', 'lga_coordinator'];
+
+router.post('/messages', validate(sendMessageSchema), async (req, res, next) => {
   try {
+    const senderRole = req.user!.role as string;
+    const isCommandCentre = COMMAND_ROLES.includes(senderRole);
+
+    if (!isCommandCentre) {
+      const [receiver] = await db.select({ role: users.role }).from(users)
+        .where(eq(users.id, req.body.receiverId));
+      if (!receiver || !COMMAND_ROLES.includes(receiver.role)) {
+        res.status(403).json({
+          error: { code: 'FORBIDDEN', message: 'You can only reply to the command centre' },
+        });
+        return;
+      }
+    }
+
     const [message] = await db.insert(messages).values({
       ...req.body,
       senderId: req.user!.id,

@@ -58,6 +58,7 @@ const translations: Record<string, TranslationEntry> = {
   'nav.resources':        { en: 'Emergency Resources', idoma: 'Emergency Resources' },
   'nav.home':             { en: 'Home',                idoma: 'Home' },
   'nav.help':             { en: 'Help',                idoma: 'Help' },
+  'nav.inbox':            { en: 'Inbox',               idoma: 'Inbox' },
   'nav.profile':          { en: 'Profile',             idoma: 'Profile' },
   'nav.user_dashboard':   { en: 'My Dashboard',        idoma: 'My Dashboard' },
   'nav.settings':         { en: 'Settings',            idoma: 'Settings' },

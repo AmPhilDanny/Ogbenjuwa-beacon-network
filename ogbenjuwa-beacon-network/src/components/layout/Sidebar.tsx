@@ -13,6 +13,7 @@ import {
   HeartHandshake,
   UserSquare,
   Shield,
+  Mail,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -40,6 +41,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
   { icon: Radar, labelKey: 'nav.patrol', href: '/patrol', pageId: 'patrol' },
   { icon: HeartHandshake, labelKey: 'nav.reunify', href: '/reunify', pageId: 'reunify' },
   { icon: Rss, labelKey: 'nav.feed', href: '/feed', pageId: 'feed' },
+  { icon: Mail, labelKey: 'nav.inbox', href: '/inbox', pageId: 'inbox' },
   { icon: AlertTriangle, labelKey: 'nav.report', href: '/report', pageId: 'report' },
   { icon: Users, labelKey: 'nav.neighborhood', href: '/neighborhood', pageId: 'neighborhood' },
   { icon: Phone, labelKey: 'nav.resources', href: '/resources', pageId: 'resources' },
