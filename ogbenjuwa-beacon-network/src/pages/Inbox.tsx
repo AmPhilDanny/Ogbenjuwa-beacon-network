@@ -98,17 +98,17 @@ export default function Inbox() {
       {/* Tabs */}
       <div className="flex gap-2 flex-wrap">
         <button onClick={() => setTab('broadcasts')}
-          className={`flex items-center gap-2 text-sm px-4 py-2 rounded-full font-medium transition-colors ${tab === 'broadcasts' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}>
+          className={`flex items-center gap-2 text-sm px-4 py-2 rounded-full font-medium transition-colors ${tab === 'broadcasts' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-foreground hover:bg-primary/20'}`}>
           <Megaphone className="w-4 h-4" /> Broadcasts
           {broadcasts.length > 0 && <span className="text-xs opacity-70">({broadcasts.length})</span>}
         </button>
         <button onClick={() => setTab('messages')}
-          className={`flex items-center gap-2 text-sm px-4 py-2 rounded-full font-medium transition-colors ${tab === 'messages' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}>
+          className={`flex items-center gap-2 text-sm px-4 py-2 rounded-full font-medium transition-colors ${tab === 'messages' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-foreground hover:bg-primary/20'}`}>
           <Mail className="w-4 h-4" /> Messages
           {unreadMessages > 0 && <span className="flex items-center justify-center min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold">{unreadMessages}</span>}
         </button>
         <button onClick={() => setTab('notifications')}
-          className={`flex items-center gap-2 text-sm px-4 py-2 rounded-full font-medium transition-colors ${tab === 'notifications' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}>
+          className={`flex items-center gap-2 text-sm px-4 py-2 rounded-full font-medium transition-colors ${tab === 'notifications' ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-foreground hover:bg-primary/20'}`}>
           <Bell className="w-4 h-4" /> Notifications
           {unreadNotifications > 0 && <span className="flex items-center justify-center min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold">{unreadNotifications}</span>}
         </button>

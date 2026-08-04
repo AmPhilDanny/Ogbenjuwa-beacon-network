@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
 import { api } from '../lib/api';
-import { BarChart3, AlertTriangle, Users, MapPin, Siren, ShieldAlert, Activity, TrendingUp, PieChart, Download } from 'lucide-react';
+import { BarChart3, AlertTriangle, Users, MapPin, Siren, ShieldAlert, Activity, TrendingUp, PieChart, Download, Filter, X } from 'lucide-react';
 
 interface DashboardStats {
   activeAlerts: number;
@@ -41,6 +42,11 @@ interface SeverityCount {
   count: number;
 }
 
+interface LocationOption {
+  id: string;
+  name: string;
+}
+
 const statCards = [
   { key: 'activeAlerts', label: 'Active Alerts', icon: AlertTriangle, color: 'text-red-500', bg: 'bg-red-50' },
   { key: 'totalUsers', label: 'Total Users', icon: Users, color: 'text-blue-500', bg: 'bg-blue-50' },
@@ -72,13 +78,58 @@ export default function Analytics() {
   const [severityData, setSeverityData] = useState<SeverityCount[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [lgas, setLgas] = useState<LocationOption[]>([]);
+  const [wards, setWards] = useState<LocationOption[]>([]);
+  const [villages, setVillages] = useState<LocationOption[]>([]);
+  const [selectedLga, setSelectedLga] = useState('');
+  const [selectedWard, setSelectedWard] = useState('');
+  const [selectedVillage, setSelectedVillage] = useState('');
+
   useEffect(() => {
+    api.get<{ data: LocationOption[] }>('/lgas')
+      .then(res => setLgas(res.data))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setSelectedWard('');
+    setSelectedVillage('');
+    setVillages([]);
+    if (!selectedLga) {
+      setWards([]);
+      return;
+    }
+    api.get<{ data: LocationOption[] }>(`/lgas/${selectedLga}/wards`)
+      .then(res => setWards(res.data))
+      .catch(() => setWards([]));
+  }, [selectedLga]);
+
+  useEffect(() => {
+    setSelectedVillage('');
+    if (!selectedLga || !selectedWard) {
+      setVillages([]);
+      return;
+    }
+    api.get<{ data: LocationOption[] }>(`/villages?lgaId=${selectedLga}&wardId=${selectedWard}`)
+      .then(res => setVillages(res.data))
+      .catch(() => setVillages([]));
+  }, [selectedLga, selectedWard]);
+
+  const fetchAnalytics = useCallback(() => {
+    const params = new URLSearchParams();
+    if (selectedLga) params.set('lgaId', selectedLga);
+    if (selectedWard) params.set('wardId', selectedWard);
+    if (selectedVillage) params.set('villageId', selectedVillage);
+    const qs = params.toString();
+    const suffix = qs ? `?${qs}` : '';
+
+    setLoading(true);
     Promise.all([
-      api.get<DashboardStats>('/dashboard/stats'),
-      api.get<{ data: LgaIncident[] }>('/dashboard/incidents-by-lga'),
-      api.get<{ data: RecentAlert[] }>('/dashboard/recent-alerts?limit=5'),
-      api.get<{ data: TrendDay[] }>('/dashboard/trends'),
-      api.get<{ data: SeverityCount[] }>('/dashboard/severity-breakdown'),
+      api.get<DashboardStats>(`/dashboard/stats${suffix}`),
+      api.get<{ data: LgaIncident[] }>(`/dashboard/incidents-by-lga${suffix}`),
+      api.get<{ data: RecentAlert[] }>(`/dashboard/recent-alerts?limit=5${qs ? `&${qs}` : ''}`),
+      api.get<{ data: TrendDay[] }>(`/dashboard/trends${suffix}`),
+      api.get<{ data: SeverityCount[] }>(`/dashboard/severity-breakdown${suffix}`),
     ])
       .then(([statsRes, lgaRes, alertsRes, trendsRes, severityRes]) => {
         setStats(statsRes);
@@ -89,9 +140,21 @@ export default function Analytics() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [selectedLga, selectedWard, selectedVillage]);
 
-  if (loading) {
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
+
+  const clearFilters = () => {
+    setSelectedLga('');
+    setSelectedWard('');
+    setSelectedVillage('');
+  };
+
+  const hasFilters = !!(selectedLga || selectedWard || selectedVillage);
+
+  if (loading && stats === null) {
     return (
       <div className="flex items-center justify-center py-20">
         <p className="text-muted-foreground">Loading analytics...</p>
@@ -114,7 +177,7 @@ export default function Analytics() {
           <p className="text-sm text-muted-foreground mt-0.5">Data insights and reporting</p>
         </div>
         <a
-          href={`${import.meta.env.VITE_API_URL || 'http://localhost:4001/api/v1'}/dashboard/export/csv`}
+          href={`${import.meta.env.VITE_API_URL || 'http://localhost:4001/api/v1'}/dashboard/export/csv${hasFilters ? `?lgaId=${selectedLga}&wardId=${selectedWard}` : ''}`}
           className="inline-flex items-center gap-2 rounded-lg border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent transition-colors"
           target="_blank"
         >
@@ -122,6 +185,60 @@ export default function Analytics() {
           Export CSV
         </a>
       </div>
+
+      {/* Location filters */}
+      <Card className="mb-6">
+        <CardContent className="py-3">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="space-y-1">
+              <label className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                <Filter className="w-3 h-3" /> LGA
+              </label>
+              <select
+                value={selectedLga}
+                onChange={e => setSelectedLga(e.target.value)}
+                className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm min-w-[180px]"
+              >
+                <option value="">All LGAs</option>
+                {lgas.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                <Filter className="w-3 h-3" /> Ward
+              </label>
+              <select
+                value={selectedWard}
+                onChange={e => setSelectedWard(e.target.value)}
+                disabled={!selectedLga}
+                className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm min-w-[180px] disabled:opacity-50"
+              >
+                <option value="">All Wards</option>
+                {wards.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                <Filter className="w-3 h-3" /> Village
+              </label>
+              <select
+                value={selectedVillage}
+                onChange={e => setSelectedVillage(e.target.value)}
+                disabled={!selectedWard}
+                className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm min-w-[180px] disabled:opacity-50"
+              >
+                <option value="">All Villages</option>
+                {villages.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+              </select>
+            </div>
+            {hasFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="mb-0.5">
+                <X className="w-3 h-3 mr-1" /> Clear Filters
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
