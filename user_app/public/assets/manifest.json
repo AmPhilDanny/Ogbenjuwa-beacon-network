@@ -1,0 +1,19 @@
+{
+  "name": "Ogbenjuwa — Community Safety Network",
+  "short_name": "Ogbenjuwa",
+  "description": "Community safety and emergency response for the Idoma region of Benue State, Nigeria.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#e8f5ee",
+  "theme_color": "#1a6b3a",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/assets/ogbenjuwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

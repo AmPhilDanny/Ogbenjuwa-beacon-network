@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a6b3a">
+  <title>Family &amp; Contacts — Ogbenjuwa</title>
+  <link rel="icon" type="image/svg+xml" href="assets/ogbenjuwa-icon.svg">
+  <link rel="manifest" href="assets/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="page-header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-mark">🛡️</span>
+        <span>Ogbenjuwa<small data-i18n="family">Family &amp; Contacts</small></span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="lang-toggle">
+        <button type="button" class="lang-btn" data-lang="english">EN</button>
+        <button type="button" class="lang-btn" data-lang="idoma">Idoma</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <div class="section-title"><span data-i18n="family">Family &amp; contacts</span></div>
+    <div class="subtext muted small" data-i18n="family_note">
+      Keep your loved ones reachable — search the community directory or manage your emergency contacts.
+    </div>
+
+    <!-- Search the directory -->
+    <div class="card" style="padding:0 12px;">
+      <div class="field" style="margin-bottom:0;">
+        <label for="family-search" data-i18n="search_directory">Search community directory</label>
+        <div class="search-row">
+          <input class="input" type="search" id="family-search" placeholder="Name, phone or village…">
+          <button type="button" class="btn btn-primary" id="family-search-btn" data-i18n="search">Search</button>
+        </div>
+      </div>
+      <div id="search-results" class="mt-12">
+        <div class="small muted center" data-i18n="search_hint">Enter a name or phone number to find people in your community.</div>
+      </div>
+    </div>
+
+    <!-- Add emergency contact -->
+    <div class="section-title mt-24"><span data-i18n="emergency_contacts">My emergency contacts</span></div>
+    <div id="contacts-list" style="padding:0 12px;">
+      <div class="card center muted" data-i18n="loading">Loading…</div>
+    </div>
+    <div class="card mt-12" style="padding:0 12px;">
+      <div class="field" style="margin-bottom:8px;">
+        <label for="contact-name" data-i18n="contact_name">Contact name</label>
+        <input class="input" type="text" id="contact-name" placeholder="e.g. Mama Aisha">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label for="contact-phone" data-i18n="contact_phone">Phone number</label>
+        <input class="input" type="tel" id="contact-phone" placeholder="+234…">
+      </div>
+      <button type="button" class="btn btn-outline btn-block mt-12" id="add-contact-btn" data-i18n="add_contact">Add contact</button>
+      <div class="small muted mt-8 sms-note hidden" id="sms-note">
+        ⚠️ <span data-i18n="family_sms_fallback">Full registration needs a community admin — SMS *347# with your LGA name to register family offline.</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/js/session.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/ws.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/family.js"></script>
+</body>
+</html>

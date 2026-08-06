@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a6b3a">
+  <title>My Profile — Ogbenjuwa</title>
+  <link rel="icon" type="image/svg+xml" href="assets/ogbenjuwa-icon.svg">
+  <link rel="manifest" href="assets/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="page-header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-mark">🛡️</span>
+        <span>Ogbenjuwa<small data-i18n="my_profile">My Profile</small></span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="lang-toggle">
+        <button type="button" class="lang-btn" data-lang="english">EN</button>
+        <button type="button" class="lang-btn" data-lang="idoma">Idoma</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <!-- Identity card -->
+    <div class="card profile-card" style="padding:0 12px;">
+      <div class="profile-head">
+        <div class="avatar" id="profile-avatar">👤</div>
+        <div>
+          <div class="profile-name" id="profile-name">—</div>
+          <div class="small muted" id="profile-sub">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="safety-card safety-clear hidden" id="safety-card">
+      <div class="safety-icon">🟢</div>
+      <div>
+        <div class="safety-level" id="safety-level">—</div>
+        <div class="safety-sub" id="safety-sub">—</div>
+      </div>
+    </div>
+
+    <!-- Details -->
+    <div class="card mt-12" style="padding:0 12px;">
+      <div class="section-title"><span data-i18n="account_details">Account details</span></div>
+      <div class="profile-row"><div class="pr-label" data-i18n="full_name">Full name</div><div class="pr-value" id="detail-name">—</div></div>
+      <div class="profile-row"><div class="pr-label" data-i18n="phone">Phone</div><div class="pr-value" id="detail-phone">—</div></div>
+      <div class="profile-row"><div class="pr-label" data-i18n="lga">LGA</div><div class="pr-value" id="detail-lga">—</div></div>
+      <div class="profile-row"><div class="pr-label" data-i18n="village">Village</div><div class="pr-value" id="detail-village">—</div></div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="card mt-12" style="padding:0 12px;">
+      <div class="section-title"><span data-i18n="notifications">Notifications</span></div>
+      <label class="switch-row">
+        <span data-i18n="push_alerts">Push alerts (SMS)</span>
+        <input type="checkbox" id="notif-toggle" checked>
+        <span class="switch"></span>
+      </label>
+      <div class="small muted mt-8" data-i18n="notif_note">We'll SMS you when there's a safety alert in your LGA. Standard rates apply.</div>
+    </div>
+
+    <!-- Sessions / actions -->
+    <div class="card mt-12" style="padding:0 12px;">
+      <div class="section-title"><span data-i18n="sessions">Sessions</span></div>
+      <div class="small muted" id="session-meta">—</div>
+      <button type="button" class="btn btn-outline btn-block mt-12" id="logout-btn" data-i18n="logout">Log out</button>
+      <button type="button" class="btn btn-link btn-block mt-8 danger-text" id="delete-btn" data-i18n="delete_account">Delete my account</button>
+    </div>
+  </div>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/js/session.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/ws.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/profile.js"></script>
+</body>
+</html>

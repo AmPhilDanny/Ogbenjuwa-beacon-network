@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a6b3a">
+  <meta name="description" content="Ogbenjuwa — Community Safety Network for the Idoma region of Benue State, Nigeria.">
+  <title>Home — Ogbenjuwa</title>
+  <link rel="icon" type="image/svg+xml" href="assets/ogbenjuwa-icon.svg">
+  <link rel="manifest" href="assets/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="page-header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-mark">🛡️</span>
+        <span>Ogbenjuwa<small>Safety Network</small></span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="lang-toggle">
+        <button type="button" class="lang-btn" data-lang="english">EN</button>
+        <button type="button" class="lang-btn" data-lang="idoma">Idoma</button>
+      </div>
+      <div class="header-user" id="header-user">
+        <div class="header-user-name">—</div>
+        <div class="header-sub"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <div id="safety-card" class="safety-card safety-clear hidden">
+      <div class="safety-icon">🟢</div>
+      <div>
+        <div class="safety-level" id="safety-level">—</div>
+        <div class="safety-sub" id="safety-sub">—</div>
+      </div>
+    </div>
+
+    <div class="quick-grid">
+      <a href="panic.html" class="quick-action quick-danger">
+        <div class="qa-icon">🚨</div>
+        <div data-i18n="panic">PANIC</div>
+      </a>
+      <a href="report.html" class="quick-action">
+        <div class="qa-icon">📋</div>
+        <div data-i18n="report_incident">Report Incident</div>
+      </a>
+      <a href="resources.html" class="quick-action">
+        <div class="qa-icon">🗺️</div>
+        <div data-i18n="find_resources">Find Resources</div>
+      </a>
+      <a href="family.html" class="quick-action">
+        <div class="qa-icon">👥</div>
+        <div data-i18n="find_family">Find Family</div>
+      </a>
+    </div>
+
+    <div class="section-title">
+      <span data-i18n="recent_alerts">Recent alerts</span>
+      <a href="alerts.html" data-i18n="see_all">See all →</a>
+    </div>
+    <div id="recent-alerts"><div class="spinner"></div></div>
+
+    <div class="section-title">
+      <span data-i18n="community_feed">Community feed</span>
+      <a href="feed.html" data-i18n="see_all">See all →</a>
+    </div>
+    <div id="feed-preview"><div class="spinner"></div></div>
+  </div>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/js/session.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/ws.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/index.js"></script>
+</body>
+</html>

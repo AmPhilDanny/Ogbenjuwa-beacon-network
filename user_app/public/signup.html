@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a6b3a">
+  <title>Create account — Ogbenjuwa</title>
+  <link rel="icon" type="image/svg+xml" href="assets/ogbenjuwa-icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <div class="lang-toggle login-lang">
+    <button type="button" class="lang-btn" data-lang="english">EN</button>
+    <button type="button" class="lang-btn" data-lang="idoma">Idoma</button>
+  </div>
+
+  <main class="auth-wrap">
+    <div class="auth-card card">
+      <div class="auth-logo">
+        <div class="logo-mark" style="font-size:40px;width:64px;height:64px;border-radius:16px;margin:0 auto;">🛡️</div>
+        <h1 data-i18n="signup">Create account</h1>
+        <p>Join your community safety network</p>
+      </div>
+
+      <form id="signup-form" novalidate>
+        <div class="field">
+          <label for="name" data-i18n="name">Full name</label>
+          <input class="input" type="text" id="name" name="name" autocomplete="name" placeholder="e.g. Mama Ojoma" required>
+        </div>
+        <div class="field">
+          <label for="email" data-i18n="email">Email</label>
+          <input class="input" type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+          <label for="username" data-i18n="username">Username</label>
+          <input class="input" type="text" id="username" name="username" autocomplete="username" placeholder="min 3 characters" required>
+        </div>
+        <div class="field">
+          <label for="password" data-i18n="password">Password</label>
+          <div style="position:relative;">
+            <input class="input" type="password" id="password" name="password" autocomplete="new-password"
+                   placeholder="min 8 characters" required>
+            <button type="button" id="toggle-pass" aria-label="Show password"
+                    style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="phone" data-i18n="phone">Phone (optional)</label>
+          <input class="input" type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+234 803 000 0000">
+        </div>
+        <div class="field">
+          <label for="lga" data-i18n="lga">Local Government Area</label>
+          <select class="input" id="lga" name="lga" required>
+            <option value="" disabled selected>Select your LGA…</option>
+          </select>
+        </div>
+        <div class="form-error" id="signup-error"></div>
+        <button type="submit" class="btn btn-primary btn-block" id="signup-submit" data-i18n="submit">Submit</button>
+      </form>
+
+      <p class="small muted" style="text-align:center;margin-top:14px;">
+        Already have an account? <a href="login.html" data-i18n="login">Log in</a>
+      </p>
+    </div>
+
+    <div class="sms-fallback hidden" id="already-in" style="max-width:400px;width:100%;margin:12px auto;">
+      <a href="index.html">Already signed in → Go to Home</a>
+    </div>
+  </main>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/js/session.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/ws.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/auth.js"></script>
+</body>
+</html>

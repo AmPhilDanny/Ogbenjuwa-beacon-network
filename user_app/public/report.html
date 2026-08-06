@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a6b3a">
+  <title>Report Incident — Ogbenjuwa</title>
+  <link rel="icon" type="image/svg+xml" href="assets/ogbenjuwa-icon.svg">
+  <link rel="manifest" href="assets/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="page-header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-mark">🛡️</span>
+        <span>Ogbenjuwa<small data-i18n="report_incident">Report Incident</small></span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="lang-toggle">
+        <button type="button" class="lang-btn" data-lang="english">EN</button>
+        <button type="button" class="lang-btn" data-lang="idoma">Idoma</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <button type="button" class="btn btn-outline btn-sm hidden" id="wizard-back" style="margin:10px 16px 0;">← Back</button>
+    <div class="progress-dots" id="progress-dots">
+      <div class="progress-dot current" data-step="1"></div>
+      <div class="progress-dot" data-step="2"></div>
+      <div class="progress-dot" data-step="3"></div>
+      <div class="progress-dot" data-step="4"></div>
+      <div class="progress-dot" data-step="5"></div>
+    </div>
+
+    <!-- Step 1: Type -->
+    <section class="step-panel" id="step-1" style="padding:0 12px;">
+      <div class="section-title"><span data-i18n="report_type">What happened?</span></div>
+      <div class="step-picker">
+        <button type="button" class="pick-option" data-type="attack"><span class="pick-icon">⚔️</span>Attack</button>
+        <button type="button" class="pick-option" data-type="fire"><span class="pick-icon">🔥</span>Fire</button>
+        <button type="button" class="pick-option" data-type="medical"><span class="pick-icon">🏥</span>Medical</button>
+        <button type="button" class="pick-option" data-type="abduction"><span class="pick-icon">🚨</span>Abduction</button>
+        <button type="button" class="pick-option" data-type="other"><span class="pick-icon">⚠️</span>Other</button>
+      </div>
+    </section>
+
+    <!-- Step 2: Location -->
+    <section class="step-panel hidden" id="step-2" style="padding:0 12px;">
+      <div class="section-title"><span data-i18n="location">Where?</span></div>
+      <div class="card">
+        <button type="button" class="btn btn-outline btn-block" id="gps-btn">📍 Detect my location (GPS)</button>
+        <div class="small muted" id="gps-display" style="margin-top:8px;"></div>
+        <div class="field mt-16" style="margin-bottom:0;">
+          <label for="report-lga" data-i18n="lga">Local Government Area</label>
+          <select class="input" id="report-lga" required>
+            <option value="" disabled selected>Select your LGA…</option>
+          </select>
+        </div>
+        <div class="field mt-16" style="margin-bottom:0;">
+          <label for="report-village" data-i18n="village">Village / area</label>
+          <input class="input" type="text" id="report-village" placeholder="e.g. Oglewu">
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 3: Details -->
+    <section class="step-panel hidden" id="step-3" style="padding:0 12px;">
+      <div class="section-title"><span data-i18n="details">Details</span></div>
+      <div class="card">
+        <textarea class="input" id="report-details" placeholder="Describe what happened…"></textarea>
+        <button type="button" class="btn btn-outline mt-12" id="photo-btn">📷 Add photo (optional)</button>
+        <div id="photo-preview" class="hidden mt-12">
+          <img id="preview-img" style="max-width:100%;border-radius:10px;">
+          <button type="button" class="btn btn-sm mt-8" id="remove-photo">Remove</button>
+        </div>
+        <input type="file" id="photo-input" accept="image/*" capture="environment" class="hidden">
+      </div>
+    </section>
+
+    <!-- Step 4: Urgency -->
+    <section class="step-panel hidden" id="step-4" style="padding:0 12px;">
+      <div class="section-title"><span data-i18n="urgency">How urgent?</span></div>
+      <div class="step-picker">
+        <button type="button" class="pick-option" data-urgency="high" style="border-color:#dc2626;color:#c2372a;">🔴 High</button>
+        <button type="button" class="pick-option" data-urgency="medium" style="border-color:#f59e0b;color:#b45309;">🟠 Medium</button>
+        <button type="button" class="pick-option" data-urgency="low" style="border-color:#2d9b57;color:#166534;">🟢 Low</button>
+      </div>
+    </section>
+
+    <!-- Step 5: Review + submit -->
+    <section class="step-panel hidden" id="step-5" style="padding:0 12px;">
+      <div class="section-title"><span>Review &amp; submit</span></div>
+      <div class="card" id="review-summary">
+        <div class="small muted">Loading…</div>
+      </div>
+      <button type="button" class="btn btn-primary btn-block mt-16" id="submit-report">📤 Submit report</button>
+    </section>
+
+    <!-- Success -->
+    <section class="step-panel hidden" id="step-done" style="padding:24px 16px;text-align:center;">
+      <div style="font-size:60px;">✅</div>
+      <h2 style="margin:10px 0 4px;" data-i18n="report_success">Report submitted</h2>
+      <p class="muted" id="done-ref" data-i18n="report_ref">Reference: —</p>
+      <p class="small muted mt-12">Your report has been sent to your LGA community admin.</p>
+      <a href="index.html" class="btn btn-primary btn-block mt-16">Go to Home</a>
+    </section>
+
+    <div class="form-error" id="report-error" style="margin:0 12px;"></div>
+  </div>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/js/session.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/ws.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/report.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a6b3a">
+  <title>Panic — Ogbenjuwa</title>
+  <link rel="icon" type="image/svg+xml" href="assets/ogbenjuwa-icon.svg">
+  <link rel="manifest" href="assets/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="page-header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-mark">🛡️</span>
+        <span>Ogbenjuwa<small>Panic</small></span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="lang-toggle">
+        <button type="button" class="lang-btn" data-lang="english">EN</button>
+        <button type="button" class="lang-btn" data-lang="idoma">Idoma</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-shell panic-wrap">
+    <!-- Idle state -->
+    <div id="panic-idle">
+      <div class="panic-btn-wrap">
+        <button type="button" class="panic-btn" id="panic-btn" data-i18n="panic_long">PANIC</button>
+      </div>
+      <p class="panic-note" id="panic-note">
+        Your location will be shared with your emergency contacts and your LGA community admin.
+      </p>
+    </div>
+
+    <!-- Sent state -->
+    <div id="panic-sent" class="sos-sent hidden">
+      <div class="sos-icon">🆘</div>
+      <h2 data-i18n="sos_sent">HELP IS COMING</h2>
+      <div class="sos-ref" id="sos-ref">Ref: —</div>
+      <div class="sos-timer" id="sos-timer">Alert sent 0:00 ago</div>
+      <a href="tel:+2348030000000" class="btn btn-danger btn-block" data-i18n="call_emergency">📞 Call LGA Emergency</a>
+      <button type="button" class="btn btn-outline btn-block mt-16" id="safe-now" data-i18n="safe_now">I am safe now</button>
+    </div>
+
+    <div class="sms-fallback" id="sms-fallback" style="width:calc(100% - 24px);">
+      <span data-i18n="sms_fallback">No internet? Send SMS to </span><code>*347#</code><br>
+      <code>PANIC [your name] [your village]</code>
+    </div>
+  </div>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/js/session.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/ws.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/panic.js"></script>
+</body>
+</html>
