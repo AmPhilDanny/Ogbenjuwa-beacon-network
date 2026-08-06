@@ -1,10 +1,18 @@
 import dotenv from 'dotenv';
 import { z } from 'zod';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+// compiled output lives one dir deeper (dist/config), so .env may be 2 or 3 levels up
+const envCandidates = [
+  path.resolve(__dirname, '../../.env'),
+  path.resolve(__dirname, '../../../.env'),
+  path.resolve(process.cwd(), '.env'),
+];
+const envPath = envCandidates.find(p => fs.existsSync(p));
+if (envPath) dotenv.config({ path: envPath });
 
 const envSchema = z.object({
   PORT: z.coerce.number().default(4001),
