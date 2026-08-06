@@ -4,12 +4,13 @@ import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { eq, or } from 'drizzle-orm';
 import db from '../config/db.js';
-import { users, sessions } from '../db/schema/index.js';
+import { users, sessions, lgas, wards, villages } from '../db/schema/index.js';
 import { env } from '../config/env.js';
 import { authenticate } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { rateLimit } from '../middleware/rate-limit.js';
 import { recordAudit } from '../lib/audit.js';
+import { roleLabel } from '../lib/role-permissions.js';
 
 const authRateLimit = rateLimit({ windowMs: 60_000, maxRequests: 10, keyGenerator: (req) => `auth:${req.ip || 'unknown'}` });
 
@@ -57,6 +58,35 @@ function generateTokens(user: { id: string; email: string; role: string; lgaId?:
 
 function isAdmin(role: string): boolean {
   return ADMIN_ROLES.includes(role);
+}
+
+async function buildUserPayload(user: {
+  id: string; email: string; name: string; role: string; username?: string | null;
+  phone?: string | null; lgaId?: string | null; wardId?: string | null; villageId?: string | null;
+  avatar?: string | null; lastLoginAt?: Date | null;
+}) {
+  const [lga, ward, village] = await Promise.all([
+    user.lgaId ? db.select({ name: lgas.name }).from(lgas).where(eq(lgas.id, user.lgaId)).limit(1) : [],
+    user.wardId ? db.select({ name: wards.name }).from(wards).where(eq(wards.id, user.wardId)).limit(1) : [],
+    user.villageId ? db.select({ name: villages.name }).from(villages).where(eq(villages.id, user.villageId)).limit(1) : [],
+  ]);
+  return {
+    id: user.id,
+    email: user.email,
+    username: user.username ?? undefined,
+    name: user.name,
+    phone: user.phone ?? undefined,
+    role: user.role,
+    roleLabel: await roleLabel(user.role),
+    lgaId: user.lgaId ?? undefined,
+    wardId: user.wardId ?? undefined,
+    villageId: user.villageId ?? undefined,
+    lga: lga[0]?.name ?? undefined,
+    ward: ward[0]?.name ?? undefined,
+    village: village[0]?.name ?? undefined,
+    avatar: user.avatar ?? undefined,
+    lastLoginAt: user.lastLoginAt ?? undefined,
+  };
 }
 
 // 2FA (OTP) DISABLED — see note above. OTP generation helper removed:
@@ -108,14 +138,7 @@ router.post('/login', authRateLimit, validate(loginSchema), async (req, res, nex
       });
 
       res.json({
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          lgaId: user.lgaId,
-          avatar: user.avatar,
-        },
+        user: await buildUserPayload(user),
         ...tokens,
       });
       return;
@@ -134,14 +157,7 @@ router.post('/login', authRateLimit, validate(loginSchema), async (req, res, nex
     });
 
     res.json({
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        lgaId: user.lgaId,
-        avatar: user.avatar,
-      },
+      user: await buildUserPayload(user),
       ...tokens,
     });
   } catch (err) {
@@ -316,18 +332,7 @@ router.get('/me', authenticate, async (req, res, next) => {
       res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User not found' } });
       return;
     }
-    res.json({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      name: user.name,
-      phone: user.phone,
-      role: user.role,
-      lgaId: user.lgaId,
-      wardId: user.wardId,
-      avatar: user.avatar,
-      lastLoginAt: user.lastLoginAt,
-    });
+    res.json(await buildUserPayload(user));
   } catch (err) {
     next(err);
   }
@@ -375,14 +380,7 @@ router.post('/register', rateLimit({ windowMs: 60_000, maxRequests: 3 }), valida
     });
 
     res.status(201).json({
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        name: user.name,
-        role: user.role,
-        lgaId: user.lgaId,
-      },
+      user: await buildUserPayload(user),
       ...tokens,
     });
   } catch (err) {

@@ -69,10 +69,13 @@ export type RegistryStatus = 'searching' | 'at_camp' | 'reunified';
 // ─── Auth types ─────────────────────────────────────────────────────────
 
 export type UserRole =
-  | 'community_admin'
-  | 'vigilante_leader'
+  | 'super_admin'
+  | 'state_observer'
   | 'lga_coordinator'
-  | 'state_observer';
+  | 'vigilante_leader'
+  | 'community_admin'
+  | 'resident'
+  | (string & {});
 
 export type PageId =
   | 'alert'
@@ -91,8 +94,14 @@ export interface Session {
   id: string;
   phone: string;
   role: UserRole;
+  roleLabel?: string;
   name: string;
   lga: string;
+  ward?: string;
+  village?: string;
+  lgaId?: string;
+  wardId?: string;
+  villageId?: string;
   token: string;
   loginAt: number;
   expiresAt: number;

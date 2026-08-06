@@ -11,7 +11,12 @@ interface Member {
   name: string;
   role: string;
   lga?: string;
+  ward?: string;
+  village?: string;
   phone?: string;
+  lgaName?: string | null;
+  wardName?: string | null;
+  villageName?: string | null;
 }
 
 export default function Neighborhood() {
@@ -19,13 +24,12 @@ export default function Neighborhood() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      api.get<{ data: Member[] }>('/users?role=vigilante').catch(() => ({ data: [] })),
-      api.get<{ data: Member[] }>('/users?role=lga_coordinator').catch(() => ({ data: [] })),
-      api.get<{ data: Member[] }>('/users?role=citizen').catch(() => ({ data: [] })),
-    ]).then(([vigs, coords, citizens]) => {
-      setMembers([...(vigs.data || []), ...(coords.data || []), ...(citizens.data || [])]);
-    }).catch(() => {}).finally(() => setLoading(false));
+    api.get<{ data: Member[] }>('/users/community')
+      .then((res) => {
+        setMembers(res.data.map((m) => ({ ...m, lga: m.lgaName ?? m.lga })));
+      })
+      .catch(() => setMembers([]))
+      .finally(() => setLoading(false));
   }, []);
 
   return (

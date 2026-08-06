@@ -5,7 +5,7 @@ import { cn } from '../lib/utils';
 import { api } from '../lib/api';
 import {
   LayoutDashboard, Users, MapPin, AlertTriangle, ShieldAlert,
-  Siren, MessageSquare, BarChart3, ScrollText, Key, Settings, Smartphone, X, Bell, type LucideIcon,
+  Siren, MessageSquare, BarChart3, ScrollText, Key, Settings, Smartphone, X, Bell, ShieldCheck, type LucideIcon,
 } from 'lucide-react';
 
 interface NavItem {
@@ -18,6 +18,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Users', href: '/users', icon: Users, roles: ['super_admin', 'state_observer', 'lga_coordinator'] },
+  { label: 'Roles', href: '/roles', icon: ShieldCheck, roles: ['super_admin'] },
   { label: 'LGAs', href: '/lgas', icon: MapPin, roles: ['super_admin', 'state_observer', 'lga_coordinator'] },
   { label: 'Alerts', href: '/alerts', icon: AlertTriangle },
   { label: 'Incidents', href: '/incidents', icon: ShieldAlert },

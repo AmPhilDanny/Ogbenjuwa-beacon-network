@@ -33,6 +33,27 @@ interface Lga {
   radius?: string | number | null;
 }
 
+interface VillageApiRow {
+  id: string;
+  name: string;
+  lgaId?: string | null;
+  lat?: string | number | null;
+  lng?: string | number | null;
+  population?: number | null;
+}
+
+interface ResourceApiRow {
+  id: string;
+  type: string;
+  name: string;
+  lgaId?: string | null;
+  lat?: string | number | null;
+  lng?: string | number | null;
+  capacity?: number | null;
+  occupied?: number | null;
+  phone?: string | null;
+}
+
 export default function Patrol() {
   const [mapView, setMapView] = useState<'patrol' | 'coverage' | 'resources'>('patrol');
   const [members, setMembers] = useState<PatrolMember[]>([]);
@@ -44,13 +65,32 @@ export default function Patrol() {
   useEffect(() => {
     Promise.all([
       api.get<{ data: PatrolMember[] }>('/patrols/teams').catch(() => ({ data: [] })),
-      api.get<{ data: Village[] }>('/villages').catch(() => ({ data: [] })),
-      api.get<{ data: Resource[] }>('/resources').catch(() => ({ data: [] })),
+      api.get<{ data: VillageApiRow[] }>('/villages').catch(() => ({ data: [] })),
+      api.get<{ data: ResourceApiRow[] }>('/resources').catch(() => ({ data: [] })),
       api.get<{ data: Lga[] }>('/lgas').catch(() => ({ data: [] })),
     ]).then(([membersRes, villagesRes, resourcesRes, lgasRes]) => {
+      const lgasById = new Map<string, string>(lgasRes.data.map((l): [string, string] => [l.id, l.name]));
       setMembers(membersRes.data);
-      setVillages(villagesRes.data);
-      setResources(resourcesRes.data);
+      setVillages(
+        villagesRes.data.map((v) => ({
+          name: v.name,
+          lga: v.lgaId ? lgasById.get(v.lgaId) ?? 'Unknown LGA' : 'Unknown LGA',
+          lat: Number(v.lat) || 0,
+          lng: Number(v.lng) || 0,
+          pop: Number(v.population) || 0,
+        }))
+      );
+      setResources(
+        resourcesRes.data.map((r) => ({
+          type: r.type,
+          name: r.name,
+          lga: r.lgaId ? lgasById.get(r.lgaId) ?? 'Unknown LGA' : 'Unknown LGA',
+          lat: Number(r.lat) || 0,
+          lng: Number(r.lng) || 0,
+          capacity: Number(r.capacity) || 0,
+          occupied: Number(r.occupied) || 0,
+        }))
+      );
       setLgas(lgasRes.data);
     }).finally(() => setLoading(false));
   }, []);

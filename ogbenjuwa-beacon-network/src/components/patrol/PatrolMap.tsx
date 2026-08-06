@@ -84,6 +84,10 @@ const MEMBER_COLORS: Record<number, string> = {
 };
 
 export function PatrolMap({ villages = [], members = [], resources = [], lgas = [] }: PatrolMapProps) {
+  const validVillages = villages.filter((v) => Number.isFinite(v.lat) && Number.isFinite(v.lng) && v.lat !== 0 && v.lng !== 0);
+  const validMembers = members.filter((m) => Number.isFinite(m.lat) && Number.isFinite(m.lng));
+  const validResources = resources.filter((r) => Number.isFinite(r.lat) && Number.isFinite(r.lng));
+
   return (
     <MapContainer
       center={IDOMA_CENTRE}
@@ -129,7 +133,7 @@ export function PatrolMap({ villages = [], members = [], resources = [], lgas = 
 
         <LayersControl.Overlay checked name="Coverage Zones">
           <>
-            {villages.map((v) => (
+            {validVillages.map((v) => (
               <CircleMarker
                 key={`cov-${v.name}`}
                 center={[v.lat, v.lng]}
@@ -144,7 +148,7 @@ export function PatrolMap({ villages = [], members = [], resources = [], lgas = 
 
         <LayersControl.Overlay checked name="Villages">
           <>
-            {villages.map((v) => (
+            {validVillages.map((v) => (
               <Marker key={`v-${v.name}`} position={[v.lat, v.lng]} icon={villageIcon}>
                 <Popup>
                   <div className="font-sans">
@@ -162,7 +166,7 @@ export function PatrolMap({ villages = [], members = [], resources = [], lgas = 
 
         <LayersControl.Overlay checked name="Patrol Members">
           <>
-            {members.map((m, idx) => (
+            {validMembers.map((m, idx) => (
               <CircleMarker
                 key={`p-${m.id}`}
                 center={[m.lat, m.lng]}
@@ -192,7 +196,7 @@ export function PatrolMap({ villages = [], members = [], resources = [], lgas = 
 
         <LayersControl.Overlay checked name="Resources">
           <>
-            {resources.map((r, i) => (
+            {validResources.map((r, i) => (
               <Marker key={`r-${i}`} position={[r.lat, r.lng]} icon={resourceIcon('#2D9B57')}>
                 <Popup>
                   <div className="font-sans">

@@ -8,7 +8,18 @@ const SESSION_KEY = 'ogbenjuwaAuth';
 interface AuthResponse {
   accessToken: string;
   refreshToken: string;
-  user: { id: string; name: string; role: UserRole; lga: string };
+  user: {
+    id: string;
+    name: string;
+    role: UserRole;
+    roleLabel?: string;
+    lga?: string;
+    ward?: string;
+    village?: string;
+    lgaId?: string;
+    wardId?: string;
+    villageId?: string;
+  };
 }
 
 // 2FA (OTP) DISABLED — server /auth/login returns tokens directly. To re-enable,
@@ -26,13 +37,30 @@ interface AuthResponse {
 //   return 'requiresOtp' in r && r.requiresOtp === true;
 // }
 
-export function createSession(user: { id: string; name: string; role: UserRole; lga: string }): Session {
+export function createSession(user: {
+  id: string;
+  name: string;
+  role: UserRole;
+  lga?: string;
+  ward?: string;
+  village?: string;
+  lgaId?: string;
+  wardId?: string;
+  villageId?: string;
+  roleLabel?: string;
+}): Session {
   const session: Session = {
     id: user.id,
     phone: '',
     role: user.role,
+    roleLabel: user.roleLabel,
     name: user.name,
-    lga: user.lga,
+    lga: user.lga ?? '',
+    ward: user.ward,
+    village: user.village,
+    lgaId: user.lgaId,
+    wardId: user.wardId,
+    villageId: user.villageId,
     token: '',
     loginAt: Date.now(),
     expiresAt: Date.now() + 8 * 60 * 60 * 1000,

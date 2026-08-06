@@ -1,6 +1,7 @@
 import { pgTable, uuid, text, timestamp, boolean, foreignKey } from 'drizzle-orm/pg-core';
 import { lgas } from './lgas';
 import { wards } from './lgas';
+import { villages } from './villages';
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -14,6 +15,7 @@ export const users = pgTable('users', {
   }).notNull().default('community_admin'),
   lgaId: uuid('lga_id'),
   wardId: uuid('ward_id'),
+  villageId: uuid('village_id'),
   avatar: text('avatar'),
   isActive: boolean('is_active').default(true).notNull(),
   otpCode: text('otp_code'),
@@ -24,6 +26,7 @@ export const users = pgTable('users', {
 }, (table) => ({
   lgaFk: foreignKey({ columns: [table.lgaId], foreignColumns: [lgas.id] }),
   wardFk: foreignKey({ columns: [table.wardId], foreignColumns: [wards.id] }),
+  villageFk: foreignKey({ columns: [table.villageId], foreignColumns: [villages.id] }),
 }));
 
 export const sessions = pgTable('sessions', {

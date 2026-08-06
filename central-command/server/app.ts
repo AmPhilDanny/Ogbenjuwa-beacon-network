@@ -33,6 +33,7 @@ import { dashboardRouter } from './routes/dashboard.js';
 import { pushSubscriptionRouter } from './routes/push-subscriptions.js';
 import { notificationPreferencesRouter } from './routes/notification-preferences.js';
 import { feedRouter } from './routes/feed.js';
+import { roleRouter } from './routes/roles.js';
 import { swaggerRouter } from './routes/swagger.js';
 
 const app = express();
@@ -110,6 +111,7 @@ try {
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/roles', roleRouter);
 app.use('/api/v1/lgas', lgaRouter);
 app.use('/api/v1/alerts', alertRouter);
 app.use('/api/v1/incidents', incidentRouter);

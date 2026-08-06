@@ -39,9 +39,16 @@ export default function Home() {
           <h1 className="text-4xl font-extrabold tracking-tight text-primary">
             Welcome back, {session?.name || 'Member'}
           </h1>
+          {session?.roleLabel && (
+            <Badge variant="outline" className="text-sm font-medium capitalize">
+              {session.roleLabel}
+            </Badge>
+          )}
           <p className="text-lg text-muted-foreground">
             Everything is currently {stats.activeAlerts > 0 ? 'being monitored' : 'secure'} in{' '}
-            <span className="font-semibold text-foreground">{session?.lga || 'your area'}</span>.
+            <span className="font-semibold text-foreground">
+              {[session?.village, session?.lga].filter(Boolean).join(', ') || 'your area'}
+            </span>.
           </p>
           <div className={cn(
             "flex items-center gap-2 pt-2 text-sm font-medium w-fit px-3 py-1 rounded-full border",

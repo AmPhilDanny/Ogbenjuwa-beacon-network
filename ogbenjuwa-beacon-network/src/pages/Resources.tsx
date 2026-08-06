@@ -9,47 +9,48 @@ interface Resource {
   id: string;
   type: string;
   name: string;
+  lgaId?: string;
   lga?: string;
+  village?: string;
   phone?: string;
   capacity?: number;
   occupied?: number;
 }
 
-const emergencyContacts = [
-  {
-    category: 'Emergency Services',
-    items: [
-      { name: 'Police Emergency', phone: '112', desc: 'National emergency response line' },
-      { name: 'Police (Otukpo Division)', phone: '0803 123 4567', desc: 'Otukpo Divisional Police Headquarters' },
-      { name: 'Medical Emergency', phone: '199', desc: '24/7 emergency medical response' },
-      { name: 'Fire Service', phone: '044 123456', desc: 'Benue State Fire Service' },
-    ]
-  },
-  {
-    category: 'Community Safety',
-    items: [
-      { name: 'Ward Lead - Ward 1', phone: '0812 345 6789', desc: 'Hon. Oche Amali (Chairman)' },
-      { name: 'Cluster A Lead', phone: '0802 456 7890', desc: 'Mrs. Adah Agbo' },
-      { name: 'Cluster B Lead', phone: '0703 567 8901', desc: 'Mr. Idoko John' },
-    ]
-  },
-  {
-    category: 'Medical Facilities',
-    items: [
-      { name: 'FMC Otukpo', phone: '044 234567', desc: 'Federal Medical Centre, 1.2km away' },
-      { name: 'General Hospital', phone: '0805 123 4567', desc: 'Otukpo General Hospital, 2.5km away' },
-      { name: 'St. Marys Hospital', phone: '0706 789 0123', desc: 'Private medical facility, 1.8km away' },
-    ]
-  }
-];
+interface Contact {
+  id: string;
+  name: string;
+  phone: string;
+  village?: string | null;
+  lgaId?: string | null;
+  lga?: string;
+}
+
+interface LgaRow {
+  id: string;
+  name: string;
+}
 
 export default function Resources() {
   const [resources, setResources] = useState<Resource[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get<{ data: Resource[] }>('/resources')
-      .then(res => setResources(res.data || []))
-      .catch(() => {});
+    Promise.all([
+      api.get<{ data: Resource[] }>('/resources').catch(() => ({ data: [] })),
+      api.get<{ data: Contact[] }>('/contacts').catch(() => ({ data: [] })),
+      api.get<{ data: LgaRow[] }>('/lgas').catch(() => ({ data: [] })),
+    ]).then(([resRes, contactsRes, lgasRes]) => {
+      const lgaById = new Map<string, string>(lgasRes.data.map((l): [string, string] => [l.id, l.name]));
+      setResources(resRes.data.map((r) => ({ ...r, lga: r.lgaId ? lgaById.get(r.lgaId) ?? undefined : r.lga })));
+      setContacts(
+        contactsRes.data.map((c) => ({
+          ...c,
+          lga: c.lgaId ? lgaById.get(c.lgaId) ?? undefined : undefined,
+        }))
+      );
+    }).finally(() => setLoading(false));
   }, []);
 
   return (
@@ -88,28 +89,52 @@ export default function Resources() {
           </Card>
         )}
 
-        {emergencyContacts.map((group) => (
-          <Card key={group.category}>
+        {!loading && contacts.length > 0 && (
+          <Card className="md:col-span-2">
             <CardHeader>
-              <CardTitle>{group.category}</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Phone className="h-5 w-5 text-primary" />
+                Emergency Contacts
+              </CardTitle>
+              <CardDescription>Verified community safety contacts.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {group.items.map((item) => (
-                <div key={item.name} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+              {contacts.map((item) => (
+                <div key={item.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
                   <div className="space-y-1">
                     <p className="font-semibold">{item.name}</p>
-                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                    {(item.lga || item.village) && (
+                      <p className="text-xs text-muted-foreground">
+                        {[item.village, item.lga].filter(Boolean).join(', ')}
+                      </p>
+                    )}
                     <p className="text-sm font-mono text-primary font-bold">{item.phone}</p>
                   </div>
-                  <Button size="sm" variant="secondary" className="gap-2">
-                    <Phone className="h-4 w-4" />
-                    Call
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="gap-2"
+                    asChild
+                  >
+                    <a href={`tel:${item.phone}`}>
+                      <Phone className="h-4 w-4" />
+                      Call
+                    </a>
                   </Button>
                 </div>
               ))}
             </CardContent>
           </Card>
-        ))}
+        )}
+
+        {loading && (
+          <Card className="md:col-span-2">
+            <CardContent className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+              <Info className="h-4 w-4" />
+              Loading emergency resources...
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="bg-primary text-primary-foreground">
           <CardHeader>
@@ -124,9 +149,15 @@ export default function Resources() {
                 <p className="text-sm opacity-90">1.2km away • Approx 15 min walk</p>
               </div>
             </div>
-            <Button variant="secondary" className="w-full gap-2">
-              <ExternalLink className="h-4 w-4" />
-              Get Directions
+            <Button variant="secondary" className="w-full gap-2" asChild>
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Otukpo+Local+Government+Secretariat"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Get Directions
+              </a>
             </Button>
           </CardContent>
         </Card>

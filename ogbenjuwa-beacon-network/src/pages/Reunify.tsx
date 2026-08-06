@@ -40,8 +40,18 @@ export default function Reunify() {
   const [reunionName, setReunionName] = useState('');
 
   useEffect(() => {
-    api.get<{ data: FamilyEntry[] }>('/family')
-      .then(res => setRegistry(res.data))
+    Promise.all([
+      api.get<{ data: FamilyEntry[] }>('/family').catch(() => ({ data: [] })),
+      api.get<{ data: { id: string; name: string }[] }>('/lgas').catch(() => ({ data: [] })),
+    ]).then(([res, lgasRes]) => {
+      const lgaById = new Map<string, string>(lgasRes.data.map((l): [string, string] => [l.id, l.name]));
+      setRegistry(
+        res.data.map((e) => ({
+          ...e,
+          lga: (e as unknown as { lgaId?: string }).lgaId ? lgaById.get((e as unknown as { lgaId: string }).lgaId) ?? '' : e.lga,
+        }))
+      );
+    })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Role } from '../shared/constants.js';
-import { hasPermission, hasRole } from '../shared/permissions.js';
+import { hasRole } from '../shared/permissions.js';
+import { hasRolePermission } from '../lib/role-permissions.js';
 import type { JwtPayload } from './auth.js';
 
 export function requireRole(...allowedRoles: Role[]) {
@@ -26,14 +27,15 @@ export function requireRole(...allowedRoles: Role[]) {
 }
 
 export function requirePermission(resource: string, action: string) {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const user = req.user as JwtPayload | undefined;
     if (!user) {
       res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
       return;
     }
 
-    if (!hasPermission(user.role as Role, `${resource}:${action}`)) {
+    const allowed = await hasRolePermission(user.role, `${resource}:${action}`);
+    if (!allowed) {
       res.status(403).json({
         error: {
           code: 'FORBIDDEN',

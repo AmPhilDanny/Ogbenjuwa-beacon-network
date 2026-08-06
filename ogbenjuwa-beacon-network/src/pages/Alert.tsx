@@ -176,6 +176,7 @@ export default function Alert() {
   const [epicentre, setEpicentre] = useState<[number, number] | null>(null);
   const [activeAlertType, setActiveAlertType] = useState<AlertTypeId | null>(null);
   const [targetVillage, setTargetVillage] = useState<string | null>(null);
+  const [lastAlertTime, setLastAlertTime] = useState('--:--');
 
   const firingRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -186,7 +187,8 @@ export default function Alert() {
       api.get<{ data: any[] }>('/villages').catch(() => ({ data: [] })),
       api.get<{ data: any[] }>('/contacts?type=emergency').catch(() => ({ data: [] })),
       api.get<{ data: any[] }>('/lgas').catch(() => ({ data: [] })),
-    ]).then(([typesRes, villagesRes, contactsRes, lgasRes]) => {
+      api.get<{ data: any[] }>('/dashboard/recent-alerts?limit=1').catch(() => ({ data: [] })),
+    ]).then(([typesRes, villagesRes, contactsRes, lgasRes, recentRes]) => {
       const mappedTypes: AlertType[] = typesRes.data.map((t: any) => ({
         id: t.key,
         label: t.label,
@@ -218,6 +220,11 @@ export default function Alert() {
         village: c.village || '',
       }));
       setContacts(mappedContacts);
+
+      const latest = recentRes.data[0];
+      if (latest?.createdAt) {
+        setLastAlertTime(new Date(latest.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      }
 
       if (mappedVillages.length > 0) {
         setVillage(mappedVillages[0].name);
@@ -373,7 +380,7 @@ export default function Alert() {
         registered={contacts.length}
         lgaNodes={9}
         delivered={deliveredCount}
-        lastTime={isTriggered ? formatTimer(timerMs) : '--:--'}
+        lastTime={isTriggered ? formatTimer(timerMs) : lastAlertTime}
       />
 
       {/* 3-column layout */}

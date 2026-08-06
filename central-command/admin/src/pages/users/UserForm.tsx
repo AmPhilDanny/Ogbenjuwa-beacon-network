@@ -9,7 +9,7 @@ import type { Lga, User, Ward } from '../../lib/types';
 const inputCls =
   'w-full px-3 py-2 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring';
 
-const ROLES = [
+const FALLBACK_ROLES = [
   { value: 'super_admin', label: 'Super Admin' },
   { value: 'state_observer', label: 'State Observer' },
   { value: 'lga_coordinator', label: 'LGA Coordinator' },
@@ -24,6 +24,7 @@ export default function UserForm() {
   const isEdit = !!id;
 
   const { data: lgasData } = useApi<{ data: Lga[] }>('/lgas');
+  const { data: rolesData } = useApi<{ data: { name: string; label: string }[] }>('/roles');
   const { data: user, loading: userLoading } = useApi<User>(isEdit ? `/users/${id}` : '', isEdit);
   const [wards, setWards] = useState<Ward[]>([]);
 
@@ -102,6 +103,8 @@ export default function UserForm() {
   if (isEdit && userLoading) return <p className="text-muted-foreground">Loading...</p>;
 
   const lgas = lgasData?.data || [];
+  const loadedRoles = (rolesData?.data || []).map((r) => ({ value: r.name, label: r.label }));
+  const roleOptions = loadedRoles.length > 0 ? loadedRoles : FALLBACK_ROLES;
 
   return (
     <div className="max-w-lg">
@@ -133,7 +136,7 @@ export default function UserForm() {
               <div>
                 <label className="block text-sm font-medium mb-1">Role</label>
                 <select className={inputCls} value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
-                  {ROLES.map((r) => (
+                  {roleOptions.map((r) => (
                     <option key={r.value} value={r.value}>{r.label}</option>
                   ))}
                 </select>

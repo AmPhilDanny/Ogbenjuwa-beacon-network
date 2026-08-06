@@ -27,6 +27,7 @@ const ApiKeys = lazy(() => import('./pages/ApiKeys'));
 const SiteSettings = lazy(() => import('./pages/settings/SiteSettings'));
 const SmsSimulator = lazy(() => import('./pages/sms/SmsSimulator'));
 const NotificationPreferences = lazy(() => import('./pages/NotificationPreferences'));
+const RolesPage = lazy(() => import('./pages/roles/RolesPage'));
 
 function PageLoader() {
   return (
@@ -68,6 +69,7 @@ export default function App() {
               <Route path="api-keys" element={<ApiKeys />} />
               <Route path="settings" element={<SiteSettings />} />
               <Route path="notifications" element={<NotificationPreferences />} />
+              <Route path="roles" element={<RolesPage />} />
               <Route path="sms" element={<SmsSimulator />} />
             </Route>
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

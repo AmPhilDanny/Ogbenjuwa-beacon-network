@@ -1,4 +1,5 @@
 export { users, sessions } from './users';
+export { roles } from './roles';
 export { lgas, wards } from './lgas';
 export { alerts } from './alerts';
 export { incidents, incidentEvidence } from './incidents';
