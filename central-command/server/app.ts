@@ -55,6 +55,8 @@ app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (server-to-server, curl, etc.)
     if (!origin) return callback(null, true);
+    // Allow Cordova apps loaded from file:// (origin is the string "null")
+    if (origin === 'null') return callback(null, true);
     // Allow localhost origins and production Vercel domains
     const allowed = corsOrigins.some(o => origin.startsWith(o)) || origin.endsWith('.vercel.app') || origin.endsWith('.onrender.com');
     callback(null, allowed);

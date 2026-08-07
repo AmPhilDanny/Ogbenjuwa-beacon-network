@@ -218,7 +218,7 @@ textarea.input { resize: vertical; min-height: 90px; }
 .pick-option.selected { border-color: var(--green); background: var(--green-light); }
 
 /* ── Panic button ───────────────────────────────────────────────────────── */
-.panic-wrap { display: flex; flex-direction: column; align-items: center; padding: 10px 16px 24px; }
+.panic-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 62px - 76px); padding: 10px 16px 24px; }
 .panic-btn-wrap { margin: 14px 0 10px; position: relative; }
 .panic-btn {
   width: 210px; height: 210px; border-radius: 50%; border: none; cursor: pointer;
@@ -227,6 +227,11 @@ textarea.input { resize: vertical; min-height: 90px; }
   font-size: 34px; letter-spacing: 3px;
   box-shadow: 0 10px 30px rgba(220, 38, 38, 0.45), inset 0 -6px 18px rgba(0,0,0,0.25);
   transition: transform .1s; position: relative; z-index: 1;
+}
+@media (max-width: 480px) {
+  .panic-btn { width: 165px; height: 165px; font-size: 26px; }
+  .panic-countdown { inset: -10px; border-width: 4px; }
+  .panic-note { max-width: 260px; font-size: 12.5px; }
 }
 .panic-btn:active { transform: scale(.96); }
 .panic-btn.arming { animation: btn-pulse 0.8s ease-in-out infinite; }
@@ -239,11 +244,16 @@ textarea.input { resize: vertical; min-height: 90px; }
 .panic-note { font-size: 13px; color: var(--ink-mid); text-align: center; max-width: 300px; }
 
 /* ── SOS sent state ─────────────────────────────────────────────────────── */
-.sos-sent { text-align: center; padding: 30px 20px; }
+.sos-sent { text-align: center; padding: 30px 20px; width: 100%; max-width: 420px; margin: 0 auto; }
 .sos-sent .sos-icon { font-size: 60px; }
 .sos-sent h2 { font-size: 20px; color: var(--red); margin: 8px 0 4px; }
 .sos-ref { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
 .sos-timer { font-weight: 700; color: var(--ink-mid); margin-bottom: 18px; font-size: 15px; }
+.sharing-status { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-mid); background: var(--green-light); border-radius: 20px; padding: 6px 12px; margin-bottom: 16px; }
+.sharing-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); animation: pulse-soft 1.2s ease-in-out infinite; }
+@keyframes pulse-soft { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+#panic-contacts { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+#panic-contacts .btn { margin: 0; }
 
 /* ── Feed posts ─────────────────────────────────────────────────────────── */
 .post-card {

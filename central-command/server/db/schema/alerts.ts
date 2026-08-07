@@ -13,6 +13,7 @@ export const alerts = pgTable('alerts', {
   lgaId: uuid('lga_id').notNull().references(() => lgas.id),
   wardId: uuid('ward_id'),
   location: text('location'),
+  contactPhone: text('contact_phone'),
   reportedBy: uuid('reported_by').notNull().references(() => users.id),
   assignedTo: uuid('assigned_to'),
   status: text('status', {

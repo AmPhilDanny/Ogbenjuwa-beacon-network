@@ -19,6 +19,7 @@ export async function ensureAuthTables(sql: postgres.Sql) {
       role text NOT NULL DEFAULT 'community_admin',
       lga_id uuid,
       ward_id uuid,
+      village_id uuid,
       avatar text,
       is_active boolean NOT NULL DEFAULT true,
       otp_code text,
@@ -53,6 +54,17 @@ export async function ensureAuthTables(sql: postgres.Sql) {
   `;
   await sql`
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+  `;
+
+  // ── idempotent column backfills (ADD COLUMN IF NOT EXISTS) ──────────
+  await sql`
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS village_id uuid;
+  `;
+  await sql`
+    ALTER TABLE alerts ADD COLUMN IF NOT EXISTS contact_phone text;
+  `;
+  await sql`
+    ALTER TABLE resources ADD COLUMN IF NOT EXISTS village_id uuid;
   `;
 
   console.log('  ✓ Auth tables ensured (users, sessions)');

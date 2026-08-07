@@ -29,6 +29,7 @@
 
   function alertCard(a) {
     var active = a.status === 'active' || a.status === 'investigating';
+    var phone = a.contactPhone || '+2348030000000';
     return '<div class="citizen-alert-card ' + (active ? 'alert-active' : 'alert-resolved') + '">' +
       '<div class="alert-card-header">' +
         '<span class="alert-icon">' + (TYPE_ICONS[a.type] || '⚠️') + '</span>' +
@@ -38,8 +39,9 @@
       '<div class="alert-location">' + UI.escapeHtml(a.location || '') + '</div>' +
       '<div class="alert-time">' + UI.timeAgo(a.createdAt) + '</div>' +
       (a.description ? '<div class="alert-instruction">⚠️ ' + UI.escapeHtml(a.description) + '</div>' : '') +
+      (a.contactPhone ? '<div class="small muted">Contact: ' + UI.escapeHtml(a.contactPhone) + '</div>' : '') +
       '<div class="alert-actions">' +
-        '<a href="tel:+2348030000000" class="btn btn-danger btn-sm">📞 ' + UI.escapeHtml(i18n.t('call_emergency')) + '</a>' +
+        '<a href="tel:' + UI.escapeHtml(phone) + '" class="btn btn-danger btn-sm">📞 ' + UI.escapeHtml(i18n.t('call_emergency')) + '</a>' +
         '<a href="resources.html" class="btn btn-outline btn-sm">🗺️ ' + UI.escapeHtml(i18n.t('find_resources')) + '</a>' +
       '</div>' +
     '</div>';

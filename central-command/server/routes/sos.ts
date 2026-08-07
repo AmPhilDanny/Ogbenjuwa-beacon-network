@@ -88,21 +88,51 @@ router.put('/:id', requireRole('super_admin', 'state_observer', 'lga_coordinator
   }
 });
 
-// Quick resolve helper
-router.post('/:id/resolve', requireRole('super_admin', 'state_observer', 'lga_coordinator'), async (req, res, next) => {
+// The SOS owner keeps sharing their live location until they resolve it
+router.post('/:id/location', validate(z.object({ location: z.string().min(1) })), async (req, res, next) => {
   try {
-    const [signal] = await db.update(sosSignals)
-      .set({ status: 'resolved', resolvedAt: new Date(), respondedBy: req.user!.id })
-      .where(eq(sosSignals.id, req.params.id as string))
-      .returning();
-
+    const [signal] = await db.select().from(sosSignals).where(eq(sosSignals.id, req.params.id as string));
     if (!signal) {
       res.status(404).json({ error: { code: 'NOT_FOUND', message: 'SOS signal not found' } });
       return;
     }
+    if (signal.userId !== req.user!.id) {
+      res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Not your SOS signal' } });
+      return;
+    }
+    const [updated] = await db.update(sosSignals)
+      .set({ location: req.body.location })
+      .where(eq(sosSignals.id, signal.id))
+      .returning();
+    broadcast('sos:location', updated);
+    res.json(updated);
+  } catch (err) {
+    next(err);
+  }
+});
 
-    broadcast('sos:updated', signal);
-    res.json(signal);
+// The SOS owner can deactivate / resolve their own active panic
+router.post('/:id/resolve', async (req, res, next) => {
+  try {
+    const [signal] = await db.select().from(sosSignals).where(eq(sosSignals.id, req.params.id as string));
+    if (!signal) {
+      res.status(404).json({ error: { code: 'NOT_FOUND', message: 'SOS signal not found' } });
+      return;
+    }
+    const isOwner = signal.userId === req.user!.id;
+    const isResponder = ['super_admin', 'state_observer', 'lga_coordinator'].includes(req.user!.role);
+    if (!isOwner && !isResponder) {
+      res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Not authorized to resolve this SOS' } });
+      return;
+    }
+
+    const [updated] = await db.update(sosSignals)
+      .set({ status: 'resolved', resolvedAt: new Date(), respondedBy: isResponder ? req.user!.id : signal.respondedBy })
+      .where(eq(sosSignals.id, signal.id))
+      .returning();
+
+    broadcast('sos:updated', updated);
+    res.json(updated);
   } catch (err) {
     next(err);
   }

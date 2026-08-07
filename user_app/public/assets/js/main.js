@@ -90,4 +90,15 @@
     requireAuth: requireAuth,
     currentPage: currentPage,
   };
+
+  if (window.OGBENJUWA.platform && window.OGBENJUWA.platform.isNative) {
+    window.OGBENJUWA.platform.ready(function () {
+      try {
+        if (window.StatusBar) {
+          window.StatusBar.backgroundColorByHexString('#1a6b3a');
+          window.StatusBar.styleLightContent();
+        }
+      } catch (e) { /* not available */ }
+    });
+  }
 })();

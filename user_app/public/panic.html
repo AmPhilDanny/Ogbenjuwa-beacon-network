@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -45,8 +45,13 @@
       <h2 data-i18n="sos_sent">HELP IS COMING</h2>
       <div class="sos-ref" id="sos-ref">Ref: —</div>
       <div class="sos-timer" id="sos-timer">Alert sent 0:00 ago</div>
-      <a href="tel:+2348030000000" class="btn btn-danger btn-block" data-i18n="call_emergency">📞 Call LGA Emergency</a>
-      <button type="button" class="btn btn-outline btn-block mt-16" id="safe-now" data-i18n="safe_now">I am safe now</button>
+      <div class="sharing-status" id="sharing-status">
+        <span class="sharing-dot"></span><span data-i18n="sharing_location">Sharing your live location with command…</span>
+      </div>
+      <div id="panic-contacts"></div>
+      <a href="tel:+2348030000000" class="btn btn-danger btn-block mt-16" id="lga-phone" data-i18n="call_emergency">📞 Call LGA Emergency</a>
+      <button type="button" class="btn btn-outline btn-block mt-8" id="safe-now" data-i18n="safe_now">I am safe now — stop sharing</button>
+      <button type="button" class="btn btn-link btn-block mt-8 danger-text" id="stop-sharing" data-i18n="stop_sharing">Stop sharing location</button>
     </div>
 
     <div class="sms-fallback" id="sms-fallback" style="width:calc(100% - 24px);">
@@ -55,12 +60,14 @@
     </div>
   </div>
 
+  <script src="cordova.js"></script>
   <script src="assets/config.js"></script>
   <script src="assets/js/session.js"></script>
   <script src="assets/js/api.js"></script>
   <script src="assets/js/ws.js"></script>
   <script src="assets/js/i18n.js"></script>
   <script src="assets/js/ui.js"></script>
+  <script src="assets/js/cordova.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="assets/js/panic.js"></script>
 </body>

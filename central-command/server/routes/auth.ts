@@ -338,6 +338,42 @@ router.get('/me', authenticate, async (req, res, next) => {
   }
 });
 
+const updateProfileSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  phone: z.string().max(30).optional().nullable(),
+  lgaId: z.string().uuid().optional().nullable(),
+  wardId: z.string().uuid().optional().nullable(),
+  villageId: z.string().uuid().optional().nullable(),
+  avatar: z.string().max(500).optional().nullable(),
+});
+
+// PATCH /auth/me — residents/any authenticated user edits their own profile
+router.patch('/me', authenticate, validate(updateProfileSchema), async (req, res, next) => {
+  try {
+    const [user] = await db.select().from(users).where(eq(users.id, req.user!.id));
+    if (!user) {
+      res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User not found' } });
+      return;
+    }
+
+    const updates: Record<string, unknown> = {};
+    for (const key of ['name', 'phone', 'lgaId', 'wardId', 'villageId', 'avatar'] as const) {
+      if (req.body[key] !== undefined) {
+        updates[key] = req.body[key] ?? null;
+      }
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await db.update(users).set(updates).where(eq(users.id, user.id));
+    }
+
+    const [updated] = await db.select().from(users).where(eq(users.id, user.id));
+    res.json(await buildUserPayload(updated));
+  } catch (err) {
+    next(err);
+  }
+});
+
 const registerSchema = z.object({
   email: z.string().email(),
   username: z.string().min(3).max(30),

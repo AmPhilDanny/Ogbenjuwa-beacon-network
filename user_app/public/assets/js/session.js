@@ -128,23 +128,27 @@
     },
 
     // ── Offline queue (non-GET actions awaiting connectivity) ───────────
+    // Stored in localStorage so queued reports survive app restarts.
     getQueue: function () {
       try {
-        return JSON.parse(sessionStorage.getItem(QUEUE_KEY) || '[]');
+        return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]');
       } catch (e) {
         return [];
       }
     },
+    setQueue: function (queue) {
+      localStorage.setItem(QUEUE_KEY, JSON.stringify(queue || []));
+    },
     enqueue: function (action) {
       var queue = this.getQueue();
       queue.push(Object.assign({ ts: Date.now() }, action));
-      sessionStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
+      this.setQueue(queue);
       return queue.length;
     },
     dequeue: function () {
       var queue = this.getQueue();
       var item = queue.shift();
-      sessionStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
+      this.setQueue(queue);
       return item || null;
     },
     queueCount: function () {

@@ -159,7 +159,7 @@ doc.add_paragraph()
 
 urls = doc.add_paragraph()
 urls.alignment = WD_ALIGN_PARAGRAPH.CENTER
-urls.add_run('🌐 ogbenjuwa.com.ng  |  🔧 central-command.ogbenjuwa.com.ng  |  👤 portal.ogbenjuwa.com.ng')
+urls.add_run('🌐 ogbenjuwa-beacon.onrender.com  |  🔧 central-command.ogbenjuwa-beacon.onrender.com  |  👤 portal.ogbenjuwa-beacon.onrender.com')
 for run in urls.runs:
     run.font.size = Pt(12)
     run.bold = True
@@ -174,7 +174,7 @@ add_heading(doc, '1. Executive Summary', 1, color=(200, 16, 46))
 add_divider(doc)
 
 add_para(doc,
-    'Ogbenjuwa (formerly "Amua") is a full-stack community safety alert platform built specifically '
+    'Ogbenjuwa is a full-stack community safety alert platform built specifically '
     'for the Idoma-speaking communities of Benue State, Nigeria. The platform enables citizens, '
     'community leaders, and security operatives to report, track, and respond to security incidents '
     'in real time — via both modern web interfaces and traditional SMS/USSD channels (*347#).',
@@ -267,9 +267,9 @@ for cell in hdr:
             run.font.size = Pt(11)
 
 rows_data = [
-    ('Layer 1 — Beacon Network', 'Public Alert Map\n(ogbenjuwa.com.ng)', 'Any community member viewing the map, reporting incidents, or checking alerts'),
-    ('Layer 2 — Citizen Portal', 'Personal Safety App\n(portal.ogbenjuwa.com.ng)', 'Registered citizens who need panic button, personal dashboard, family reunification'),
-    ('Layer 3 — Central Command', 'Admin Dashboard + API\n(central-command.ogbenjuwa.com.ng)', 'LGA coordinators, vigilante leaders, super admins managing all operations'),
+    ('Layer 1 — Beacon Network', 'Public Alert Map\n(ogbenjuwa-beacon.onrender.com)', 'Any community member viewing the map, reporting incidents, or checking alerts'),
+    ('Layer 2 — Citizen Portal', 'Personal Safety App\n(portal.ogbenjuwa-beacon.onrender.com)', 'Registered citizens who need panic button, personal dashboard, family reunification'),
+    ('Layer 3 — Central Command', 'Admin Dashboard + API\n(central-command.ogbenjuwa-beacon.onrender.com)', 'LGA coordinators, vigilante leaders, super admins managing all operations'),
 ]
 
 for i, (l, p, u) in enumerate(rows_data):
@@ -358,10 +358,10 @@ doc.add_paragraph()
 
 add_para(doc, 'Deployment Infrastructure:', bold=True, size=11)
 deploy_items = [
-    'Beacon Network (Frontend): Vercel → ogbenjuwa.com.ng',
-    'Citizen Portal (Frontend): Vercel → portal.ogbenjuwa.com.ng',
-    'Central Command API: Render (Docker) → api.ogbenjuwa.com.ng',
-    'Admin Dashboard: Vercel → central-command.ogbenjuwa.com.ng',
+    'Beacon Network (Frontend): Vercel → ogbenjuwa-beacon.onrender.com',
+    'Citizen Portal (Frontend): Vercel → portal.ogbenjuwa-beacon.onrender.com',
+    'Central Command API: Render (Docker) → api.ogbenjuwa-beacon.onrender.com',
+    'Admin Dashboard: Vercel → central-command.ogbenjuwa-beacon.onrender.com',
     'Database: Neon/Supabase (serverless PostgreSQL)',
 ]
 for item in deploy_items:
@@ -375,7 +375,7 @@ doc.add_paragraph()
 add_heading(doc, '5. Layer 1 — Ogbenjuwa Beacon Network (Public Alert Map)', 1, color=(200, 16, 46))
 add_divider(doc)
 
-add_para(doc, 'URL: ogbenjuwa.com.ng  |  Port: 3000  |  Access: Public (no login required)', bold=True, color=(100, 100, 100), size=10)
+add_para(doc, 'URL: ogbenjuwa-beacon.onrender.com  |  Port: 3000  |  Access: Public (no login required)', bold=True, color=(100, 100, 100), size=10)
 doc.add_paragraph()
 
 add_para(doc,
@@ -462,7 +462,7 @@ doc.add_paragraph()
 add_heading(doc, '6. Layer 2 — Citizen Portal (Personal Safety App)', 1, color=(200, 16, 46))
 add_divider(doc)
 
-add_para(doc, 'URL: portal.ogbenjuwa.com.ng  |  Port: 3001  |  Access: Self-registration via phone OTP', bold=True, color=(100, 100, 100), size=10)
+add_para(doc, 'URL: portal.ogbenjuwa-beacon.onrender.com  |  Port: 3001  |  Access: Self-registration via phone OTP', bold=True, color=(100, 100, 100), size=10)
 doc.add_paragraph()
 
 add_para(doc,
@@ -519,7 +519,7 @@ doc.add_paragraph()
 add_heading(doc, '7. Layer 3 — Central Command Deck (Admin + API Backend)', 1, color=(200, 16, 46))
 add_divider(doc)
 
-add_para(doc, 'URL: central-command.ogbenjuwa.com.ng  |  API Port: 4001  |  Admin Port: 4000', bold=True, color=(100, 100, 100), size=10)
+add_para(doc, 'URL: central-command.ogbenjuwa-beacon.onrender.com  |  API Port: 4001  |  Admin Port: 4000', bold=True, color=(100, 100, 100), size=10)
 doc.add_paragraph()
 
 add_para(doc,
@@ -762,7 +762,7 @@ doc.add_paragraph()
 add_heading(doc, '9. API Endpoints Summary', 1, color=(200, 16, 46))
 add_divider(doc)
 
-add_para(doc, 'Base URL: https://api.ogbenjuwa.com.ng/api/v1  |  Documentation: /api/docs (Swagger UI)', size=10, color=(100, 100, 100))
+add_para(doc, 'Base URL: https://api.ogbenjuwa-beacon.onrender.com/api/v1  |  Documentation: /api/docs (Swagger UI)', size=10, color=(100, 100, 100))
 doc.add_paragraph()
 
 endpoint_groups = [
@@ -1173,9 +1173,9 @@ contact_info = doc.add_paragraph()
 contact_info.alignment = WD_ALIGN_PARAGRAPH.CENTER
 contact_info.add_run(
     'GitHub: github.com/AmPhilDanny/Ogbenjuwa-beacon-network\n'
-    'Website: ogbenjuwa.com.ng\n'
-    'Portal: portal.ogbenjuwa.com.ng\n'
-    'Admin: central-command.ogbenjuwa.com.ng\n'
+    'Website: ogbenjuwa-beacon.onrender.com\n'
+    'Portal: portal.ogbenjuwa-beacon.onrender.com\n'
+    'Admin: central-command.ogbenjuwa-beacon.onrender.com\n'
     'Emergency SMS: *347#'
 )
 for run in contact_info.runs:

@@ -20,6 +20,7 @@ const createAlertSchema = z.object({
   lgaId: z.string().uuid(),
   wardId: z.string().uuid().optional(),
   location: z.string().optional(),
+  contactPhone: z.string().max(30).optional().nullable(),
   isPublic: z.boolean().default(false),
 });
 
@@ -31,6 +32,7 @@ const updateAlertSchema = z.object({
   lgaId: z.string().uuid().optional(),
   wardId: z.string().uuid().nullable().optional(),
   location: z.string().optional(),
+  contactPhone: z.string().max(30).optional().nullable(),
   status: z.enum(['active', 'investigating', 'resolved', 'false_alarm']).optional(),
   assignedTo: z.string().uuid().nullable().optional(),
   isPublic: z.boolean().optional(),

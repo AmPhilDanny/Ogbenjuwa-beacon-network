@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -42,17 +42,31 @@
       <button type="button" class="chip" data-type="food"><span data-i18n="food">Food</span></button>
     </div>
 
+    <div class="res-filters" style="display:flex;gap:8px;padding:10px 12px 0;flex-wrap:wrap;">
+      <select class="input res-filter" id="filter-lga" style="flex:1;min-width:130px;" aria-label="Local Government Area">
+        <option value="">All LGAs</option>
+      </select>
+      <select class="input res-filter" id="filter-ward" style="flex:1;min-width:110px;" aria-label="Ward">
+        <option value="">All wards</option>
+      </select>
+      <select class="input res-filter" id="filter-village" style="flex:1;min-width:110px;" aria-label="Village">
+        <option value="">All villages</option>
+      </select>
+    </div>
+
     <div id="resources-list" style="padding:0 12px;">
       <div class="card center muted" data-i18n="loading">Loading…</div>
     </div>
   </div>
 
+  <script src="cordova.js"></script>
   <script src="assets/config.js"></script>
   <script src="assets/js/session.js"></script>
   <script src="assets/js/api.js"></script>
   <script src="assets/js/ws.js"></script>
   <script src="assets/js/i18n.js"></script>
   <script src="assets/js/ui.js"></script>
+  <script src="assets/js/cordova.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="assets/js/resources.js"></script>
 </body>

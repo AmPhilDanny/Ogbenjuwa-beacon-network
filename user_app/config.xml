@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.Ogbenjuwa" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Ogbenjuwa</name>
+    <description>Ogbenjuwa Community Safety Network - citizen portal. Real-time alerts, panic button, incident reports, family search, and local resources for Idoma communities in Benue State.</description>
+    <author>Ogbenjuwa Team</author>
+
+    <content src="login.html" />
+
+    <!-- App permissions required by the citizen platform -->
+    <access origin="*" />
+    <allow-navigation href="https://*" />
+    <allow-navigation href="http://*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="geo:*" />
+
+    <!-- WebView: allow the file:// app shell to call the https API without CORS preflight -->
+    <preference name="AndroidInsecureFileModeEnabled" value="true" />
+
+    <!-- Status / splash -->
+    <preference name="StatusBarBackgroundColor" value="#1a6b3a" />
+    <preference name="StatusBarStyle" value="lightcontent" />
+    <preference name="SplashScreen" value="screen" />
+    <preference name="SplashScreenDelay" value="1500" />
+    <preference name="Orientation" value="portrait" />
+    <preference name="android-minSdkVersion" value="24" />
+    <preference name="android-targetSdkVersion" value="35" />
+
+    <platform name="android">
+        <!-- INTERNET + ACCESS_NETWORK_STATE permissions are added by cordova-plugin-whitelist and
+             cordova-plugin-network-information automatically. Do NOT add config-file blocks here -
+             they get copied verbatim into res/xml/config.xml and break resource compilation. -->
+    </platform>
+</widget>

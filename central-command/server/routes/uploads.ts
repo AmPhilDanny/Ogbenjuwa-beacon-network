@@ -41,7 +41,7 @@ const upload = multer({
 
 router.use(authenticate);
 
-router.post('/', requireRole('super_admin'), upload.single('file'), async (req, res, next) => {
+router.post('/', upload.single('file'), async (req, res, next) => {
   try {
     if (!req.file) {
       res.status(400).json({ error: { code: 'NO_FILE', message: 'No file provided' } });

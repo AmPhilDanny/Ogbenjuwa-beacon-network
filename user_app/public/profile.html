@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -32,12 +32,16 @@
     <!-- Identity card -->
     <div class="card profile-card" style="padding:0 12px;">
       <div class="profile-head">
-        <div class="avatar" id="profile-avatar">👤</div>
+        <div class="avatar-wrap">
+          <div class="avatar" id="profile-avatar">👤</div>
+          <button type="button" class="avatar-edit" id="avatar-btn" title="Change photo">📷</button>
+        </div>
         <div>
           <div class="profile-name" id="profile-name">—</div>
           <div class="small muted" id="profile-sub">—</div>
         </div>
       </div>
+      <input type="file" id="avatar-input" accept="image/*" class="hidden">
     </div>
 
     <div class="safety-card safety-clear hidden" id="safety-card">
@@ -55,6 +59,39 @@
       <div class="profile-row"><div class="pr-label" data-i18n="phone">Phone</div><div class="pr-value" id="detail-phone">—</div></div>
       <div class="profile-row"><div class="pr-label" data-i18n="lga">LGA</div><div class="pr-value" id="detail-lga">—</div></div>
       <div class="profile-row"><div class="pr-label" data-i18n="village">Village</div><div class="pr-value" id="detail-village">—</div></div>
+
+      <!-- Edit form (hidden until Edit is pressed) -->
+      <div id="edit-form" class="hidden">
+        <div class="field mt-12">
+          <label for="edit-name">Full name</label>
+          <input type="text" class="input" id="edit-name" maxlength="120">
+        </div>
+        <div class="field mt-12">
+          <label for="edit-phone">Phone</label>
+          <input type="tel" class="input" id="edit-phone" maxlength="20">
+        </div>
+        <div class="field mt-12">
+          <label for="edit-village">Village / area</label>
+          <input type="text" class="input" id="edit-village" maxlength="120">
+        </div>
+        <div class="row-btns mt-12" style="display:flex;gap:8px;">
+          <button type="button" class="btn btn-primary" id="save-profile" style="flex:1;">Save</button>
+          <button type="button" class="btn btn-outline" id="cancel-edit" style="flex:1;">Cancel</button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-outline btn-block mt-12" id="edit-btn">✏️ Edit details</button>
+    </div>
+
+    <!-- My emergency contacts -->
+    <div class="card mt-12" style="padding:0 12px;">
+      <div class="section-title"><span>📞 My emergency contacts</span></div>
+      <div class="small muted mt-8">These contacts are called when you press PANIC.</div>
+      <div id="contact-list" class="mt-12"></div>
+      <div class="contact-add mt-12" style="display:flex;gap:8px;">
+        <input type="text" class="input" id="contact-name" placeholder="Name" style="flex:1;">
+        <input type="tel" class="input" id="contact-phone" placeholder="Phone" style="flex:1;">
+        <button type="button" class="btn btn-primary" id="contact-add-btn">＋</button>
+      </div>
     </div>
 
     <!-- Notifications -->
@@ -77,12 +114,14 @@
     </div>
   </div>
 
+  <script src="cordova.js"></script>
   <script src="assets/config.js"></script>
   <script src="assets/js/session.js"></script>
   <script src="assets/js/api.js"></script>
   <script src="assets/js/ws.js"></script>
   <script src="assets/js/i18n.js"></script>
   <script src="assets/js/ui.js"></script>
+  <script src="assets/js/cordova.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="assets/js/profile.js"></script>
 </body>

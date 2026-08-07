@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { eq, desc, sql } from 'drizzle-orm';
 import db from '../config/db.js';
-import { incidents, lgas } from '../db/schema/index.js';
+import { incidents, incidentEvidence, lgas } from '../db/schema/index.js';
 import { authenticate } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { broadcast } from '../ws/index.js';
@@ -15,6 +15,9 @@ const createReportSchema = z.object({
   type: z.enum(CITIZEN_TYPES),
   lga: z.string().min(1),
   description: z.string().optional(),
+  photoUrl: z.string().max(500).optional().nullable(),
+  lat: z.number().optional(),
+  lng: z.number().optional(),
 });
 
 const PRIORITY_MAP: Record<(typeof CITIZEN_TYPES)[number], 'critical' | 'high' | 'medium' | 'low'> = {
@@ -30,21 +33,33 @@ router.use(authenticate);
 // Citizen-submitted reports — land in the incidents table so Central Command sees them
 router.post('/', validate(createReportSchema), async (req, res, next) => {
   try {
-    const { type, lga, description } = req.body as { type: (typeof CITIZEN_TYPES)[number]; lga: string; description?: string };
+    const { type, lga, description, photoUrl, lat, lng } = req.body as { type: (typeof CITIZEN_TYPES)[number]; lga: string; description?: string; photoUrl?: string | null; lat?: number; lng?: number };
     const [lgaRow] = await db.select().from(lgas).where(sql`lower(${lgas.name}) = lower(${lga})`);
     if (!lgaRow) {
       res.status(400).json({ error: { code: 'INVALID_LGA', message: `Unknown LGA: ${lga}` } });
       return;
     }
 
+    const location = lat !== undefined && lng !== undefined ? `${lat},${lng}` : null;
+
     const [incident] = await db.insert(incidents).values({
       type,
       title: `${type.charAt(0).toUpperCase() + type.slice(1)} report from ${lgaRow.name}`,
       description,
       lgaId: lgaRow.id,
+      location,
       priority: PRIORITY_MAP[type],
       reportedBy: req.user!.id,
     }).returning();
+
+    if (photoUrl) {
+      await db.insert(incidentEvidence).values({
+        incidentId: incident.id,
+        type: 'photo',
+        url: photoUrl,
+        uploadedBy: req.user!.id,
+      }).execute();
+    }
 
     broadcast('incident:new', incident);
     res.status(201).json({
@@ -52,6 +67,7 @@ router.post('/', validate(createReportSchema), async (req, res, next) => {
       type,
       lga: lgaRow.name,
       description: incident.description,
+      photoUrl: photoUrl || undefined,
       timestamp: new Date(incident.createdAt).getTime(),
       status: 'submitted',
     });

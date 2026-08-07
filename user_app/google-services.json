@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "268495805961",
+    "project_id": "ogbenjuwa-eb12d",
+    "storage_bucket": "ogbenjuwa-eb12d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:268495805961:android:8c26f8c947ade97556a2d8",
+        "android_client_info": {
+          "package_name": "com.Ogbenjuwa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVNRM0Ld6kCanXTsIGH4B8O-wn18G4H2U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -13,7 +13,8 @@ const createResourceSchema = z.object({
   type: z.enum(['medical', 'shelter', 'water', 'food']),
   name: z.string().min(1),
   lgaId: z.string().uuid(),
-  wardId: z.string().uuid().optional(),
+  wardId: z.string().uuid().optional().nullable(),
+  villageId: z.string().uuid().optional().nullable(),
   lat: z.number().optional(),
   lng: z.number().optional(),
   capacity: z.number().int().default(0),
@@ -27,10 +28,14 @@ router.get('/', async (req, res, next) => {
   try {
     const type = req.query.type as string;
     const lgaId = req.query.lgaId as string;
+    const wardId = req.query.wardId as string;
+    const villageId = req.query.villageId as string;
 
     let query = db.select().from(resources);
     if (type) query = query.where(eq(resources.type, type as any)) as typeof query;
     if (lgaId) query = query.where(eq(resources.lgaId, lgaId)) as typeof query;
+    if (wardId) query = query.where(eq(resources.wardId, wardId)) as typeof query;
+    if (villageId) query = query.where(eq(resources.villageId, villageId)) as typeof query;
 
     const all = await query;
     res.json({ data: all });

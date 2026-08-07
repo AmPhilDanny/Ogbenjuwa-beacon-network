@@ -6,15 +6,44 @@
   var api = window.OGBENJUWA.api;
   var UI = window.OGBENJUWA.UI;
   var i18n = window.OGBENJUWA.i18n;
+  var Session = window.OGBENJUWA.Session;
+
+  // Offline-queue flush handler: uploads the queued photo, then submits the report.
+  api.onQueueItem('report', function (payload) {
+    var p = payload || {};
+    function rethrow(err) { throw err; }
+    return (p.photo
+      ? uploadPhoto(p.photo)
+      : Promise.resolve(null))
+      .then(function (up) {
+        return api.post('/reports', {
+          type: p.type,
+          lga: p.lga || undefined,
+          village: p.village || undefined,
+          description: p.description || undefined,
+          lat: p.lat || undefined,
+          lng: p.lng || undefined,
+          photoUrl: up && up.url ? up.url : undefined,
+        });
+      })
+      .catch(rethrow);
+  });
 
   var REPORT = {
     type: null,
     lgaId: null,
+    lga: '',
     village: '',
     description: '',
     photo: null,      // dataURL or null
     urgency: 'medium',
+    lat: null,
+    lng: null,
   };
+
+  function uploadPhoto(dataUrl) {
+    return api.upload('/uploads', dataUrl, 'incident.jpg');
+  }
   var step = 1;
   var totalSteps = 5;
 
@@ -76,16 +105,60 @@
       ? lgaSel.selectedOptions[0].textContent
       : '';
 
-    api.post('/reports', {
-      type: REPORT.type,
-      lga: lgaName,
-      description: REPORT.description || undefined,
-    }).then(function (res) {
-      document.getElementById('done-ref').textContent = 'Reference: ' + (res.id || '—');
+    function showDone(res) {
+      document.getElementById('done-ref').textContent = 'Reference: ' + (res && res.id ? res.id : '—');
       showStep(1);
       document.querySelectorAll('.step-panel').forEach(function (p) { p.classList.add('hidden'); });
       document.getElementById('step-done').classList.remove('hidden');
       document.getElementById('progress-dots').classList.add('hidden');
+    }
+
+    function submit(payload) {
+      return api.post('/reports', payload).then(showDone);
+    }
+
+    if (!navigator.onLine) {
+      // Offline: queue the full report (photo included) and flush later
+      Session.enqueue({
+        kind: 'report',
+        payload: {
+          type: REPORT.type,
+          lga: lgaName,
+          village: REPORT.village,
+          description: REPORT.description,
+          lat: REPORT.lat,
+          lng: REPORT.lng,
+          photo: REPORT.photo,
+        },
+      });
+      UI.toast('Offline — report queued. Will submit when connected.', 'warning');
+      btn.disabled = false;
+      return;
+    }
+
+    var uploadPromise = REPORT.photo
+      ? uploadPhoto(REPORT.photo).catch(function (err) {
+          if (err && err.code === 'OFFLINE_QUEUED') {
+            UI.toast('Offline — report queued. Will submit when connected.', 'warning');
+            btn.disabled = false;
+            return { queued: true };
+          }
+          throw err;
+        })
+      : Promise.resolve(null);
+
+    uploadPromise.then(function (up) {
+      if (up && up.queued) return;
+      var payload = {
+        type: REPORT.type,
+        lga: lgaName,
+        village: REPORT.village || undefined,
+        description: REPORT.description || undefined,
+        lat: REPORT.lat || undefined,
+        lng: REPORT.lng || undefined,
+        photoUrl: up && up.url ? up.url : undefined,
+      };
+      return submit(payload);
     }).catch(function (err) {
       if (errEl) {
         errEl.textContent = err && err.message ? err.message : 'Could not submit report';
@@ -127,6 +200,8 @@
       var btn = this;
       btn.textContent = 'Getting location…';
       navigator.geolocation.getCurrentPosition(function (pos) {
+        REPORT.lat = pos.coords.latitude;
+        REPORT.lng = pos.coords.longitude;
         document.getElementById('gps-display').textContent =
           '📍 ' + pos.coords.latitude.toFixed(4) + ', ' + pos.coords.longitude.toFixed(4) +
           ' — accuracy ±' + Math.round(pos.coords.accuracy) + 'm';
@@ -138,6 +213,8 @@
 
     document.getElementById('report-lga').addEventListener('change', function (e) {
       REPORT.lgaId = e.target.value || null;
+      var sel = this;
+      if (sel.selectedOptions && sel.selectedOptions[0]) REPORT.lga = sel.selectedOptions[0].textContent;
       if (validateStep()) advance();
     });
     document.getElementById('report-village').addEventListener('input', function (e) {

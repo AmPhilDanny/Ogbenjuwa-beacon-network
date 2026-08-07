@@ -1,5 +1,5 @@
 // ─── Ogbenjuwa Citizen App — Community resources (resources.html) ────────
-// Public endpoint: GET /resources?type=&lgaId= — no auth required.
+// Public endpoint: GET /resources?type=&lgaId=&wardId=&villageId=
 
 (function () {
   'use strict';
@@ -8,6 +8,9 @@
   var UI = window.OGBENJUWA.UI;
 
   var currentType = '';
+  var selectedLgaId = '';
+  var selectedWardId = '';
+  var selectedVillageId = '';
   var session = window.OGBENJUWA.Session.getSession();
 
   var TYPE_ICONS = {
@@ -25,7 +28,9 @@
 
   function fetchResources() {
     var q = 'type=' + encodeURIComponent(currentType);
-    if (session && session.lgaId) q += '&lgaId=' + encodeURIComponent(session.lgaId);
+    if (selectedLgaId) q += '&lgaId=' + encodeURIComponent(selectedLgaId);
+    if (selectedWardId) q += '&wardId=' + encodeURIComponent(selectedWardId);
+    if (selectedVillageId) q += '&villageId=' + encodeURIComponent(selectedVillageId);
 
     document.getElementById('resources-list').innerHTML =
       '<div class="card center muted">' + UI.escapeHtml((window.OGBENJUWA.i18n && window.OGBENJUWA.i18n.t('loading')) || 'Loading…') + '</div>';
@@ -37,6 +42,40 @@
       document.getElementById('resources-list').innerHTML =
         '<div class="card center muted">' + UI.escapeHtml(err && err.message ? err.message : 'Could not load resources') + '</div>';
     });
+  }
+
+  function populateSelect(selId, items, placeholder) {
+    var sel = document.getElementById(selId);
+    if (!sel) return;
+    var prev = sel.value;
+    sel.innerHTML = '<option value="">' + (placeholder || 'All') + '</option>';
+    items.forEach(function (item) {
+      var opt = document.createElement('option');
+      opt.value = item.id;
+      opt.textContent = item.name;
+      sel.appendChild(opt);
+    });
+    if (prev && Array.prototype.some.call(sel.options, function (o) { return o.value === prev; })) {
+      sel.value = prev;
+    } else {
+      sel.selectedIndex = 0;
+    }
+  }
+
+  function loadWardsAndVillages(lgaId) {
+    selectedWardId = '';
+    selectedVillageId = '';
+    document.getElementById('filter-ward').innerHTML = '<option value="">All wards</option>';
+    document.getElementById('filter-village').innerHTML = '<option value="">All villages</option>';
+    if (!lgaId) return;
+
+    api.get('/lgas/' + encodeURIComponent(lgaId) + '/wards').then(function (res) {
+      populateSelect('filter-ward', normalize(res), 'All wards');
+    }).catch(function () { /* leave empty */ });
+
+    api.get('/villages?lgaId=' + encodeURIComponent(lgaId)).then(function (res) {
+      populateSelect('filter-village', normalize(res), 'All villages');
+    }).catch(function () { /* leave empty */ });
   }
 
   function render(list) {
@@ -80,7 +119,6 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-    // Public page — allow guests, but preload session if present
     window.OGBENJUWA.boot.public();
 
     document.getElementById('type-chips').addEventListener('click', function (e) {
@@ -92,6 +130,31 @@
       fetchResources();
     });
 
-    fetchResources();
+    api.get('/lgas').then(function (res) {
+      var lgas = normalize(res);
+      populateSelect('filter-lga', lgas, 'All LGAs');
+      if (session && session.lgaId) {
+        selectedLgaId = session.lgaId;
+        document.getElementById('filter-lga').value = session.lgaId;
+      }
+      loadWardsAndVillages(document.getElementById('filter-lga').value);
+      fetchResources();
+    }).catch(function () {
+      fetchResources();
+    });
+
+    document.getElementById('filter-lga').addEventListener('change', function (e) {
+      selectedLgaId = e.target.value || '';
+      loadWardsAndVillages(e.target.value || '');
+      fetchResources();
+    });
+    document.getElementById('filter-ward').addEventListener('change', function (e) {
+      selectedWardId = e.target.value || '';
+      fetchResources();
+    });
+    document.getElementById('filter-village').addEventListener('change', function (e) {
+      selectedVillageId = e.target.value || '';
+      fetchResources();
+    });
   });
 })();
