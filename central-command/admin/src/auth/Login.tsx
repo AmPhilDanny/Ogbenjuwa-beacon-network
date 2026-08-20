@@ -2,7 +2,7 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { api, ApiClientError } from '../lib/api';
-import { useI18n } from '../lib/i18n';
+import { useI18n, LanguageToggle } from '../lib/i18n';
 
 export default function Login() {
   const { t } = useI18n();
@@ -44,7 +44,10 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-sidebar flex items-center justify-center p-4">
+    <div className="min-h-screen bg-sidebar flex items-center justify-center p-4 relative">
+      <div className="absolute top-4 right-4">
+        <LanguageToggle />
+      </div>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           {brand?.logoUrl && <img src={brand.logoUrl} alt={brand.siteName} className="mx-auto h-12 w-12 rounded-xl mb-3 object-contain" />}
