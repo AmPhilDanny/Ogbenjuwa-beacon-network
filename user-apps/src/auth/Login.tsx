@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Shield, KeyRound, ChevronRight, AlertCircle, User } from 'lucide-react';
+import { Shield, KeyRound, ChevronRight, AlertCircle, User, Globe } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { getSiteSettings } from '@/lib/site-settings';
 
 export default function Login() {
-  const { t } = useLanguage();
+  const { t, language, toggleLanguage } = useLanguage();
   const navigate = useNavigate();
   const { loginWithCredentials, isAuthenticated } = useAuth();
   const brand = getSiteSettings();
@@ -44,6 +44,15 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-ogbenjuwa-ink p-4">
+      {/* Language toggle */}
+      <button
+        onClick={toggleLanguage}
+        className="absolute right-4 top-4 flex items-center gap-1.5 rounded-md border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+        title={language === 'en' ? 'Switch to Idoma' : 'Switch to English'}
+      >
+        <Globe className="h-3.5 w-3.5" />
+        {language === 'en' ? 'ENG' : 'IDM'}
+      </button>
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl" style={{ backgroundColor: brand?.primaryColor || '#059669' }}>

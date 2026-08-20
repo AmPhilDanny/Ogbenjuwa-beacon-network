@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { LanguageToggle } from '@/components/LanguageToggle';
 import { getSiteSettings } from '@/lib/site-settings';
 
 interface TopNavProps {
@@ -61,6 +62,9 @@ export function TopNav({ onMenuClick, onSOSClick }: TopNavProps) {
         
         {/* Theme toggle */}
         <ThemeToggle />
+        
+        {/* Language toggle */}
+        <LanguageToggle />
         
         {/* Authenticated user info */}
         {isAuthenticated && session && (
