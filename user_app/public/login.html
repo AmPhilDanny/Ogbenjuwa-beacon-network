@@ -29,14 +29,14 @@
         <div class="field">
           <label for="login" data-i18n="email">Email or username</label>
           <input class="input" type="text" id="login" name="login" autocomplete="username"
-                 placeholder="Email or username" required>
+                 placeholder="Email or username" data-i18n-placeholder="email" required>
         </div>
         <div class="field">
           <label for="password" data-i18n="password">Password</label>
           <div style="position:relative;">
             <input class="input" type="password" id="password" name="password" autocomplete="current-password"
                    placeholder="••••••••" required>
-            <button type="button" id="toggle-pass" aria-label="Show password"
+            <button type="button" id="toggle-pass" aria-label="Show password" data-i18n-aria-label="show_password"
                     style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
           </div>
         </div>
@@ -50,10 +50,10 @@
     </div>
 
     <div class="sms-fallback hidden" id="already-in" style="max-width:400px;width:100%;margin:12px auto;">
-      <a href="index.html">Already signed in → Go to Home</a>
+      <a href="index.html" data-i18n="go_home">Already signed in → Go to Home</a>
     </div>
     <div class="sms-fallback" style="max-width:400px;width:100%;margin:12px auto 0;">
-      <span data-i18n="log_in_help">Can't log in? Call </span><code>*347#</code> from any phone
+      <span data-i18n="log_in_help">Can't log in? Call </span><code>*347#</code> <span data-i18n="from_any_phone">from any phone</span>
     </div>
   </main>
 

@@ -8,6 +8,7 @@ import { api, ApiClientError } from '../../lib/api';
 import { formatDate, formatRelativeTime } from '../../lib/utils';
 import type { PatrolTeam, PatrolMember, PatrolShift, User } from '../../lib/types';
 import { Pencil, Power, Trash2, UserPlus, UserMinus, Plus } from 'lucide-react';
+import { useI18n } from '../../lib/i18n';
 
 const inputCls =
   'w-full px-3 py-2 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring';
@@ -20,6 +21,7 @@ const SHIFT_STATUSES: { status: PatrolShift['status']; label: string }[] = [
 ];
 
 export default function PatrolDetail() {
+  const { t } = useI18n();
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: team, loading, refetch } = useApi<PatrolTeam>(`/patrols/${id}`);
@@ -31,8 +33,8 @@ export default function PatrolDetail() {
   const [shiftForm, setShiftForm] = useState({ date: '', startTime: '', endTime: '', notes: '' });
   const [saving, setSaving] = useState(false);
 
-  if (loading) return <p className="text-muted-foreground">Loading...</p>;
-  if (!team) return <p className="text-muted-foreground">Patrol team not found</p>;
+  if (loading) return <p className="text-muted-foreground">{t('Loading...')}</p>;
+  if (!team) return <p className="text-muted-foreground">{t('Patrol team not found')}</p>;
 
   const currentTeam = team;
   const members = currentTeam.members || [];
@@ -147,14 +149,14 @@ export default function PatrolDetail() {
         </div>
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={() => navigate(`/patrols/${currentTeam.id}/edit`)}>
-            <Pencil className="w-4 h-4 mr-1.5" /> Edit
+            <Pencil className="w-4 h-4 mr-1.5" /> {t('Edit')}
           </Button>
           <Button size="sm" variant={currentTeam.isActive ? 'outline' : 'primary'} onClick={handleToggleActive}>
             <Power className="w-4 h-4 mr-1.5" />
             {currentTeam.isActive ? 'Deactivate' : 'Activate'}
           </Button>
           <Button size="sm" variant="danger" onClick={handleDelete}>
-            <Trash2 className="w-4 h-4 mr-1.5" /> Delete
+            <Trash2 className="w-4 h-4 mr-1.5" /> {t('Delete')}
           </Button>
         </div>
       </div>
@@ -163,23 +165,23 @@ export default function PatrolDetail() {
       {notice && <p className="text-sm text-green-600 mb-4 p-3 rounded-md bg-green-600/10">{notice}</p>}
 
       <Card className="mb-4">
-        <CardHeader><CardTitle>Overview</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t('Overview')}</CardTitle></CardHeader>
         <CardContent>
           <dl className="grid grid-cols-2 gap-4 text-sm">
-            <div><dt className="text-muted-foreground">Leader</dt><dd className="font-medium">{currentTeam.leaderName || '-'}</dd></div>
-            <div><dt className="text-muted-foreground">Members</dt><dd className="font-medium">{members.length}</dd></div>
-            <div><dt className="text-muted-foreground">Status</dt><dd><StatusBadge status={currentTeam.isActive ? 'active' : 'inactive'} /></dd></div>
-            <div><dt className="text-muted-foreground">Created</dt><dd className="font-medium">{currentTeam.createdAt ? formatDate(currentTeam.createdAt) : '-'}</dd></div>
+            <div><dt className="text-muted-foreground">{t('Leader')}</dt><dd className="font-medium">{currentTeam.leaderName || '-'}</dd></div>
+            <div><dt className="text-muted-foreground">{t('Members')}</dt><dd className="font-medium">{members.length}</dd></div>
+            <div><dt className="text-muted-foreground">{t('Status')}</dt><dd><StatusBadge status={currentTeam.isActive ? 'active' : 'inactive'} /></dd></div>
+            <div><dt className="text-muted-foreground">{t('Created')}</dt><dd className="font-medium">{currentTeam.createdAt ? formatDate(currentTeam.createdAt) : '-'}</dd></div>
           </dl>
         </CardContent>
       </Card>
 
       <Card className="mb-4">
-        <CardHeader><CardTitle>Members ({members.length})</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t('Members')} ({members.length})</CardTitle></CardHeader>
         <CardContent>
           <form onSubmit={handleAddMember} className="flex gap-2 mb-4">
             <select className={inputCls} value={newMemberId} onChange={(e) => setNewMemberId(e.target.value)}>
-              <option value="">Add member...</option>
+              <option value="">{t('Add member...')}</option>
               {availableUsers.map((u) => (
                 <option key={u.id} value={u.id}>{u.name} ({u.role})</option>
               ))}
@@ -189,7 +191,7 @@ export default function PatrolDetail() {
             </Button>
           </form>
           {members.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No members yet</p>
+            <p className="text-sm text-muted-foreground">{t('No members yet')}</p>
           ) : (
             <ul className="divide-y">
               {members.map((m) => (
@@ -201,7 +203,7 @@ export default function PatrolDetail() {
                   <button
                     className="p-1.5 rounded-md hover:bg-accent/10 text-accent"
                     onClick={() => handleRemoveMember(m)}
-                    title="Remove member"
+                    title={t('Remove member')}
                   >
                     <UserMinus className="w-4 h-4" />
                   </button>
@@ -213,15 +215,15 @@ export default function PatrolDetail() {
       </Card>
 
       <Card className="mb-4">
-        <CardHeader><CardTitle>Shifts</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t('Shifts')}</CardTitle></CardHeader>
         <CardContent>
           <form onSubmit={handleCreateShift} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Date</label>
+              <label className="block text-sm font-medium mb-1">{t('Date')}</label>
               <input type="date" className={inputCls} value={shiftForm.date} onChange={(e) => setShiftForm({ ...shiftForm, date: e.target.value })} required />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Start</label>
+              <label className="block text-sm font-medium mb-1">{t('Start')}</label>
               <input type="time" className={inputCls} value={shiftForm.startTime} onChange={(e) => setShiftForm({ ...shiftForm, startTime: e.target.value })} required />
             </div>
             <div>
@@ -229,18 +231,18 @@ export default function PatrolDetail() {
               <input type="time" className={inputCls} value={shiftForm.endTime} onChange={(e) => setShiftForm({ ...shiftForm, endTime: e.target.value })} required />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Notes</label>
+              <label className="block text-sm font-medium mb-1">{t('Notes')}</label>
               <input className={inputCls} value={shiftForm.notes} onChange={(e) => setShiftForm({ ...shiftForm, notes: e.target.value })} />
             </div>
             <div className="md:col-span-4">
               <Button type="submit" disabled={saving}>
-                <Plus className="w-4 h-4 mr-1" /> Schedule Shift
+                <Plus className="w-4 h-4 mr-1" /> {t('Schedule Shift')}
               </Button>
             </div>
           </form>
 
           {shifts.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No shifts scheduled</p>
+            <p className="text-sm text-muted-foreground">{t('No shifts scheduled')}</p>
           ) : (
             <ul className="divide-y">
               {shifts.map((s) => (
@@ -262,7 +264,7 @@ export default function PatrolDetail() {
                       <button
                         className="p-1.5 rounded-md hover:bg-accent/10 text-accent"
                         onClick={() => handleDeleteShift(s)}
-                        title="Delete shift"
+                        title={t('Delete shift')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

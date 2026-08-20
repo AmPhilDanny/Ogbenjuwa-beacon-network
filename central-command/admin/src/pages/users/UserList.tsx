@@ -7,8 +7,10 @@ import { api, ApiClientError } from '../../lib/api';
 import { formatDate } from '../../lib/utils';
 import type { User } from '../../lib/types';
 import { Plus, Power, Trash2 } from 'lucide-react';
+import { useI18n } from '../../lib/i18n';
 
 export default function UserList() {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const { data, loading, refetch } = useApi<{ data: User[] }>('/users');
 
@@ -32,14 +34,14 @@ export default function UserList() {
   }
 
   const columns = [
-    { key: 'name', header: 'Name', sortable: true, render: (u: User) => <span className="font-medium">{u.name}</span> },
-    { key: 'email', header: 'Email', sortable: true },
-    { key: 'role', header: 'Role', sortable: true, render: (u: User) => <StatusBadge status={u.role} /> },
-    { key: 'isActive', header: 'Status', render: (u: User) => <StatusBadge status={u.isActive ? 'active' : 'inactive'} /> },
+    { key: 'name', header: t('Name'), sortable: true, render: (u: User) => <span className="font-medium">{u.name}</span> },
+    { key: 'email', header: t('Email'), sortable: true },
+    { key: 'role', header: t('Role'), sortable: true, render: (u: User) => <StatusBadge status={u.role} /> },
+    { key: 'isActive', header: t('Status'), render: (u: User) => <StatusBadge status={u.isActive ? 'active' : 'inactive'} /> },
     { key: 'createdAt', header: 'Joined', render: (u: User) => formatDate(u.createdAt) },
     {
       key: 'actions',
-      header: 'Actions',
+      header: t('Actions'),
       render: (u: User) => (
         <div className="flex gap-1">
           <button
@@ -52,7 +54,7 @@ export default function UserList() {
           <button
             className="p-1.5 rounded-md hover:bg-accent/10 text-accent"
             onClick={(e) => { e.stopPropagation(); handleDelete(u); }}
-            title="Delete"
+            title={t('Delete')}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -66,10 +68,10 @@ export default function UserList() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-serif font-bold">Users</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Manage operators and administrators</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{t('Manage operators and administrators')}</p>
         </div>
         <Button onClick={() => navigate('/users/new')}>
-          <Plus className="w-4 h-4 mr-1" /> Add User
+          <Plus className="w-4 h-4 mr-1" /> {t('Add User')}
         </Button>
       </div>
       <DataTable

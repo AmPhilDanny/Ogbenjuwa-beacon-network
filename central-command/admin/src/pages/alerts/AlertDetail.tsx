@@ -8,6 +8,7 @@ import { api, ApiClientError } from '../../lib/api';
 import { formatDate, formatRelativeTime } from '../../lib/utils';
 import type { Alert, Lga } from '../../lib/types';
 import { Pencil, Trash2, Search, CheckCircle2, XCircle, Globe } from 'lucide-react';
+import { useI18n } from '../../lib/i18n';
 
 const STATUS_FLOW: { status: Alert['status']; label: string }[] = [
   { status: 'active', label: 'Active' },
@@ -17,6 +18,7 @@ const STATUS_FLOW: { status: Alert['status']; label: string }[] = [
 ];
 
 export default function AlertDetail() {
+  const { t } = useI18n();
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: alert, loading, refetch } = useApi<Alert>(`/alerts/${id}`);
@@ -25,8 +27,8 @@ export default function AlertDetail() {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
-  if (loading) return <p className="text-muted-foreground">Loading...</p>;
-  if (!alert) return <p className="text-muted-foreground">Alert not found</p>;
+  if (loading) return <p className="text-muted-foreground">{t('Loading...')}</p>;
+  if (!alert) return <p className="text-muted-foreground">{t('Alert not found')}</p>;
 
   const currentAlert = alert;
   const lgaName = lgasData?.data?.find((l) => l.id === currentAlert.lgaId)?.name;
@@ -67,10 +69,10 @@ export default function AlertDetail() {
         </div>
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={() => navigate(`/alerts/${currentAlert.id}/edit`)}>
-            <Pencil className="w-4 h-4 mr-1.5" /> Edit
+            <Pencil className="w-4 h-4 mr-1.5" /> {t('Edit')}
           </Button>
           <Button size="sm" variant="danger" onClick={handleDelete}>
-            <Trash2 className="w-4 h-4 mr-1.5" /> Delete
+            <Trash2 className="w-4 h-4 mr-1.5" /> {t('Delete')}
           </Button>
         </div>
       </div>
@@ -79,7 +81,7 @@ export default function AlertDetail() {
       {notice && <p className="text-sm text-green-600 mb-4 p-3 rounded-md bg-green-600/10">{notice}</p>}
 
       <Card className="mb-4">
-        <CardHeader><CardTitle>Status</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t('Status')}</CardTitle></CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 flex-wrap">
             {STATUS_FLOW.map((s) => (
@@ -102,24 +104,24 @@ export default function AlertDetail() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Details</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t('Details')}</CardTitle></CardHeader>
         <CardContent>
           <dl className="grid grid-cols-2 gap-4 text-sm">
-            <div><dt className="text-muted-foreground">Type</dt><dd className="font-medium capitalize">{currentAlert.type}</dd></div>
-            <div><dt className="text-muted-foreground">Severity</dt><dd><StatusBadge status={currentAlert.severity} /></dd></div>
-            <div><dt className="text-muted-foreground">Status</dt><dd><StatusBadge status={currentAlert.status} /></dd></div>
+            <div><dt className="text-muted-foreground">{t('Type')}</dt><dd className="font-medium capitalize">{currentAlert.type}</dd></div>
+            <div><dt className="text-muted-foreground">{t('Severity')}</dt><dd><StatusBadge status={currentAlert.severity} /></dd></div>
+            <div><dt className="text-muted-foreground">{t('Status')}</dt><dd><StatusBadge status={currentAlert.status} /></dd></div>
             <div><dt className="text-muted-foreground">LGA</dt><dd className="font-medium">{lgaName || currentAlert.lgaId}</dd></div>
-            <div><dt className="text-muted-foreground">Location</dt><dd className="font-medium">{currentAlert.location || '-'}</dd></div>
+            <div><dt className="text-muted-foreground">{t('Location')}</dt><dd className="font-medium">{currentAlert.location || '-'}</dd></div>
             <div>
-              <dt className="text-muted-foreground">Visibility</dt>
+              <dt className="text-muted-foreground">{t('Visibility')}</dt>
               <dd className="font-medium flex items-center gap-1">
                 <Globe className="w-3.5 h-3.5" />
                 {currentAlert.isPublic ? 'Public' : 'Internal'}
               </dd>
             </div>
-            <div className="col-span-2"><dt className="text-muted-foreground">Description</dt><dd className="font-medium mt-1">{currentAlert.description || 'No description'}</dd></div>
-            <div><dt className="text-muted-foreground">Created</dt><dd className="font-medium">{formatDate(currentAlert.createdAt)}</dd></div>
-            {currentAlert.resolvedAt && <div><dt className="text-muted-foreground">Resolved</dt><dd className="font-medium">{formatDate(currentAlert.resolvedAt)}</dd></div>}
+            <div className="col-span-2"><dt className="text-muted-foreground">{t('Description')}</dt><dd className="font-medium mt-1">{currentAlert.description || 'No description'}</dd></div>
+            <div><dt className="text-muted-foreground">{t('Created')}</dt><dd className="font-medium">{formatDate(currentAlert.createdAt)}</dd></div>
+            {currentAlert.resolvedAt && <div><dt className="text-muted-foreground">{t('Resolved')}</dt><dd className="font-medium">{formatDate(currentAlert.resolvedAt)}</dd></div>}
           </dl>
         </CardContent>
       </Card>

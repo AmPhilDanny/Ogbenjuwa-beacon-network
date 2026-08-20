@@ -10,11 +10,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { useApi } from '../../hooks/useApi';
 import { api, ApiClientError } from '../../lib/api';
 import type { PatrolTeam, PatrolCheckin, Lga, Ward, Village } from '../../lib/types';
+import { useI18n } from '../../lib/i18n';
 
 const inputCls =
   'px-3 py-2 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring';
 
 export default function PatrolList() {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const { data, loading, error, refetch } = useApi<{ data: PatrolTeam[] }>('/patrols');
   const { data: liveData } = useApi<{ data: PatrolCheckin[] }>('/patrols/checkins/live');
@@ -47,31 +49,31 @@ export default function PatrolList() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.wardId]);
 
-  const filteredTeams = teams.filter((t) => {
-    if (filters.lgaId && t.lgaId !== filters.lgaId) return false;
-    if (filters.wardId && t.wardId !== filters.wardId) return false;
-    if (filters.villageId && t.villageId !== filters.villageId) return false;
+  const filteredTeams = teams.filter((item) => {
+    if (filters.lgaId && item.lgaId !== filters.lgaId) return false;
+    if (filters.wardId && item.wardId !== filters.wardId) return false;
+    if (filters.villageId && item.villageId !== filters.villageId) return false;
     return true;
   });
 
-  const activeShifts = teams.filter((t) => t.isActive);
+  const activeShifts = teams.filter((item) => item.isActive);
   const liveMembers = checkins.length;
 
-  async function handleToggleActive(t: PatrolTeam) {
+  async function handleToggleActive(item: PatrolTeam) {
     setActionError('');
     try {
-      await api.put(`/patrols/${t.id}`, { isActive: !t.isActive });
+      await api.put(`/patrols/${item.id}`, { isActive: !item.isActive });
       refetch();
     } catch (err) {
       setActionError(err instanceof ApiClientError ? err.message : 'Failed to update team');
     }
   }
 
-  async function handleDelete(t: PatrolTeam) {
-    if (!window.confirm(`Delete patrol team "${t.name}"? This also removes its shifts and members.`)) return;
+  async function handleDelete(item: PatrolTeam) {
+    if (!window.confirm(`Delete patrol team "${item.name}"? This also removes its shifts and members.`)) return;
     setActionError('');
     try {
-      await api.delete(`/patrols/${t.id}`);
+      await api.delete(`/patrols/${item.id}`);
       refetch();
     } catch (err) {
       setActionError(err instanceof ApiClientError ? err.message : 'Failed to delete team');
@@ -79,35 +81,35 @@ export default function PatrolList() {
   }
 
   const columns = [
-    { key: 'name', header: 'Team', sortable: true, render: (t: PatrolTeam) => <span className="font-medium">{t.name}</span> },
-    { key: 'lgaName', header: 'LGA', render: (t: PatrolTeam) => t.lgaName || '-' },
-    { key: 'area', header: 'Ward / Village', render: (t: PatrolTeam) => [t.wardName, t.villageName].filter(Boolean).join(' / ') || '-' },
-    { key: 'leaderName', header: 'Leader', render: (t: PatrolTeam) => t.leaderName || '-' },
-    { key: 'memberCount', header: 'Members', sortable: true },
-    { key: 'isActive', header: 'Status', render: (t: PatrolTeam) => <StatusBadge status={t.isActive ? 'active' : 'inactive'} /> },
+    { key: 'name', header: 'Team', sortable: true, render: (item: PatrolTeam) => <span className="font-medium">{item.name}</span> },
+    { key: 'lgaName', header: 'LGA', render: (item: PatrolTeam) => item.lgaName || '-' },
+    { key: 'area', header: 'Ward / Village', render: (item: PatrolTeam) => [item.wardName, item.villageName].filter(Boolean).join(' / ') || '-' },
+    { key: 'leaderName', header: t('Leader'), render: (item: PatrolTeam) => item.leaderName || '-' },
+    { key: 'memberCount', header: t('Members'), sortable: true },
+    { key: 'isActive', header: t('Status'), render: (item: PatrolTeam) => <StatusBadge status={item.isActive ? 'active' : 'inactive'} /> },
     {
       key: 'actions',
-      header: 'Actions',
-      render: (t: PatrolTeam) => (
+      header: t('Actions'),
+      render: (item: PatrolTeam) => (
         <div className="flex gap-1">
           <button
             className="p-1.5 rounded-md hover:bg-muted"
-            onClick={(e) => { e.stopPropagation(); navigate(`/patrols/${t.id}/edit`); }}
-            title="Edit"
+            onClick={(e) => { e.stopPropagation(); navigate(`/patrols/${item.id}/edit`); }}
+            title={t('Edit')}
           >
             <Pencil className="w-4 h-4" />
           </button>
           <button
             className="p-1.5 rounded-md hover:bg-muted"
-            onClick={(e) => { e.stopPropagation(); handleToggleActive(t); }}
-            title={t.isActive ? 'Deactivate' : 'Activate'}
+            onClick={(e) => { e.stopPropagation(); handleToggleActive(item); }}
+            title={item.isActive ? 'Deactivate' : 'Activate'}
           >
-            <Power className={`w-4 h-4 ${t.isActive ? 'text-green-600' : 'text-muted-foreground'}`} />
+            <Power className={`w-4 h-4 ${item.isActive ? 'text-green-600' : 'text-muted-foreground'}`} />
           </button>
           <button
             className="p-1.5 rounded-md hover:bg-accent/10 text-accent"
-            onClick={(e) => { e.stopPropagation(); handleDelete(t); }}
-            title="Delete"
+            onClick={(e) => { e.stopPropagation(); handleDelete(item); }}
+            title={t('Delete')}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -121,10 +123,10 @@ export default function PatrolList() {
       <div className="mb-6 flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-serif font-bold">Patrol Operations</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Manage patrol teams, shifts and live positions</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{t('Manage patrol teams, shifts and live positions')}</p>
         </div>
         <Button onClick={() => navigate('/patrols/new')}>
-          <Plus className="w-4 h-4 mr-1" /> New Team
+          <Plus className="w-4 h-4 mr-1" /> {t('New Team')}
         </Button>
       </div>
 
@@ -135,14 +137,14 @@ export default function PatrolList() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         <StatsCard icon={Radio} label="Active Teams" value={activeShifts.length} subtext={`of ${teams.length} total teams`} />
         <StatsCard icon={Users} label="Members in Field" value={liveMembers} subtext="check-ins in last 10 min" />
-        <StatsCard icon={MapPin} label="LGAs Covered" value={new Set(teams.map((t) => t.lgaId)).size} subtext="with patrol teams" />
+        <StatsCard icon={MapPin} label="LGAs Covered" value={new Set(teams.map((item) => item.lgaId)).size} subtext="with patrol teams" />
         <StatsCard icon={CalendarClock} label="Total Teams" value={teams.length} subtext="across all locations" />
       </div>
 
       {/* Live map */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Live Patrol Map</CardTitle>
+          <CardTitle>{t('Live Patrol Map')}</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <div className="h-[400px] w-full">
@@ -156,37 +158,37 @@ export default function PatrolList() {
         <CardContent className="pt-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Local Government</label>
+              <label className="block text-sm font-medium mb-1">{t('Local Government')}</label>
               <select
                 className={inputCls}
                 value={filters.lgaId}
                 onChange={(e) => setFilters({ ...filters, lgaId: e.target.value })}
               >
-                <option value="">All LGAs</option>
+                <option value="">{t('All LGAs')}</option>
                 {lgas.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Ward</label>
+              <label className="block text-sm font-medium mb-1">{t('Ward')}</label>
               <select
                 className={inputCls}
                 value={filters.wardId}
                 onChange={(e) => setFilters({ ...filters, wardId: e.target.value })}
                 disabled={!filters.lgaId}
               >
-                <option value="">All wards</option>
+                <option value="">{t('All wards')}</option>
                 {wards.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Village</label>
+              <label className="block text-sm font-medium mb-1">{t('Village')}</label>
               <select
                 className={inputCls}
                 value={filters.villageId}
                 onChange={(e) => setFilters({ ...filters, villageId: e.target.value })}
                 disabled={!filters.wardId}
               >
-                <option value="">All villages</option>
+                <option value="">{t('All villages')}</option>
                 {villages.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
               </select>
             </div>
@@ -200,7 +202,7 @@ export default function PatrolList() {
         loading={loading}
         searchable
         searchKeys={['name', 'lgaName', 'leaderName']}
-        onRowClick={(t) => navigate(`/patrols/${t.id}`)}
+        onRowClick={(item) => navigate(`/patrols/${item.id}`)}
       />
     </div>
   );

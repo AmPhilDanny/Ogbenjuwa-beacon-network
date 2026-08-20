@@ -22,28 +22,28 @@
       <div class="auth-logo">
         <div class="logo-mark" style="font-size:40px;width:64px;height:64px;border-radius:16px;margin:0 auto;">🛡️</div>
         <h1 data-i18n="signup">Create account</h1>
-        <p>Join your community safety network</p>
+        <p data-i18n="join_network">Join your community safety network</p>
       </div>
 
       <form id="signup-form" novalidate>
         <div class="field">
           <label for="name" data-i18n="name">Full name</label>
-          <input class="input" type="text" id="name" name="name" autocomplete="name" placeholder="e.g. Mama Ojoma" required>
+          <input class="input" type="text" id="name" name="name" autocomplete="name" placeholder="e.g. Mama Ojoma" data-i18n-placeholder="eg_mama_ojoma" required>
         </div>
         <div class="field">
           <label for="email" data-i18n="email">Email</label>
-          <input class="input" type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required>
+          <input class="input" type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" data-i18n-placeholder="email_placeholder" required>
         </div>
         <div class="field">
           <label for="username" data-i18n="username">Username</label>
-          <input class="input" type="text" id="username" name="username" autocomplete="username" placeholder="min 3 characters" required>
+          <input class="input" type="text" id="username" name="username" autocomplete="username" placeholder="min 3 characters" data-i18n-placeholder="min_3_chars" required>
         </div>
         <div class="field">
           <label for="password" data-i18n="password">Password</label>
           <div style="position:relative;">
             <input class="input" type="password" id="password" name="password" autocomplete="new-password"
-                   placeholder="min 8 characters" required>
-            <button type="button" id="toggle-pass" aria-label="Show password"
+                   placeholder="min 8 characters" data-i18n-placeholder="min_8_chars" required>
+            <button type="button" id="toggle-pass" aria-label="Show password" data-i18n-aria-label="show_password"
                     style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
           </div>
         </div>
@@ -67,7 +67,7 @@
     </div>
 
     <div class="sms-fallback hidden" id="already-in" style="max-width:400px;width:100%;margin:12px auto;">
-      <a href="index.html">Already signed in → Go to Home</a>
+      <a href="index.html" data-i18n="go_home">Already signed in → Go to Home</a>
     </div>
   </main>
 

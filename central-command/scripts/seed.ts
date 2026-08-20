@@ -112,11 +112,11 @@ async function seed() {
   // ── 3. Alert Types (5) ──────────────────────────────────────────────
   console.log('Seeding alert types...');
   const alertTypesData = [
-    { key: 'attack', label: 'Armed Attack', labelIdoma: 'Ufele', icon: '⚔️', color: '#DC2626', smsTemplate: '🚨 OGBENJUWA ALERT: Armed attack reported near {v}. Warriors dispatched. Seek shelter.' },
-    { key: 'fire', label: 'Fire Outbreak', labelIdoma: 'Ole', icon: '🔥', color: '#EA580C', smsTemplate: '🔥 OGBENJUWA ALERT: Fire outbreak reported at {v}. Evacuate the area.' },
-    { key: 'medical', label: 'Medical Emergency', labelIdoma: 'Ochere', icon: '🏥', color: '#8B5CF6', smsTemplate: '🏥 OGBENJUWA ALERT: Medical emergency at {v}. Warrior medics dispatched.' },
-    { key: 'abduction', label: 'Abduction Report', labelIdoma: 'Ofa', icon: '🚷', color: '#B45309', smsTemplate: '🚷 OGBENJUWA ALERT: Abduction reported near {v}. Warriors on the move.' },
-    { key: 'other', label: 'Other / Unknown', labelIdoma: 'Obu Ofu', icon: '⚠️', color: '#6B7280', smsTemplate: '⚠️ OGBENJUWA ALERT: Incident reported at {v}. Warriors alerted.' },
+    { key: 'attack', label: 'Armed Attack', labelIdoma: 'efu ku iyefu', icon: '⚔️', color: '#DC2626', smsTemplate: '🚨 OGBENJUWA ALERT: Armed attack reported near {v}. Warriors dispatched. Seek shelter.' },
+    { key: 'fire', label: 'Fire Outbreak', labelIdoma: 'Ole mi\'ola', icon: '🔥', color: '#EA580C', smsTemplate: '🔥 OGBENJUWA ALERT: Fire outbreak reported at {v}. Evacuate the area.' },
+    { key: 'medical', label: 'Medical Emergency', labelIdoma: 'O dooche achigili', icon: '🏥', color: '#8B5CF6', smsTemplate: '🏥 OGBENJUWA ALERT: Medical emergency at {v}. Warrior medics dispatched.' },
+    { key: 'abduction', label: 'Abduction Report', labelIdoma: 'Oka ku o hekpa oche', icon: '🚷', color: '#B45309', smsTemplate: '🚷 OGBENJUWA ALERT: Abduction reported near {v}. Warriors on the move.' },
+    { key: 'other', label: 'Other / Unknown', labelIdoma: 'Oha / N\'jon', icon: '⚠️', color: '#6B7280', smsTemplate: '⚠️ OGBENJUWA ALERT: Incident reported at {v}. Warriors alerted.' },
   ];
 
   await db.insert(schema.alertTypes).values(

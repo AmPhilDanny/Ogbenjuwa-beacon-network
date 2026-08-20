@@ -34,7 +34,7 @@
       <div class="profile-head">
         <div class="avatar-wrap">
           <div class="avatar" id="profile-avatar">👤</div>
-          <button type="button" class="avatar-edit" id="avatar-btn" title="Change photo">📷</button>
+          <button type="button" class="avatar-edit" id="avatar-btn" title="Change photo" data-i18n-title="change_photo">📷</button>
         </div>
         <div>
           <div class="profile-name" id="profile-name">—</div>
@@ -71,7 +71,7 @@
           <input type="tel" class="input" id="edit-phone" maxlength="20">
         </div>
         <div class="field mt-12">
-          <label for="edit-village">Village / area</label>
+          <label for="edit-village" data-i18n="village">Village / area</label>
           <input type="text" class="input" id="edit-village" maxlength="120">
         </div>
         <div class="row-btns mt-12" style="display:flex;gap:8px;">
@@ -84,11 +84,11 @@
 
     <!-- My emergency contacts -->
     <div class="card mt-12" style="padding:0 12px;">
-      <div class="section-title"><span>📞 My emergency contacts</span></div>
-      <div class="small muted mt-8">These contacts are called when you press PANIC.</div>
+      <div class="section-title"><span data-i18n="emergency_contacts">📞 My emergency contacts</span></div>
+      <div class="small muted mt-8" data-i18n="panic_contacts_note">These contacts are called when you press PANIC.</div>
       <div id="contact-list" class="mt-12"></div>
       <div class="contact-add mt-12" style="display:flex;gap:8px;">
-        <input type="text" class="input" id="contact-name" placeholder="Name" style="flex:1;">
+        <input type="text" class="input" id="contact-name" placeholder="Name" style="flex:1;" data-i18n-placeholder="contact_name_placeholder">
         <input type="tel" class="input" id="contact-phone" placeholder="Phone" style="flex:1;">
         <button type="button" class="btn btn-primary" id="contact-add-btn">＋</button>
       </div>

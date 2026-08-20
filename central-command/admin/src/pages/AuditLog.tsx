@@ -3,6 +3,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { api } from '../lib/api';
 import { ScrollText, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { useI18n } from '../lib/i18n';
 
 interface AuditEntry {
   id: string;
@@ -42,6 +43,7 @@ const RESOURCE_LABELS: Record<string, string> = {
 };
 
 export default function AuditLog() {
+  const { t } = useI18n();
   const [logs, setLogs] = useState<AuditEntry[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -81,7 +83,7 @@ export default function AuditLog() {
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-serif font-bold">Audit Log</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Track all administrative actions</p>
+        <p className="text-sm text-muted-foreground mt-0.5">{t('Track all administrative actions')}</p>
       </div>
 
       {/* Filters */}
@@ -89,33 +91,33 @@ export default function AuditLog() {
         <CardContent className="py-3">
           <div className="flex flex-wrap items-center gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Action</label>
+              <label className="text-xs font-medium text-muted-foreground">{t('Action')}</label>
               <select
                 value={filterAction}
                 onChange={e => { setFilterAction(e.target.value); setPage(1); }}
                 className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm"
               >
-                <option value="">All Actions</option>
-                <option value="CREATE">CREATE</option>
-                <option value="UPDATE">UPDATE</option>
-                <option value="DELETE">DELETE</option>
-                <option value="LOGIN">LOGIN</option>
-                <option value="LOGOUT">LOGOUT</option>
+                <option value="">{t('All Actions')}</option>
+                <option value="CREATE">{t('CREATE')}</option>
+                <option value="UPDATE">{t('UPDATE')}</option>
+                <option value="DELETE">{t('DELETE')}</option>
+                <option value="LOGIN">{t('LOGIN')}</option>
+                <option value="LOGOUT">{t('LOGOUT')}</option>
               </select>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Resource</label>
+              <label className="text-xs font-medium text-muted-foreground">{t('Resource')}</label>
               <select
                 value={filterResource}
                 onChange={e => { setFilterResource(e.target.value); setPage(1); }}
                 className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm"
               >
-                <option value="">All Resources</option>
+                <option value="">{t('All Resources')}</option>
                 {RESOURCE_OPTIONS.map(r => <option key={r} value={r}>{RESOURCE_LABELS[r]}</option>)}
               </select>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">From</label>
+              <label className="text-xs font-medium text-muted-foreground">{t('From')}</label>
               <input
                 type="date"
                 value={dateFrom}
@@ -134,7 +136,7 @@ export default function AuditLog() {
             </div>
             {(filterAction || filterResource || dateFrom || dateTo) && (
               <Button variant="ghost" size="sm" onClick={() => { setFilterAction(''); setFilterResource(''); setDateFrom(''); setDateTo(''); }} className="mt-4">
-                <X className="w-3 h-3 mr-1" /> Clear Filters
+                <X className="w-3 h-3 mr-1" /> {t('Clear Filters')}
               </Button>
             )}
           </div>
@@ -143,12 +145,12 @@ export default function AuditLog() {
 
       {/* Table */}
       {loading ? (
-        <p className="text-sm text-muted-foreground py-8 text-center">Loading audit logs...</p>
+        <p className="text-sm text-muted-foreground py-8 text-center">{t('Loading audit logs...')}</p>
       ) : logs.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center py-12 text-center">
             <ScrollText className="w-10 h-10 text-muted-foreground/40 mb-3" />
-            <p className="text-sm text-muted-foreground">No audit logs found</p>
+            <p className="text-sm text-muted-foreground">{t('No audit logs found')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -200,9 +202,9 @@ export default function AuditLog() {
       {/* Pagination */}
       {total > 0 && (
         <div className="flex items-center justify-center gap-2 mt-4">
-          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Previous</Button>
+          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>{t('Previous')}</Button>
           <span className="text-sm text-muted-foreground px-2">Page {page} of {totalPages} · {total} entries</span>
-          <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Next</Button>
+          <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>{t('Next')}</Button>
         </div>
       )}
     </div>

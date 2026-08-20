@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { api } from '../lib/api';
 import { Bell, Smartphone, Mail, AlertTriangle, Moon, Save } from 'lucide-react';
 import { toast } from 'sonner';
+import { useI18n } from '../lib/i18n';
 
 interface Preferences {
   smsAlerts: boolean;
@@ -15,6 +16,7 @@ interface Preferences {
 }
 
 export default function NotificationPreferences() {
+  const { t } = useI18n();
   const [prefs, setPrefs] = useState<Preferences>({
     smsAlerts: true,
     pushAlerts: true,
@@ -50,7 +52,7 @@ export default function NotificationPreferences() {
   };
 
   if (loading) {
-    return <p className="text-sm text-muted-foreground py-8 text-center">Loading preferences...</p>;
+    return <p className="text-sm text-muted-foreground py-8 text-center">{t('Loading preferences...')}</p>;
   }
 
   const toggles = [
@@ -65,7 +67,7 @@ export default function NotificationPreferences() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-serif font-bold">Notification Preferences</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Manage how you receive alerts</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{t('Manage how you receive alerts')}</p>
         </div>
         <Button onClick={save} disabled={saving}>
           <Save className="w-4 h-4 mr-2" />
@@ -75,7 +77,7 @@ export default function NotificationPreferences() {
 
       <div className="space-y-4">
         <Card>
-          <CardHeader><CardTitle className="text-base flex items-center gap-2"><Bell className="w-4 h-4" /> Notification Channels</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base flex items-center gap-2"><Bell className="w-4 h-4" /> {t('Notification Channels')}</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             {toggles.map(t => (
               <div key={t.key} className="flex items-center justify-between py-2">
@@ -98,12 +100,12 @@ export default function NotificationPreferences() {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle className="text-base flex items-center gap-2"><Moon className="w-4 h-4" /> Quiet Hours</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base flex items-center gap-2"><Moon className="w-4 h-4" /> {t('Quiet Hours')}</CardTitle></CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground mb-4">Suppress non-critical notifications during these hours.</p>
+            <p className="text-xs text-muted-foreground mb-4">{t('Suppress non-critical notifications during these hours.')}</p>
             <div className="flex items-center gap-4">
               <div>
-                <label className="text-xs text-muted-foreground block mb-1">Start</label>
+                <label className="text-xs text-muted-foreground block mb-1">{t('Start')}</label>
                 <input
                   type="time"
                   value={prefs.quietHoursStart || ''}

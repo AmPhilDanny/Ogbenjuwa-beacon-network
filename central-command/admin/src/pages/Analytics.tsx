@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button';
 import { api } from '../lib/api';
 import { BarChart3, AlertTriangle, Users, MapPin, Siren, ShieldAlert, Activity, TrendingUp, PieChart, Download, Filter, X } from 'lucide-react';
+import { useI18n } from '../lib/i18n';
 
 interface DashboardStats {
   activeAlerts: number;
@@ -71,6 +72,7 @@ const SEVERITY_BG: Record<string, string> = {
 };
 
 export default function Analytics() {
+  const { t } = useI18n();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [lgaData, setLgaData] = useState<LgaIncident[]>([]);
   const [recentAlerts, setRecentAlerts] = useState<RecentAlert[]>([]);
@@ -157,7 +159,7 @@ export default function Analytics() {
   if (loading && stats === null) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-muted-foreground">Loading analytics...</p>
+        <p className="text-muted-foreground">{t('Loading analytics...')}</p>
       </div>
     );
   }
@@ -174,7 +176,7 @@ export default function Analytics() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-serif font-bold">Analytics</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Data insights and reporting</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{t('Data insights and reporting')}</p>
         </div>
         <a
           href={`${import.meta.env.VITE_API_URL || 'http://localhost:4001/api/v1'}/dashboard/export/csv${hasFilters ? `?lgaId=${selectedLga}&wardId=${selectedWard}` : ''}`}
@@ -182,7 +184,7 @@ export default function Analytics() {
           target="_blank"
         >
           <Download className="w-4 h-4" />
-          Export CSV
+          {t('Export CSV')}
         </a>
       </div>
 
@@ -199,13 +201,13 @@ export default function Analytics() {
                 onChange={e => setSelectedLga(e.target.value)}
                 className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm min-w-[180px]"
               >
-                <option value="">All LGAs</option>
+                <option value="">{t('All LGAs')}</option>
                 {lgas.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
               </select>
             </div>
             <div className="space-y-1">
               <label className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                <Filter className="w-3 h-3" /> Ward
+                <Filter className="w-3 h-3" /> {t('Ward')}
               </label>
               <select
                 value={selectedWard}
@@ -213,13 +215,13 @@ export default function Analytics() {
                 disabled={!selectedLga}
                 className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm min-w-[180px] disabled:opacity-50"
               >
-                <option value="">All Wards</option>
+                <option value="">{t('All Wards')}</option>
                 {wards.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
               </select>
             </div>
             <div className="space-y-1">
               <label className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                <Filter className="w-3 h-3" /> Village
+                <Filter className="w-3 h-3" /> {t('Village')}
               </label>
               <select
                 value={selectedVillage}
@@ -227,13 +229,13 @@ export default function Analytics() {
                 disabled={!selectedWard}
                 className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm min-w-[180px] disabled:opacity-50"
               >
-                <option value="">All Villages</option>
+                <option value="">{t('All Villages')}</option>
                 {villages.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
               </select>
             </div>
             {hasFilters && (
               <Button variant="ghost" size="sm" onClick={clearFilters} className="mb-0.5">
-                <X className="w-3 h-3 mr-1" /> Clear Filters
+                <X className="w-3 h-3 mr-1" /> {t('Clear Filters')}
               </Button>
             )}
           </div>
@@ -270,7 +272,7 @@ export default function Analytics() {
             {trends.length === 0 ? (
               <div className="flex flex-col items-center py-8 text-center">
                 <BarChart3 className="w-8 h-8 text-muted-foreground/40 mb-2" />
-                <p className="text-sm text-muted-foreground">No trend data yet</p>
+                <p className="text-sm text-muted-foreground">{t('No trend data yet')}</p>
               </div>
             ) : (
               <svg viewBox={`0 0 ${Math.max(trends.length * (BAR_W + 4) + 20, 200)} ${CHART_H + 30}`} className="w-full h-auto" preserveAspectRatio="xMidYMid meet">
@@ -331,14 +333,14 @@ export default function Analytics() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm">
               <PieChart className="w-4 h-4" />
-              Severity Breakdown
+              {t('Severity Breakdown')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {severityData.length === 0 ? (
               <div className="flex flex-col items-center py-8 text-center">
                 <PieChart className="w-8 h-8 text-muted-foreground/40 mb-2" />
-                <p className="text-sm text-muted-foreground">No severity data yet</p>
+                <p className="text-sm text-muted-foreground">{t('No severity data yet')}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -375,7 +377,7 @@ export default function Analytics() {
                   })()}
                   <circle cx="60" cy="60" r="28" fill="white" />
                   <text x="60" y="56" textAnchor="middle" fontSize="16" fontWeight="bold" fill="#1e293b">{severityData.reduce((s, x) => s + x.count, 0)}</text>
-                  <text x="60" y="68" textAnchor="middle" fontSize="8" fill="#94a3b8">total</text>
+                  <text x="60" y="68" textAnchor="middle" fontSize="8" fill="#94a3b8">{t('total')}</text>
                 </svg>
 
                 {/* Legend */}
@@ -402,12 +404,12 @@ export default function Analytics() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Incidents by LGA */}
         <Card>
-          <CardHeader><CardTitle>Incidents by LGA</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('Incidents by LGA')}</CardTitle></CardHeader>
           <CardContent>
             {lgaData.length === 0 ? (
               <div className="flex flex-col items-center py-8 text-center">
                 <BarChart3 className="w-8 h-8 text-muted-foreground/40 mb-2" />
-                <p className="text-sm text-muted-foreground">No incident data yet</p>
+                <p className="text-sm text-muted-foreground">{t('No incident data yet')}</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -433,12 +435,12 @@ export default function Analytics() {
 
         {/* Recent Alerts */}
         <Card>
-          <CardHeader><CardTitle>Recent Alerts</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('Recent Alerts')}</CardTitle></CardHeader>
           <CardContent>
             {recentAlerts.length === 0 ? (
               <div className="flex flex-col items-center py-8 text-center">
                 <AlertTriangle className="w-8 h-8 text-muted-foreground/40 mb-2" />
-                <p className="text-sm text-muted-foreground">No recent alerts</p>
+                <p className="text-sm text-muted-foreground">{t('No recent alerts')}</p>
               </div>
             ) : (
               <div className="space-y-3">

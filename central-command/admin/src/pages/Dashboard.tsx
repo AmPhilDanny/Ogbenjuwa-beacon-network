@@ -5,8 +5,10 @@ import { AlertTriangle, Users, MapPin, Siren, Activity } from 'lucide-react';
 import { useApi } from '../hooks/useApi';
 import { formatRelativeTime } from '../lib/utils';
 import type { Alert, DashboardStats, Lga } from '../lib/types';
+import { useI18n } from '../lib/i18n';
 
 export default function Dashboard() {
+  const { t } = useI18n();
   const { data: stats } = useApi<DashboardStats>('/dashboard/stats');
   const { data: alertsData } = useApi<{ data: Alert[] }>('/alerts?limit=5');
   const { data: lgasData } = useApi<{ data: Lga[] }>('/lgas');
@@ -19,7 +21,7 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-serif font-bold">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Ogbenjuwa Central Command overview</p>
+        <p className="text-sm text-muted-foreground mt-0.5">{t('Ogbenjuwa Central Command overview')}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
@@ -34,12 +36,12 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-primary" />
-              Recent Alerts
+              {t('Recent Alerts')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {alerts.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">No recent alerts</p>
+              <p className="text-sm text-muted-foreground py-8 text-center">{t('No recent alerts')}</p>
             ) : (
               <div className="space-y-3">
                 {alerts.map((alert) => (
@@ -60,12 +62,12 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-primary" />
-              LGA Coverage
+              {t('LGA Coverage')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {lgas.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">No LGAs configured yet</p>
+              <p className="text-sm text-muted-foreground py-8 text-center">{t('No LGAs configured yet')}</p>
             ) : (
               <ul className="space-y-2">
                 {lgas.map((l) => (

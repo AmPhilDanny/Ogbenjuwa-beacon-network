@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useI18n } from '../lib/i18n';
 
 interface Column<T> {
   key: string;
@@ -29,6 +30,7 @@ export default function DataTable<T extends Record<string, any>>({
   pageSize = 20,
   onRowClick,
 }: DataTableProps<T>) {
+  const { t } = useI18n();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [sortKey, setSortKey] = useState<string | null>(null);
@@ -69,7 +71,7 @@ export default function DataTable<T extends Record<string, any>>({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="search"
-            placeholder="Search..."
+            placeholder={t('Search...')}
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="w-full pl-9 pr-3 py-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -105,13 +107,13 @@ export default function DataTable<T extends Record<string, any>>({
             {loading ? (
               <tr>
                 <td colSpan={columns.length} className="px-4 py-12 text-center text-muted-foreground">
-                  Loading...
+                  {t('Loading...')}
                 </td>
               </tr>
             ) : paged.length === 0 ? (
               <tr>
                 <td colSpan={columns.length} className="px-4 py-12 text-center text-muted-foreground">
-                  No results found
+                  {t('No results found')}
                 </td>
               </tr>
             ) : (

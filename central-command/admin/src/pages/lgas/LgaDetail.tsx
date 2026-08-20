@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { useApi } from '../../hooks/useApi';
 import { api, ApiClientError } from '../../lib/api';
 import type { Lga, Village } from '../../lib/types';
+import { useI18n } from '../../lib/i18n';
 
 const DEFAULT_CENTER: [number, number] = [7.15, 8.13];
 const DEFAULT_ZOOM = 9;
@@ -32,6 +33,7 @@ function MapClickHandler({ onSelect }: { onSelect: (lat: number, lng: number) =>
 }
 
 export default function LgaDetail() {
+  const { t } = useI18n();
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: lga, loading, refetch } = useApi<Lga & { wards: { id: string; name: string }[] }>(`/lgas/${id}`);
@@ -72,8 +74,8 @@ export default function LgaDetail() {
   const villages = (lga?.villages || []) as Village[];
   const wards = lga?.wards || [];
 
-  if (loading) return <p className="text-muted-foreground">Loading...</p>;
-  if (!lga) return <p className="text-muted-foreground">LGA not found</p>;
+  if (loading) return <p className="text-muted-foreground">{t('Loading...')}</p>;
+  if (!lga) return <p className="text-muted-foreground">{t('LGA not found')}</p>;
 
   const currentLga = lga;
 
@@ -236,12 +238,12 @@ export default function LgaDetail() {
                   className={inputCls}
                   value={nameDraft}
                   onChange={(e) => setNameDraft(e.target.value)}
-                  placeholder="LGA name"
+                  placeholder={t('LGA name')}
                   autoFocus
                   required
                 />
-                <Button type="submit" size="sm">Save</Button>
-                <Button type="button" size="sm" variant="outline" onClick={() => setEditingName(false)}>Cancel</Button>
+                <Button type="submit" size="sm">{t('Save')}</Button>
+                <Button type="button" size="sm" variant="outline" onClick={() => setEditingName(false)}>{t('Cancel')}</Button>
               </form>
             ) : (
               <>
@@ -249,7 +251,7 @@ export default function LgaDetail() {
                 <button
                   className="p-1.5 rounded-md hover:bg-muted"
                   onClick={() => { setNameDraft(lga.name); setEditingName(true); }}
-                  title="Rename LGA"
+                  title={t('Rename LGA')}
                 >
                   <Pencil className="w-4 h-4" />
                 </button>
@@ -270,7 +272,7 @@ export default function LgaDetail() {
           </Button>
           <Button variant="danger" size="sm" onClick={handleDeleteLga}>
             <Trash2 className="w-4 h-4 mr-1.5" />
-            Delete LGA
+            {t('Delete LGA')}
           </Button>
         </div>
       </div>
@@ -286,7 +288,7 @@ export default function LgaDetail() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <MapPin className="w-4 h-4" /> Map Coverage
+              <MapPin className="w-4 h-4" /> {t('Map Coverage')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -318,15 +320,15 @@ export default function LgaDetail() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Latitude</label>
-                <input className={inputCls} value={lat} onChange={(e) => setLat(e.target.value)} placeholder="e.g. 7.1900" />
+                <label className="block text-sm font-medium mb-1">{t('Latitude')}</label>
+                <input className={inputCls} value={lat} onChange={(e) => setLat(e.target.value)} placeholder={t('e.g. 7.1900')} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Longitude</label>
-                <input className={inputCls} value={lng} onChange={(e) => setLng(e.target.value)} placeholder="e.g. 8.1300" />
+                <label className="block text-sm font-medium mb-1">{t('Longitude')}</label>
+                <input className={inputCls} value={lng} onChange={(e) => setLng(e.target.value)} placeholder={t('e.g. 8.1300')} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Radius (km)</label>
+                <label className="block text-sm font-medium mb-1">{t('Radius (km)')}</label>
                 <input
                   type="number"
                   min="0"
@@ -360,28 +362,28 @@ export default function LgaDetail() {
           <CardContent>
             <form onSubmit={handleVillageSubmit} className="grid grid-cols-1 md:grid-cols-6 gap-3 mb-4">
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1">Name</label>
-                <input className={inputCls} value={villageForm.name} onChange={(e) => setVillageForm({ ...villageForm, name: e.target.value })} placeholder="Village name" required />
+                <label className="block text-sm font-medium mb-1">{t('Name')}</label>
+                <input className={inputCls} value={villageForm.name} onChange={(e) => setVillageForm({ ...villageForm, name: e.target.value })} placeholder={t('Village name')} required />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Ward</label>
+                <label className="block text-sm font-medium mb-1">{t('Ward')}</label>
                 <select className={inputCls} value={villageForm.wardId} onChange={(e) => setVillageForm({ ...villageForm, wardId: e.target.value })}>
-                  <option value="">None</option>
+                  <option value="">{t('None')}</option>
                   {wards.map((w) => (
                     <option key={w.id} value={w.id}>{w.name}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Latitude</label>
-                <input className={inputCls} value={villageForm.lat} onChange={(e) => setVillageForm({ ...villageForm, lat: e.target.value })} placeholder="e.g. 7.2500" />
+                <label className="block text-sm font-medium mb-1">{t('Latitude')}</label>
+                <input className={inputCls} value={villageForm.lat} onChange={(e) => setVillageForm({ ...villageForm, lat: e.target.value })} placeholder={t('e.g. 7.2500')} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Longitude</label>
-                <input className={inputCls} value={villageForm.lng} onChange={(e) => setVillageForm({ ...villageForm, lng: e.target.value })} placeholder="e.g. 8.1500" />
+                <label className="block text-sm font-medium mb-1">{t('Longitude')}</label>
+                <input className={inputCls} value={villageForm.lng} onChange={(e) => setVillageForm({ ...villageForm, lng: e.target.value })} placeholder={t('e.g. 8.1500')} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Population</label>
+                <label className="block text-sm font-medium mb-1">{t('Population')}</label>
                 <input type="number" min="0" className={inputCls} value={villageForm.population} onChange={(e) => setVillageForm({ ...villageForm, population: e.target.value })} />
               </div>
               <div className="md:col-span-6 flex gap-2">
@@ -390,14 +392,14 @@ export default function LgaDetail() {
                 </Button>
                 {villageForm.id && (
                   <Button type="button" size="sm" variant="outline" onClick={resetVillageForm}>
-                    Cancel edit
+                    {t('Cancel edit')}
                   </Button>
                 )}
               </div>
             </form>
 
             {villages.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No villages configured yet</p>
+              <p className="text-sm text-muted-foreground">{t('No villages configured yet')}</p>
             ) : (
               <ul className="space-y-2">
                 {villages.map((v) => (
@@ -413,11 +415,11 @@ export default function LgaDetail() {
                       <button
                         className="p-1.5 rounded-md hover:bg-muted"
                         onClick={() => setVillageForm({ id: v.id, name: v.name, wardId: v.wardId || '', lat: v.lat != null ? String(Number(v.lat)) : '', lng: v.lng != null ? String(Number(v.lng)) : '', population: String(v.population) })}
-                        title="Edit"
+                        title={t('Edit')}
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
-                      <button className="p-1.5 rounded-md hover:bg-accent/10 text-accent" onClick={() => handleDeleteVillage(v)} title="Delete">
+                      <button className="p-1.5 rounded-md hover:bg-accent/10 text-accent" onClick={() => handleDeleteVillage(v)} title={t('Delete')}>
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -437,22 +439,22 @@ export default function LgaDetail() {
                   className={inputCls}
                   value={wardName}
                   onChange={(e) => setWardName(e.target.value)}
-                  placeholder="Ward name"
+                  placeholder={t('Ward name')}
                   required
                 />
               </div>
               <Button type="submit" size="sm" disabled={saving}>
-                <Plus className="w-4 h-4 mr-1.5" /> Add Ward
+                <Plus className="w-4 h-4 mr-1.5" /> {t('Add Ward')}
               </Button>
             </form>
             {wards.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No wards configured</p>
+              <p className="text-sm text-muted-foreground">{t('No wards configured')}</p>
             ) : (
               <ul className="space-y-2">
                 {wards.map((w) => (
                   <li key={w.id} className="text-sm py-2 px-3 rounded-md border border-border flex items-center justify-between">
                     <span className="font-medium">{w.name}</span>
-                    <button className="p-1.5 rounded-md hover:bg-accent/10 text-accent" onClick={() => handleDeleteWard(w)} title="Delete">
+                    <button className="p-1.5 rounded-md hover:bg-accent/10 text-accent" onClick={() => handleDeleteWard(w)} title={t('Delete')}>
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </li>

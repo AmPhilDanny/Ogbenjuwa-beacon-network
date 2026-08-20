@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useI18n } from '../lib/i18n';
 import { cn } from '../lib/utils';
 import { api } from '../lib/api';
 import {
@@ -38,6 +39,7 @@ interface SidebarProps {
 
 export default function Sidebar({ onClose }: SidebarProps) {
   const { user } = useAuth();
+  const { t } = useI18n();
   const [brand, setBrand] = useState<{ siteName?: string; logoUrl?: string | null }>({});
 
   useEffect(() => {
@@ -60,7 +62,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
           ) : null}
           <div>
             <h2 className="text-lg font-serif text-primary">{brand?.siteName || 'Ogbenjuwa'}</h2>
-            <p className="text-[10px] text-sidebar-foreground/40 tracking-wider uppercase">Central Command</p>
+            <p className="text-[10px] text-sidebar-foreground/40 tracking-wider uppercase">{t('Central Command')}</p>
           </div>
         </div>
         <button
@@ -85,7 +87,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
             )}
           >
             <item.icon className="w-4 h-4 shrink-0" />
-            <span>{item.label}</span>
+            <span>{t(item.label)}</span>
           </NavLink>
         ))}
       </nav>

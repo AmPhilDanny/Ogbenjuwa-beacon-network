@@ -8,11 +8,13 @@ import { Card, CardContent } from '../../components/ui/card';
 import { useApi } from '../../hooks/useApi';
 import { api, ApiClientError } from '../../lib/api';
 import type { Lga } from '../../lib/types';
+import { useI18n } from '../../lib/i18n';
 
 const inputCls =
   'w-full px-3 py-2 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring';
 
 export default function LgaList() {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const { data, loading, error, refetch } = useApi<{ data: Lga[] }>('/lgas');
 
@@ -85,14 +87,14 @@ export default function LgaList() {
 
   const columns = [
     { key: 'name', header: 'LGA', sortable: true, render: (l: Lga) => <span className="font-medium">{l.name}</span> },
-    { key: 'code', header: 'Code' },
-    { key: 'state', header: 'State' },
-    { key: 'region', header: 'Region' },
+    { key: 'code', header: t('Code') },
+    { key: 'state', header: t('State') },
+    { key: 'region', header: t('Region') },
     { key: 'coverageTarget', header: 'Coverage', render: (l: Lga) => `${l.coverageTarget}%` },
-    { key: 'isActive', header: 'Status', render: (l: Lga) => <StatusBadge status={l.isActive ? 'active' : 'inactive'} /> },
+    { key: 'isActive', header: t('Status'), render: (l: Lga) => <StatusBadge status={l.isActive ? 'active' : 'inactive'} /> },
     {
       key: 'actions',
-      header: 'Actions',
+      header: t('Actions'),
       render: (l: Lga) => (
         <div className="flex gap-1">
           <button
@@ -105,7 +107,7 @@ export default function LgaList() {
           <button
             className="p-1.5 rounded-md hover:bg-accent/10 text-accent"
             onClick={(e) => { e.stopPropagation(); handleDelete(l); }}
-            title="Delete"
+            title={t('Delete')}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -118,12 +120,12 @@ export default function LgaList() {
     <div>
       <div className="mb-6 flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-serif font-bold">Local Government Areas</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Manage LGAs and wards across Benue State</p>
+          <h1 className="text-2xl font-serif font-bold">{t('Local Government')} Areas</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">{t('Manage LGAs and wards across Benue State')}</p>
         </div>
         <Button onClick={() => { setShowForm((s) => !s); resetForm(); }}>
           <Plus className="w-4 h-4 mr-2" />
-          Add LGA
+          {t('Add LGA')}
         </Button>
       </div>
 
@@ -132,19 +134,19 @@ export default function LgaList() {
           <CardContent className="pt-6">
             <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Name</label>
-                <input className={inputCls} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Otukpo" required />
+                <label className="block text-sm font-medium mb-1">{t('Name')}</label>
+                <input className={inputCls} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={t('e.g. Otukpo')} required />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Code</label>
-                <input className={inputCls} value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} placeholder="e.g. OTK" required />
+                <label className="block text-sm font-medium mb-1">{t('Code')}</label>
+                <input className={inputCls} value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} placeholder={t('e.g. OTK')} required />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">State</label>
+                <label className="block text-sm font-medium mb-1">{t('State')}</label>
                 <input className={inputCls} value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Region</label>
+                <label className="block text-sm font-medium mb-1">{t('Region')}</label>
                 <input className={inputCls} value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })} />
               </div>
               <div>
@@ -152,20 +154,20 @@ export default function LgaList() {
                 <input type="number" min="0" max="100" className={inputCls} value={form.coverageTarget} onChange={(e) => setForm({ ...form, coverageTarget: e.target.value })} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Latitude</label>
-                <input className={inputCls} value={form.lat} onChange={(e) => setForm({ ...form, lat: e.target.value })} placeholder="Optional" />
+                <label className="block text-sm font-medium mb-1">{t('Latitude')}</label>
+                <input className={inputCls} value={form.lat} onChange={(e) => setForm({ ...form, lat: e.target.value })} placeholder={t('Optional')} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Longitude</label>
-                <input className={inputCls} value={form.lng} onChange={(e) => setForm({ ...form, lng: e.target.value })} placeholder="Optional" />
+                <label className="block text-sm font-medium mb-1">{t('Longitude')}</label>
+                <input className={inputCls} value={form.lng} onChange={(e) => setForm({ ...form, lng: e.target.value })} placeholder={t('Optional')} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Radius (km)</label>
-                <input type="number" min="0" step="0.5" className={inputCls} value={form.radius} onChange={(e) => setForm({ ...form, radius: e.target.value })} placeholder="Optional" />
+                <label className="block text-sm font-medium mb-1">{t('Radius (km)')}</label>
+                <input type="number" min="0" step="0.5" className={inputCls} value={form.radius} onChange={(e) => setForm({ ...form, radius: e.target.value })} placeholder={t('Optional')} />
               </div>
               <div className="md:col-span-4 flex gap-2">
                 <Button type="submit" disabled={saving}>{saving ? 'Creating...' : 'Create LGA'}</Button>
-                <Button type="button" variant="outline" onClick={() => { setShowForm(false); resetForm(); }}>Cancel</Button>
+                <Button type="button" variant="outline" onClick={() => { setShowForm(false); resetForm(); }}>{t('Cancel')}</Button>
               </div>
             </form>
             {formError && <p className="text-sm text-accent mt-3">{formError}</p>}

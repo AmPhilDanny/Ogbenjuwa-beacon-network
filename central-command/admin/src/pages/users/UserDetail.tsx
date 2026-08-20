@@ -8,16 +8,18 @@ import { formatDate } from '../../lib/utils';
 import type { User } from '../../lib/types';
 import { Pencil, Power, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useI18n } from '../../lib/i18n';
 
 export default function UserDetail() {
+  const { t } = useI18n();
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: user, loading, refetch } = useApi<User>(`/users/${id}`);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
-  if (loading) return <p className="text-muted-foreground">Loading...</p>;
-  if (!user) return <p className="text-muted-foreground">User not found</p>;
+  if (loading) return <p className="text-muted-foreground">{t('Loading...')}</p>;
+  if (!user) return <p className="text-muted-foreground">{t('User not found')}</p>;
 
   const currentUser = user;
 
@@ -51,14 +53,14 @@ export default function UserDetail() {
         <h1 className="text-2xl font-serif font-bold">{currentUser.name}</h1>
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={() => navigate(`/users/${currentUser.id}/edit`)}>
-            <Pencil className="w-4 h-4 mr-1.5" /> Edit
+            <Pencil className="w-4 h-4 mr-1.5" /> {t('Edit')}
           </Button>
           <Button size="sm" variant={currentUser.isActive ? 'outline' : 'primary'} onClick={handleToggleActive}>
             <Power className="w-4 h-4 mr-1.5" />
             {currentUser.isActive ? 'Deactivate' : 'Activate'}
           </Button>
           <Button size="sm" variant="danger" onClick={handleDelete}>
-            <Trash2 className="w-4 h-4 mr-1.5" /> Delete
+            <Trash2 className="w-4 h-4 mr-1.5" /> {t('Delete')}
           </Button>
         </div>
       </div>
@@ -67,16 +69,16 @@ export default function UserDetail() {
       {notice && <p className="text-sm text-green-600 mb-4 p-3 rounded-md bg-green-600/10">{notice}</p>}
 
       <Card>
-        <CardHeader><CardTitle>Profile</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t('Profile')}</CardTitle></CardHeader>
         <CardContent>
           <dl className="grid grid-cols-2 gap-4 text-sm">
-            <div><dt className="text-muted-foreground">Email</dt><dd className="font-medium">{currentUser.email}</dd></div>
-            <div><dt className="text-muted-foreground">Username</dt><dd className="font-medium">{currentUser.username || '-'}</dd></div>
-            <div><dt className="text-muted-foreground">Phone</dt><dd className="font-medium">{currentUser.phone || '-'}</dd></div>
-            <div><dt className="text-muted-foreground">Role</dt><dd><StatusBadge status={currentUser.role} /></dd></div>
-            <div><dt className="text-muted-foreground">Status</dt><dd><StatusBadge status={currentUser.isActive ? 'active' : 'inactive'} /></dd></div>
-            <div><dt className="text-muted-foreground">Last Login</dt><dd className="font-medium">{currentUser.lastLoginAt ? formatDate(currentUser.lastLoginAt) : 'Never'}</dd></div>
-            <div><dt className="text-muted-foreground">Created</dt><dd className="font-medium">{formatDate(currentUser.createdAt)}</dd></div>
+            <div><dt className="text-muted-foreground">{t('Email')}</dt><dd className="font-medium">{currentUser.email}</dd></div>
+            <div><dt className="text-muted-foreground">{t('Username')}</dt><dd className="font-medium">{currentUser.username || '-'}</dd></div>
+            <div><dt className="text-muted-foreground">{t('Phone')}</dt><dd className="font-medium">{currentUser.phone || '-'}</dd></div>
+            <div><dt className="text-muted-foreground">{t('Role')}</dt><dd><StatusBadge status={currentUser.role} /></dd></div>
+            <div><dt className="text-muted-foreground">{t('Status')}</dt><dd><StatusBadge status={currentUser.isActive ? 'active' : 'inactive'} /></dd></div>
+            <div><dt className="text-muted-foreground">{t('Last Login')}</dt><dd className="font-medium">{currentUser.lastLoginAt ? formatDate(currentUser.lastLoginAt) : 'Never'}</dd></div>
+            <div><dt className="text-muted-foreground">{t('Created')}</dt><dd className="font-medium">{formatDate(currentUser.createdAt)}</dd></div>
           </dl>
         </CardContent>
       </Card>

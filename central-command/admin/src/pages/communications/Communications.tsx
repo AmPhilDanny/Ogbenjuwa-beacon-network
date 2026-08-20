@@ -6,6 +6,7 @@ import type { Announcement, MessageItem, NotificationItem, User } from '../../li
 import {
   Send, Plus, Eye, EyeOff, Trash2, Check, Bell, X, Megaphone, Mail, Search,
 } from 'lucide-react';
+import { useI18n } from '../../lib/i18n';
 
 const inputCls =
   'w-full px-3 py-2 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring';
@@ -21,13 +22,14 @@ const TYPE_STYLES: Record<string, string> = {
 };
 
 export default function Communications() {
+  const { t } = useI18n();
   const [tab, setTab] = useState<Tab>('broadcast');
 
   return (
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-serif font-bold">Communications</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Broadcast to the network, send private messages, and track all communication</p>
+        <p className="text-sm text-muted-foreground mt-0.5">{t('Broadcast to the network, send private messages, and track all communication')}</p>
       </div>
 
       {/* Tabs */}
@@ -36,19 +38,19 @@ export default function Communications() {
           className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors shrink-0 ${
             tab === 'broadcast' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}>
-          <Megaphone className="w-4 h-4" /> Broadcast
+          <Megaphone className="w-4 h-4" /> {t('Broadcast')}
         </button>
         <button onClick={() => setTab('messages')}
           className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors shrink-0 ${
             tab === 'messages' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}>
-          <Mail className="w-4 h-4" /> Private Messages
+          <Mail className="w-4 h-4" /> {t('Private Messages')}
         </button>
         <button onClick={() => setTab('log')}
           className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors shrink-0 ${
             tab === 'log' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}>
-          <Bell className="w-4 h-4" /> Notification Log
+          <Bell className="w-4 h-4" /> {t('Notification Log')}
         </button>
       </div>
 
@@ -62,6 +64,7 @@ export default function Communications() {
 // ─── Broadcast Tab ─────────────────────────────────────────────────────────
 
 function BroadcastTab() {
+  const { t } = useI18n();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -140,7 +143,7 @@ function BroadcastTab() {
     <div className="space-y-4">
       {!showCreate && !editId && (
         <Button onClick={() => { setShowCreate(true); setForm({ title: '', body: '', isPublished: false }); }}>
-          <Plus className="w-4 h-4 mr-2" /> New Broadcast
+          <Plus className="w-4 h-4 mr-2" /> {t('New Broadcast')}
         </Button>
       )}
 
@@ -158,12 +161,12 @@ function BroadcastTab() {
           <CardContent>
             <form onSubmit={handleSave} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Title</label>
-                <input className={inputCls} value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} placeholder="e.g. Security meeting tonight" />
+                <label className="text-sm font-medium">{t('Title')}</label>
+                <input className={inputCls} value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} placeholder={t('e.g. Security meeting tonight')} />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Message</label>
-                <textarea className={`${inputCls} min-h-[120px]`} value={form.body} onChange={e => setForm(p => ({ ...p, body: e.target.value }))} placeholder="Write the message everyone will receive..." />
+                <label className="text-sm font-medium">{t('Message')}</label>
+                <textarea className={`${inputCls} min-h-[120px]`} value={form.body} onChange={e => setForm(p => ({ ...p, body: e.target.value }))} placeholder={t('Write the message everyone will receive...')} />
               </div>
               <label className="flex items-center gap-2 text-sm cursor-pointer">
                 <input type="checkbox" checked={form.isPublished} onChange={e => setForm(p => ({ ...p, isPublished: e.target.checked }))} className="rounded border-input" />
@@ -171,7 +174,7 @@ function BroadcastTab() {
               </label>
               {error && <p className="text-sm text-red-600">{error}</p>}
               <div className="flex gap-2 justify-end">
-                <Button type="button" variant="ghost" onClick={() => { setShowCreate(false); setEditId(null); setForm({ title: '', body: '', isPublished: false }); }}>Cancel</Button>
+                <Button type="button" variant="ghost" onClick={() => { setShowCreate(false); setEditId(null); setForm({ title: '', body: '', isPublished: false }); }}>{t('Cancel')}</Button>
                 <Button type="submit" disabled={saving || !form.title.trim() || !form.body.trim()}>
                   <Send className="w-4 h-4 mr-2" /> {saving ? 'Saving...' : editId ? 'Update' : form.isPublished ? 'Broadcast' : 'Save Draft'}
                 </Button>
@@ -182,12 +185,12 @@ function BroadcastTab() {
       )}
 
       {loading ? (
-        <p className="text-sm text-muted-foreground py-8 text-center">Loading broadcasts...</p>
+        <p className="text-sm text-muted-foreground py-8 text-center">{t('Loading broadcasts...')}</p>
       ) : announcements.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center py-12 text-center">
             <Megaphone className="w-10 h-10 text-muted-foreground/40 mb-3" />
-            <p className="text-sm text-muted-foreground">No broadcasts yet</p>
+            <p className="text-sm text-muted-foreground">{t('No broadcasts yet')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -219,10 +222,10 @@ function BroadcastTab() {
                   <button onClick={() => handleTogglePublish(a)} className="p-1.5 rounded hover:bg-muted" title={a.isPublished ? 'Unpublish' : 'Broadcast now'}>
                     {a.isPublished ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                   </button>
-                  <button onClick={() => startEdit(a)} className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground" title="Edit">
+                  <button onClick={() => startEdit(a)} className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground" title={t('Edit')}>
                     <Send className="w-3.5 h-3.5" />
                   </button>
-                  <button onClick={() => handleDelete(a)} className="p-1.5 rounded hover:bg-muted text-red-500" title="Delete">
+                  <button onClick={() => handleDelete(a)} className="p-1.5 rounded hover:bg-muted text-red-500" title={t('Delete')}>
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -238,6 +241,7 @@ function BroadcastTab() {
 // ─── Messages Tab ──────────────────────────────────────────────────────────
 
 function MessagesTab() {
+  const { t } = useI18n();
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCompose, setShowCompose] = useState(false);
@@ -312,7 +316,7 @@ function MessagesTab() {
     <div className="space-y-4">
       {!showCompose && (
         <Button onClick={() => { setShowCompose(true); setForm({ receiverId: '', subject: '', body: '' }); }}>
-          <Plus className="w-4 h-4 mr-2" /> Send Private Message
+          <Plus className="w-4 h-4 mr-2" /> {t('Send Private Message')}
         </Button>
       )}
 
@@ -321,7 +325,7 @@ function MessagesTab() {
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
-              Send Private Message
+              {t('Send Private Message')}
             </CardTitle>
             <button onClick={() => setShowCompose(false)} className="p-1 rounded hover:bg-muted">
               <X className="w-4 h-4" />
@@ -330,17 +334,17 @@ function MessagesTab() {
           <CardContent>
             <form onSubmit={handleSend} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Recipient</label>
+                <label className="text-sm font-medium">{t('Recipient')}</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
                   <input
                     className={`${inputCls} pl-9`}
-                    placeholder="Search users by name or email..."
+                    placeholder={t('Search users by name or email...')}
                     value={search}
                     onChange={e => searchUsers(e.target.value)}
                   />
                 </div>
-                {searching && <p className="text-xs text-muted-foreground">Searching...</p>}
+                {searching && <p className="text-xs text-muted-foreground">{t('Searching...')}</p>}
                 {userResults.length > 0 && (
                   <div className="border border-input rounded-md divide-y divide-border max-h-48 overflow-y-auto">
                     {userResults.map(u => (
@@ -361,7 +365,7 @@ function MessagesTab() {
                   </div>
                 )}
                 {form.receiverId && !selected && (
-                  <p className="text-xs text-green-600">Recipient selected</p>
+                  <p className="text-xs text-green-600">{t('Recipient selected')}</p>
                 )}
                 {selected && (
                   <p className="text-xs text-green-600">
@@ -370,16 +374,16 @@ function MessagesTab() {
                 )}
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Subject</label>
-                <input className={inputCls} value={form.subject} onChange={e => setForm(p => ({ ...p, subject: e.target.value }))} placeholder="e.g. Verify your patrol report" />
+                <label className="text-sm font-medium">{t('Subject')}</label>
+                <input className={inputCls} value={form.subject} onChange={e => setForm(p => ({ ...p, subject: e.target.value }))} placeholder={t('e.g. Verify your patrol report')} />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Message</label>
-                <textarea className={`${inputCls} min-h-[100px]`} value={form.body} onChange={e => setForm(p => ({ ...p, body: e.target.value }))} placeholder="Private message — only the recipient can see this..." />
+                <label className="text-sm font-medium">{t('Message')}</label>
+                <textarea className={`${inputCls} min-h-[100px]`} value={form.body} onChange={e => setForm(p => ({ ...p, body: e.target.value }))} placeholder={t('Private message — only the recipient can see this...')} />
               </div>
               {error && <p className="text-sm text-red-600">{error}</p>}
               <div className="flex gap-2 justify-end">
-                <Button type="button" variant="ghost" onClick={() => setShowCompose(false)}>Cancel</Button>
+                <Button type="button" variant="ghost" onClick={() => setShowCompose(false)}>{t('Cancel')}</Button>
                 <Button type="submit" disabled={saving || !form.receiverId || !form.subject.trim() || !form.body.trim()}>
                   <Send className="w-4 h-4 mr-2" /> {saving ? 'Sending...' : 'Send Message'}
                 </Button>
@@ -390,12 +394,12 @@ function MessagesTab() {
       )}
 
       {loading ? (
-        <p className="text-sm text-muted-foreground py-8 text-center">Loading messages...</p>
+        <p className="text-sm text-muted-foreground py-8 text-center">{t('Loading messages...')}</p>
       ) : messages.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center py-12 text-center">
             <Mail className="w-10 h-10 text-muted-foreground/40 mb-3" />
-            <p className="text-sm text-muted-foreground">No private messages yet</p>
+            <p className="text-sm text-muted-foreground">{t('No private messages yet')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -420,7 +424,7 @@ function MessagesTab() {
                   </p>
                 </div>
                 {!m.isRead && (
-                  <button onClick={() => handleMarkRead(m)} className="p-1.5 rounded hover:bg-muted shrink-0" title="Mark as read">
+                  <button onClick={() => handleMarkRead(m)} className="p-1.5 rounded hover:bg-muted shrink-0" title={t('Mark as read')}>
                     <Check className="w-3.5 h-3.5 text-primary" />
                   </button>
                 )}
@@ -436,6 +440,7 @@ function MessagesTab() {
 // ─── Notification Log Tab ──────────────────────────────────────────────────
 
 function NotificationLogTab() {
+  const { t } = useI18n();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState<string>('');
@@ -477,7 +482,7 @@ function NotificationLogTab() {
         <Card>
           <CardContent className="flex flex-col items-center py-12 text-center">
             <Bell className="w-10 h-10 text-muted-foreground/40 mb-3" />
-            <p className="text-sm text-muted-foreground">No notifications have been sent yet</p>
+            <p className="text-sm text-muted-foreground">{t('No notifications have been sent yet')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -503,7 +508,7 @@ function NotificationLogTab() {
                 {n.isRead ? (
                   <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-600 shrink-0">Read</span>
                 ) : (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700 shrink-0">Delivered</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700 shrink-0">{t('Delivered')}</span>
                 )}
               </div>
             ))}

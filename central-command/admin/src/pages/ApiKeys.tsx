@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button';
 import { api } from '../lib/api';
 import { Key, Plus, Trash2, Copy, Check, X, Eye, EyeOff } from 'lucide-react';
+import { useI18n } from '../lib/i18n';
 
 interface ApiKey {
   id: string;
@@ -27,6 +28,7 @@ const LAYER_LABELS: Record<string, string> = {
 };
 
 export default function ApiKeys() {
+  const { t } = useI18n();
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -114,7 +116,7 @@ export default function ApiKeys() {
                 <p className="text-sm font-medium text-green-800 mb-1">API Key Created — Copy it now. You won't see it again!</p>
                 <div className="flex items-center gap-2 bg-white rounded-lg border border-green-200 p-2">
                   <code className="flex-1 text-sm font-mono truncate">{createdKey.fullKey}</code>
-                  <button onClick={handleCopy} className="p-1.5 rounded hover:bg-green-100 shrink-0" title="Copy">
+                  <button onClick={handleCopy} className="p-1.5 rounded hover:bg-green-100 shrink-0" title={t('Copy')}>
                     {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
@@ -144,7 +146,7 @@ export default function ApiKeys() {
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Key Name</label>
-              <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder="e.g., Beacon Network Production" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
+              <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder={t('e.g., Beacon Network Production')} value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Layer</label>
@@ -156,7 +158,7 @@ export default function ApiKeys() {
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Permissions <span className="text-muted-foreground font-normal">(comma-separated)</span></label>
-              <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder="e.g., alerts:read, alerts:write" value={form.permissions} onChange={e => setForm(p => ({ ...p, permissions: e.target.value }))} />
+              <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder={t('e.g., alerts:read, alerts:write')} value={form.permissions} onChange={e => setForm(p => ({ ...p, permissions: e.target.value }))} />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Expires At <span className="text-muted-foreground font-normal">(optional)</span></label>
@@ -218,7 +220,7 @@ export default function ApiKeys() {
                     <button onClick={() => handleToggleActive(k)} className="p-1.5 rounded hover:bg-muted" title={k.isActive ? 'Deactivate' : 'Activate'}>
                       {k.isActive ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                     </button>
-                    <button onClick={() => handleDelete(k.id)} className="p-1.5 rounded hover:bg-muted text-red-500" title="Revoke">
+                    <button onClick={() => handleDelete(k.id)} className="p-1.5 rounded hover:bg-muted text-red-500" title={t('Revoke')}>
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>

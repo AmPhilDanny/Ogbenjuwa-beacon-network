@@ -6,6 +6,7 @@ import { useApi } from '../../hooks/useApi';
 import { api, ApiClientError } from '../../lib/api';
 import { formatDate } from '../../lib/utils';
 import { Plus, Pencil, Trash2, X, ShieldCheck } from 'lucide-react';
+import { useI18n } from '../../lib/i18n';
 
 interface Role {
   id: string;
@@ -30,6 +31,7 @@ interface FormState {
 const EMPTY_FORM: FormState = { name: '', label: '', description: '', permissionKeys: '' };
 
 export default function RolesPage() {
+  const { t } = useI18n();
   const { data, loading, refetch } = useApi<{ data: Role[] }>('/roles');
   const [editing, setEditing] = useState<Role | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
@@ -102,30 +104,30 @@ export default function RolesPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-serif font-bold">Roles</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Define access roles for the beacon network</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{t('Define access roles for the beacon network')}</p>
         </div>
         <Button onClick={startCreate}>
-          <Plus className="w-4 h-4 mr-1" /> New Role
+          <Plus className="w-4 h-4 mr-1" /> {t('New Role')}
         </Button>
       </div>
 
       <Card className="mb-6">
         <CardContent>
           {loading ? (
-            <p className="text-sm text-muted-foreground text-center py-8">Loading roles...</p>
+            <p className="text-sm text-muted-foreground text-center py-8">{t('Loading roles...')}</p>
           ) : roles.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">No roles defined yet.</p>
+            <p className="text-sm text-muted-foreground text-center py-8">{t('No roles defined yet.')}</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-muted/50">
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">Role</th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">Label</th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">Permissions</th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">Created</th>
-                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">Actions</th>
+                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('Role')}</th>
+                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('Label')}</th>
+                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('Permissions')}</th>
+                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('Status')}</th>
+                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t('Created')}</th>
+                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">{t('Actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -151,14 +153,14 @@ export default function RolesPage() {
                         <div className="flex justify-end gap-1">
                           <button
                             className="p-1.5 rounded-md hover:bg-accent/10 text-accent"
-                            title="Edit"
+                            title={t('Edit')}
                             onClick={() => startEdit(r)}
                           >
                             <Pencil className="w-4 h-4" />
                           </button>
                           <button
                             className="p-1.5 rounded-md hover:bg-destructive/10 text-destructive"
-                            title="Delete"
+                            title={t('Delete')}
                             onClick={() => handleDelete(r)}
                           >
                             <Trash2 className="w-4 h-4" />
@@ -187,19 +189,19 @@ export default function RolesPage() {
             <form onSubmit={handleSave} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Role Key (e.g. ward_lead)</label>
+                  <label className="block text-sm font-medium mb-1">{t('Role')} Key (e.g. ward_lead)</label>
                   <input
                     className={inputCls}
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     required
                     pattern="[a-z0-9_]+"
-                    title="Lowercase letters, numbers, underscores"
+                    title={t('Lowercase letters, numbers, underscores')}
                     disabled={!!editing}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Label (e.g. Ward Lead)</label>
+                  <label className="block text-sm font-medium mb-1">{t('Label (e.g. Ward Lead)')}</label>
                   <input
                     className={inputCls}
                     value={form.label}
@@ -209,17 +211,17 @@ export default function RolesPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Description</label>
+                <label className="block text-sm font-medium mb-1">{t('Description')}</label>
                 <input
                   className={inputCls}
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  placeholder="What this role is responsible for"
+                  placeholder={t('What this role is responsible for')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Permission Keys (one per line, e.g. alerts:read)
+                  {t('Permission Keys (one per line, e.g. alerts:read)')}
                 </label>
                 <textarea
                   className={`${inputCls} font-mono text-xs h-36`}
@@ -247,7 +249,7 @@ export default function RolesPage() {
                   {saving ? 'Saving...' : editing ? 'Save Changes' : 'Create Role'}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => { setEditing(null); setForm(EMPTY_FORM); setError(''); }}>
-                  Cancel
+                  {t('Cancel')}
                 </Button>
               </div>
             </form>

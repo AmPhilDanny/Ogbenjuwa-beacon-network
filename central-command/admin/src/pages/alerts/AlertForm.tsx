@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { useApi } from '../../hooks/useApi';
 import { api, ApiClientError } from '../../lib/api';
 import type { Alert, AlertType, Lga, Ward } from '../../lib/types';
+import { useI18n } from '../../lib/i18n';
 
 const inputCls =
   'w-full px-3 py-2 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring';
@@ -17,6 +18,7 @@ const SEVERITIES = [
 ];
 
 export default function AlertForm() {
+  const { t } = useI18n();
   const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = !!id;
@@ -104,7 +106,7 @@ export default function AlertForm() {
     }
   }
 
-  if (isEdit && alertLoading) return <p className="text-muted-foreground">Loading...</p>;
+  if (isEdit && alertLoading) return <p className="text-muted-foreground">{t('Loading...')}</p>;
 
   const alertTypes = alertTypesData?.data || [];
   const lgas = lgasData?.data || [];
@@ -113,26 +115,26 @@ export default function AlertForm() {
     <div className="max-w-lg">
       <h1 className="text-2xl font-serif font-bold mb-6">{isEdit ? 'Edit Alert' : 'Create Alert'}</h1>
       <Card>
-        <CardHeader><CardTitle>Alert Details</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t('Alert Details')}</CardTitle></CardHeader>
         <CardContent>
           {error && <p className="text-sm text-accent mb-4 p-3 rounded-md bg-accent/10">{error}</p>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Title</label>
+              <label className="block text-sm font-medium mb-1">{t('Title')}</label>
               <input className={inputCls} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Type</label>
+                <label className="block text-sm font-medium mb-1">{t('Type')}</label>
                 <select className={inputCls} value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} required>
-                  {alertTypes.length === 0 && <option value="">Loading types...</option>}
-                  {alertTypes.map((t) => (
-                    <option key={t.key} value={t.key}>{t.label}</option>
+                  {alertTypes.length === 0 && <option value="">{t('Loading types...')}</option>}
+                  {alertTypes.map((item) => (
+                    <option key={item.key} value={item.key}>{item.label}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Severity</label>
+                <label className="block text-sm font-medium mb-1">{t('Severity')}</label>
                 <select className={inputCls} value={form.severity} onChange={(e) => setForm({ ...form, severity: e.target.value })}>
                   {SEVERITIES.map((s) => (
                     <option key={s.value} value={s.value}>{s.label}</option>
@@ -144,16 +146,16 @@ export default function AlertForm() {
               <div>
                 <label className="block text-sm font-medium mb-1">LGA</label>
                 <select className={inputCls} value={form.lgaId} onChange={(e) => handleLgaChange(e.target.value)} required>
-                  <option value="">Select LGA</option>
+                  <option value="">{t('Select LGA')}</option>
                   {lgas.map((l) => (
                     <option key={l.id} value={l.id}>{l.name}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Ward</label>
+                <label className="block text-sm font-medium mb-1">{t('Ward')}</label>
                 <select className={inputCls} value={form.wardId} onChange={(e) => setForm({ ...form, wardId: e.target.value })} disabled={!form.lgaId}>
-                  <option value="">None</option>
+                  <option value="">{t('None')}</option>
                   {wards.map((w) => (
                     <option key={w.id} value={w.id}>{w.name}</option>
                   ))}
@@ -161,11 +163,11 @@ export default function AlertForm() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Location</label>
-              <input className={inputCls} value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="e.g. Near Otukpo Main Market" />
+              <label className="block text-sm font-medium mb-1">{t('Location')}</label>
+              <input className={inputCls} value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder={t('e.g. Near Otukpo Main Market')} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Description</label>
+              <label className="block text-sm font-medium mb-1">{t('Description')}</label>
               <textarea className={inputCls} rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
             </div>
             <label className="flex items-center gap-2 text-sm cursor-pointer">
@@ -175,11 +177,11 @@ export default function AlertForm() {
                 onChange={(e) => setForm({ ...form, isPublic: e.target.checked })}
                 className="w-4 h-4"
               />
-              Public alert (visible to citizens)
+              {t('Public alert (visible to citizens)')}
             </label>
             <div className="flex gap-3 pt-2">
               <Button type="submit" disabled={loading}>{loading ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Alert'}</Button>
-              <Button type="button" variant="outline" onClick={() => navigate('/alerts')}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => navigate('/alerts')}>{t('Cancel')}</Button>
             </div>
           </form>
         </CardContent>

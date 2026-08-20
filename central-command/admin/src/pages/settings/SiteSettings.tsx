@@ -6,6 +6,7 @@ import { api } from '../../lib/api';
 import { uploadFile } from '../../lib/upload';
 import { toast } from 'sonner';
 import { Save, Upload, Palette, Globe, Link as LinkIcon, Settings, Image, Search, Layout, Trash2, Loader2 } from 'lucide-react';
+import { useI18n } from '../../lib/i18n';
 
 interface SiteSettingData {
   siteName?: string;
@@ -51,6 +52,7 @@ const TABS = [
 ];
 
 export default function SiteSettings() {
+  const { t } = useI18n();
   const { data: settingsData, loading, refetch } = useApi<SiteSettingData>('/settings/admin');
   const [form, setForm] = useState<SiteSettingData>({});
   const [saving, setSaving] = useState(false);
@@ -106,7 +108,7 @@ export default function SiteSettings() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-muted-foreground">Loading settings...</p>
+        <p className="text-muted-foreground">{t('Loading settings...')}</p>
       </div>
     );
   }
@@ -119,7 +121,7 @@ export default function SiteSettings() {
           <p className="text-sm text-muted-foreground mt-0.5">Manage branding, logo, colors, and site-wide configuration</p>
         </div>
         <div className="flex items-center gap-3">
-          {saved && <span className="text-sm text-green-600 font-medium">Saved!</span>}
+          {saved && <span className="text-sm text-green-600 font-medium">{t('Saved!')}</span>}
           <Button onClick={handleSave} disabled={saving}>
             <Save className="w-4 h-4 mr-2" />
             {saving ? 'Saving...' : 'Save Changes'}
@@ -149,27 +151,27 @@ export default function SiteSettings() {
       {activeTab === 'branding' && (
         <div className="space-y-6">
           <Card>
-            <CardHeader><CardTitle>Site Identity</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('Site Identity')}</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Site Name</label>
+                  <label className="text-sm font-medium">{t('Site Name')}</label>
                   <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.siteName || ''} onChange={e => handleChange('siteName', e.target.value)} />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Font Family</label>
+                  <label className="text-sm font-medium">{t('Font Family')}</label>
                   <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.fontFamily || ''} onChange={e => handleChange('fontFamily', e.target.value)} />
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Tagline</label>
+                <label className="text-sm font-medium">{t('Tagline')}</label>
                 <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.tagline || ''} onChange={e => handleChange('tagline', e.target.value)} />
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader><CardTitle>Color Scheme</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('Color Scheme')}</CardTitle></CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {(['primaryColor', 'secondaryColor', 'accentColor'] as const).map(field => (
@@ -186,7 +188,7 @@ export default function SiteSettings() {
           </Card>
 
           <Card>
-            <CardHeader><CardTitle>Preview</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('Preview')}</CardTitle></CardHeader>
             <CardContent>
               <div className="rounded-xl border overflow-hidden">
                 <div className="h-2" style={{ backgroundColor: form.primaryColor || '#1e40af' }} />
@@ -199,9 +201,9 @@ export default function SiteSettings() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <span className="px-3 py-1 rounded-full text-white text-xs font-medium" style={{ backgroundColor: form.primaryColor || '#1e40af' }}>Primary</span>
-                    <span className="px-3 py-1 rounded-full text-white text-xs font-medium" style={{ backgroundColor: form.secondaryColor || '#64748b' }}>Secondary</span>
-                    <span className="px-3 py-1 rounded-full text-white text-xs font-medium" style={{ backgroundColor: form.accentColor || '#f59e0b' }}>Accent</span>
+                    <span className="px-3 py-1 rounded-full text-white text-xs font-medium" style={{ backgroundColor: form.primaryColor || '#1e40af' }}>{t('Primary')}</span>
+                    <span className="px-3 py-1 rounded-full text-white text-xs font-medium" style={{ backgroundColor: form.secondaryColor || '#64748b' }}>{t('Secondary')}</span>
+                    <span className="px-3 py-1 rounded-full text-white text-xs font-medium" style={{ backgroundColor: form.accentColor || '#f59e0b' }}>{t('Accent')}</span>
                   </div>
                 </div>
               </div>
@@ -214,7 +216,7 @@ export default function SiteSettings() {
       {activeTab === 'logo' && (
         <div className="space-y-6">
           <Card>
-            <CardHeader><CardTitle>Site Logo</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('Site Logo')}</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-6">
                 <div className="w-24 h-24 rounded-xl border-2 border-dashed flex items-center justify-center bg-muted/30 overflow-hidden">
@@ -232,15 +234,15 @@ export default function SiteSettings() {
                     {uploading === 'logoUrl' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
                     {form.logoUrl ? 'Replace Logo' : 'Upload Logo'}
                   </Button>
-                  <p className="text-xs text-muted-foreground">PNG, JPG, WebP or SVG. Max 10MB.</p>
+                  <p className="text-xs text-muted-foreground">{t('PNG, JPG, WebP or SVG. Max 10MB.')}</p>
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Logo URL</label>
+                <label className="text-sm font-medium">{t('Logo URL')}</label>
                 <div className="flex gap-2">
-                  <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono" placeholder="Uploaded file or https://..." value={form.logoUrl || ''} onChange={e => handleChange('logoUrl', e.target.value)} />
+                  <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono" placeholder={t('Uploaded file or https://...')} value={form.logoUrl || ''} onChange={e => handleChange('logoUrl', e.target.value)} />
                   {form.logoUrl && (
-                    <Button variant="outline" size="sm" title="Clear logo" onClick={() => handleChange('logoUrl', null)}>
+                    <Button variant="outline" size="sm" title={t('Clear logo')} onClick={() => handleChange('logoUrl', null)}>
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </Button>
                   )}
@@ -249,11 +251,11 @@ export default function SiteSettings() {
             </CardContent>
           </Card>
           <Card>
-            <CardHeader><CardTitle>Favicon</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('Favicon')}</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-6">
                 <div className="w-10 h-10 rounded-lg border-2 border-dashed flex items-center justify-center bg-muted/30 overflow-hidden">
-                  {form.faviconUrl ? <img src={form.faviconUrl} alt="Favicon" className="max-w-full max-h-full rounded object-contain" /> : <Upload className="w-4 h-4 text-muted-foreground/40" />}
+                  {form.faviconUrl ? <img src={form.faviconUrl} alt={t('Favicon')} className="max-w-full max-h-full rounded object-contain" /> : <Upload className="w-4 h-4 text-muted-foreground/40" />}
                 </div>
                 <div className="space-y-2 flex-1">
                   <input
@@ -270,11 +272,11 @@ export default function SiteSettings() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Favicon URL</label>
+                <label className="text-sm font-medium">{t('Favicon URL')}</label>
                 <div className="flex gap-2">
-                  <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono" placeholder="Uploaded file or https://..." value={form.faviconUrl || ''} onChange={e => handleChange('faviconUrl', e.target.value)} />
+                  <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono" placeholder={t('Uploaded file or https://...')} value={form.faviconUrl || ''} onChange={e => handleChange('faviconUrl', e.target.value)} />
                   {form.faviconUrl && (
-                    <Button variant="outline" size="sm" title="Clear favicon" onClick={() => handleChange('faviconUrl', null)}>
+                    <Button variant="outline" size="sm" title={t('Clear favicon')} onClick={() => handleChange('faviconUrl', null)}>
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </Button>
                   )}
@@ -289,40 +291,40 @@ export default function SiteSettings() {
       {activeTab === 'hero' && (
         <div className="space-y-6">
           <Card>
-            <CardHeader><CardTitle>Hero Section</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('Hero Section')}</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Heading</label>
-                <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.heroHeading || ''} onChange={e => handleChange('heroHeading', e.target.value)} placeholder="Community Security & Safety Network" />
+                <label className="text-sm font-medium">{t('Heading')}</label>
+                <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.heroHeading || ''} onChange={e => handleChange('heroHeading', e.target.value)} placeholder={t('Community Security & Safety Network')} />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Subheading</label>
-                <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.heroSubheading || ''} onChange={e => handleChange('heroSubheading', e.target.value)} placeholder="Warriors protecting the Idoma Region" />
+                <label className="text-sm font-medium">{t('Subheading')}</label>
+                <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.heroSubheading || ''} onChange={e => handleChange('heroSubheading', e.target.value)} placeholder={t('Warriors protecting the Idoma Region')} />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Description</label>
+                <label className="text-sm font-medium">{t('Description')}</label>
                 <textarea className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm min-h-[80px]" value={form.heroDescription || ''} onChange={e => handleChange('heroDescription', e.target.value)} placeholder="An early-warning and emergency response platform..." />
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader><CardTitle>Call-to-Action Buttons</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('Call-to-Action Buttons')}</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Primary CTA Text</label>
-                  <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.heroCtaText || ''} onChange={e => handleChange('heroCtaText', e.target.value)} placeholder="Live Demo" />
+                  <label className="text-sm font-medium">{t('Primary CTA Text')}</label>
+                  <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.heroCtaText || ''} onChange={e => handleChange('heroCtaText', e.target.value)} placeholder={t('Live Demo')} />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Primary CTA Link</label>
+                  <label className="text-sm font-medium">{t('Primary CTA Link')}</label>
                   <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.heroCtaLink || ''} onChange={e => handleChange('heroCtaLink', e.target.value)} placeholder="/login" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Secondary CTA Text</label>
-                  <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.heroSecondaryCtaText || ''} onChange={e => handleChange('heroSecondaryCtaText', e.target.value)} placeholder="Patrol Map" />
+                  <label className="text-sm font-medium">{t('Secondary CTA Text')}</label>
+                  <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.heroSecondaryCtaText || ''} onChange={e => handleChange('heroSecondaryCtaText', e.target.value)} placeholder={t('Patrol Map')} />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Secondary CTA Link</label>
+                  <label className="text-sm font-medium">{t('Secondary CTA Link')}</label>
                   <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.heroSecondaryCtaLink || ''} onChange={e => handleChange('heroSecondaryCtaLink', e.target.value)} placeholder="/patrol" />
                 </div>
               </div>
@@ -335,35 +337,35 @@ export default function SiteSettings() {
       {activeTab === 'meta' && (
         <div className="space-y-6">
           <Card>
-            <CardHeader><CardTitle>Search Engine Meta Tags</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('Search Engine Meta Tags')}</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Meta Description</label>
-                <textarea className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm min-h-[60px]" value={form.metaDescription || ''} onChange={e => handleChange('metaDescription', e.target.value)} placeholder="Ogbenjuwa Community Safety Network..." />
-                <p className="text-xs text-muted-foreground">Appears in search engine results. Recommended: 150-160 characters.</p>
+                <label className="text-sm font-medium">{t('Meta Description')}</label>
+                <textarea className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm min-h-[60px]" value={form.metaDescription || ''} onChange={e => handleChange('metaDescription', e.target.value)} placeholder={t('Ogbenjuwa Community Safety Network...')} />
+                <p className="text-xs text-muted-foreground">{t('Appears in search engine results. Recommended: 150-160 characters.')}</p>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Meta Keywords</label>
-                <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.metaKeywords || ''} onChange={e => handleChange('metaKeywords', e.target.value)} placeholder="Ogbenjuwa, community safety, Idoma..." />
-                <p className="text-xs text-muted-foreground">Comma-separated keywords for search engines.</p>
+                <label className="text-sm font-medium">{t('Meta Keywords')}</label>
+                <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.metaKeywords || ''} onChange={e => handleChange('metaKeywords', e.target.value)} placeholder={t('Ogbenjuwa, community safety, Idoma...')} />
+                <p className="text-xs text-muted-foreground">{t('Comma-separated keywords for search engines.')}</p>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader><CardTitle>Open Graph / Social Sharing</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('Open Graph / Social Sharing')}</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">OG Title</label>
-                <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.ogTitle || ''} onChange={e => handleChange('ogTitle', e.target.value)} placeholder="Ogbenjuwa — Community Safety Network" />
-                <p className="text-xs text-muted-foreground">Title shown when shared on Facebook, Twitter, WhatsApp. Falls back to site name if empty.</p>
+                <label className="text-sm font-medium">{t('OG Title')}</label>
+                <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.ogTitle || ''} onChange={e => handleChange('ogTitle', e.target.value)} placeholder={t('Ogbenjuwa — Community Safety Network')} />
+                <p className="text-xs text-muted-foreground">{t('Title shown when shared on Facebook, Twitter, WhatsApp. Falls back to site name if empty.')}</p>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">OG Description</label>
+                <label className="text-sm font-medium">{t('OG Description')}</label>
                 <textarea className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm min-h-[60px]" value={form.ogDescription || ''} onChange={e => handleChange('ogDescription', e.target.value)} />
-                <p className="text-xs text-muted-foreground">Description shown when shared on social media. Falls back to meta description if empty.</p>
+                <p className="text-xs text-muted-foreground">{t('Description shown when shared on social media. Falls back to meta description if empty.')}</p>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">OG Image</label>
+                <label className="text-sm font-medium">{t('OG Image')}</label>
                 <input
                   ref={ogInputRef}
                   type="file"
@@ -388,20 +390,20 @@ export default function SiteSettings() {
       {/* Contact Tab */}
       {activeTab === 'contact' && (
         <Card>
-          <CardHeader><CardTitle>Contact Information</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('Contact Information')}</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Email</label>
+                <label className="text-sm font-medium">{t('Email')}</label>
                 <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" type="email" value={form.emailContact || ''} onChange={e => handleChange('emailContact', e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Phone</label>
+                <label className="text-sm font-medium">{t('Phone')}</label>
                 <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.phoneContact || ''} onChange={e => handleChange('phoneContact', e.target.value)} />
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">Address</label>
+              <label className="text-sm font-medium">{t('Address')}</label>
               <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" value={form.address || ''} onChange={e => handleChange('address', e.target.value)} />
             </div>
           </CardContent>
@@ -411,7 +413,7 @@ export default function SiteSettings() {
       {/* Social Links Tab */}
       {activeTab === 'social' && (
         <Card>
-          <CardHeader><CardTitle>Social Media</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('Social Media')}</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             {['twitter', 'facebook', 'instagram', 'linkedin', 'youtube'].map(p => (
               <div key={p} className="flex items-center gap-3">
@@ -427,21 +429,21 @@ export default function SiteSettings() {
       {activeTab === 'advanced' && (
         <div className="space-y-6">
           <Card>
-            <CardHeader><CardTitle>Footer</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('Footer')}</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">Footer Text</label>
-              <textarea className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm min-h-[60px]" value={form.footerText || ''} onChange={e => handleChange('footerText', e.target.value)} placeholder="Warriors protecting the Idoma Region, Benue State, Nigeria." />
+              <label className="text-sm font-medium">{t('Footer Text')}</label>
+              <textarea className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm min-h-[60px]" value={form.footerText || ''} onChange={e => handleChange('footerText', e.target.value)} placeholder={t('Warriors protecting the Idoma Region, Benue State, Nigeria.')} />
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle>Maintenance Mode</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('Maintenance Mode')}</CardTitle></CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium">Enable Maintenance Mode</p>
-                <p className="text-xs text-muted-foreground">Only super admins can access when enabled</p>
+                <p className="text-sm font-medium">{t('Enable Maintenance Mode')}</p>
+                <p className="text-xs text-muted-foreground">{t('Only super admins can access when enabled')}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" checked={form.maintenanceMode || false} onChange={e => handleChange('maintenanceMode', e.target.checked)} />

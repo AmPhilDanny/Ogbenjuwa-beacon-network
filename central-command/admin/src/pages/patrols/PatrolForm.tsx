@@ -5,11 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { useApi } from '../../hooks/useApi';
 import { api, ApiClientError } from '../../lib/api';
 import type { Lga, User, Ward, Village, PatrolTeam } from '../../lib/types';
+import { useI18n } from '../../lib/i18n';
 
 const inputCls =
   'w-full px-3 py-2 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring';
 
 export default function PatrolForm() {
+  const { t } = useI18n();
   const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = !!id;
@@ -101,7 +103,7 @@ export default function PatrolForm() {
     }
   }
 
-  if (isEdit && teamLoading) return <p className="text-muted-foreground">Loading...</p>;
+  if (isEdit && teamLoading) return <p className="text-muted-foreground">{t('Loading...')}</p>;
 
   const lgas = lgasData?.data || [];
   const users = usersData?.data || [];
@@ -110,41 +112,41 @@ export default function PatrolForm() {
     <div className="max-w-lg">
       <h1 className="text-2xl font-serif font-bold mb-6">{isEdit ? 'Edit Patrol Team' : 'Create Patrol Team'}</h1>
       <Card>
-        <CardHeader><CardTitle>Team Details</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t('Team Details')}</CardTitle></CardHeader>
         <CardContent>
           {error && <p className="text-sm text-accent mb-4 p-3 rounded-md bg-accent/10">{error}</p>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Team Name</label>
+              <label className="block text-sm font-medium mb-1">{t('Team Name')}</label>
               <input className={inputCls} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Local Government</label>
+              <label className="block text-sm font-medium mb-1">{t('Local Government')}</label>
               <select className={inputCls} value={form.lgaId} onChange={(e) => handleLgaChange(e.target.value)} required>
-                <option value="">Select LGA</option>
+                <option value="">{t('Select LGA')}</option>
                 {lgas.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
               </select>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Ward</label>
+                <label className="block text-sm font-medium mb-1">{t('Ward')}</label>
                 <select className={inputCls} value={form.wardId} onChange={(e) => handleWardChange(e.target.value)} disabled={!form.lgaId}>
-                  <option value="">All wards</option>
+                  <option value="">{t('All wards')}</option>
                   {wards.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Village</label>
+                <label className="block text-sm font-medium mb-1">{t('Village')}</label>
                 <select className={inputCls} value={form.villageId} onChange={(e) => setForm({ ...form, villageId: e.target.value })} disabled={!form.lgaId}>
-                  <option value="">All villages</option>
+                  <option value="">{t('All villages')}</option>
                   {villages.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
                 </select>
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Team Leader</label>
+              <label className="block text-sm font-medium mb-1">{t('Team Leader')}</label>
               <select className={inputCls} value={form.leaderId} onChange={(e) => setForm({ ...form, leaderId: e.target.value })} required>
-                <option value="">Select leader</option>
+                <option value="">{t('Select leader')}</option>
                 {users.map((u) => (
                   <option key={u.id} value={u.id}>{u.name} ({u.role})</option>
                 ))}
@@ -152,7 +154,7 @@ export default function PatrolForm() {
             </div>
             <div className="flex gap-3 pt-2">
               <Button type="submit" disabled={loading}>{loading ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Team'}</Button>
-              <Button type="button" variant="outline" onClick={() => navigate('/patrols')}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => navigate('/patrols')}>{t('Cancel')}</Button>
             </div>
           </form>
         </CardContent>

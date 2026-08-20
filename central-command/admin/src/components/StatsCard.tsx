@@ -1,5 +1,6 @@
 import { type LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
+import { useI18n } from '../lib/i18n';
 
 interface StatsCardProps {
   icon: LucideIcon;
@@ -10,6 +11,7 @@ interface StatsCardProps {
 }
 
 export default function StatsCard({ icon: Icon, label, value, trend, subtext }: StatsCardProps) {
+  const { t } = useI18n();
   return (
     <Card>
       <CardContent className="p-4 lg:p-5">
@@ -33,7 +35,7 @@ export default function StatsCard({ icon: Icon, label, value, trend, subtext }: 
             <span className={trend >= 0 ? 'text-green-600' : 'text-red-600'}>
               {Math.abs(trend)}%
             </span>
-            <span className="text-muted-foreground">vs last month</span>
+            <span className="text-muted-foreground">{t('vs last month')}</span>
           </div>
         )}
       </CardContent>

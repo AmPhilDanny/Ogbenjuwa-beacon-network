@@ -3,12 +3,14 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
+import { useI18n, LanguageToggle } from '../lib/i18n';
 import { api } from '../lib/api';
 import { Sun, Moon, Bell, Search, LogOut, Menu } from 'lucide-react';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const { theme, toggle } = useTheme();
+  const { t } = useI18n();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -55,17 +57,18 @@ export default function AdminLayout() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="search"
-                placeholder="Search..."
+                placeholder={t('Search...')}
                 className="w-64 pl-9 pr-3 py-2 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-2">
+            <LanguageToggle />
             <button
               onClick={toggle}
               className="p-2 rounded-md hover:bg-muted transition-colors"
-              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              title={t(`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`)}
             >
               {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
             </button>
@@ -83,7 +86,7 @@ export default function AdminLayout() {
               <button
                 onClick={logout}
                 className="p-2 rounded-md hover:bg-muted transition-colors text-muted-foreground"
-                title="Sign out"
+                title={t('Sign out')}
               >
                 <LogOut className="w-4 h-4" />
               </button>

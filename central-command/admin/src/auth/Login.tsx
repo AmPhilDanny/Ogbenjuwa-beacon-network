@@ -2,8 +2,10 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { api, ApiClientError } from '../lib/api';
+import { useI18n } from '../lib/i18n';
 
 export default function Login() {
+  const { t } = useI18n();
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [brand, setBrand] = useState<{ siteName?: string; logoUrl?: string | null }>({});
@@ -47,7 +49,7 @@ export default function Login() {
         <div className="text-center mb-8">
           {brand?.logoUrl && <img src={brand.logoUrl} alt={brand.siteName} className="mx-auto h-12 w-12 rounded-xl mb-3 object-contain" />}
           <h1 className="text-4xl text-primary font-serif mb-2">{brand?.siteName || 'Ogbenjuwa'}</h1>
-          <p className="text-sidebar-foreground/60 text-sm">Central Command Deck</p>
+          <p className="text-sidebar-foreground/60 text-sm">{t('Central Command Deck')}</p>
         </div>
 
         <form onSubmit={handleCredentialsSubmit} className="bg-card rounded-lg border border-border p-8 shadow-xl">
@@ -61,20 +63,20 @@ export default function Login() {
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="login" className="block text-sm font-medium text-card-foreground mb-1">Email or Username</label>
+              <label htmlFor="login" className="block text-sm font-medium text-card-foreground mb-1">{t('Email or Username')}</label>
               <input
                 id="login"
                 type="text"
                 value={loginField}
                 onChange={(e) => setLoginField(e.target.value)}
                 className="w-full px-3 py-2.5 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
-                placeholder="email@example.com or username"
+                placeholder={t('email@example.com or username')}
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-card-foreground mb-1">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium text-card-foreground mb-1">{t('Password')}</label>
               <input
                 id="password"
                 type="password"

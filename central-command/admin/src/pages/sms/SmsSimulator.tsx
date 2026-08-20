@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Button } from '../../components/ui/button';
 import { api } from '../../lib/api';
 import { Phone, MessageSquare, Radio, Send, RotateCw, CheckCircle2, XCircle, Clock, Smartphone } from 'lucide-react';
+import { useI18n } from '../../lib/i18n';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -125,6 +126,7 @@ function PhoneShell({ children }: { children: React.ReactNode }) {
 // ─── Main Component ───────────────────────────────────────────────────────
 
 export default function SmsSimulator() {
+  const { t } = useI18n();
   // Compose form
   const [mode, setMode] = useState<'sms' | 'ussd'>('sms');
   const [message, setMessage] = useState('OGBENJUWA ALERT: Please remain vigilant. Report suspicious activity to *347#');
@@ -223,7 +225,7 @@ export default function SmsSimulator() {
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-serif font-bold">SMS / USSD Simulator</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Simulate emergency broadcasts and manage SMS logs</p>
+        <p className="text-sm text-muted-foreground mt-0.5">{t('Simulate emergency broadcasts and manage SMS logs')}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -233,7 +235,7 @@ export default function SmsSimulator() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <Send className="w-4 h-4" /> Compose Broadcast
+                <Send className="w-4 h-4" /> {t('Compose Broadcast')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -263,25 +265,25 @@ export default function SmsSimulator() {
 
               {/* Message */}
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Message</label>
+                <label className="text-sm font-medium">{t('Message')}</label>
                 <textarea
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm min-h-[100px]"
                   value={message}
                   onChange={e => setMessage(e.target.value)}
-                  placeholder="Type your alert message..."
+                  placeholder={t('Type your alert message...')}
                 />
               </div>
 
               {/* Recipient phones */}
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Recipient Phones</label>
+                <label className="text-sm font-medium">{t('Recipient Phones')}</label>
                 <input
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
                   value={phoneInput}
                   onChange={e => setPhoneInput(e.target.value)}
                   placeholder="+234803XXXXXXX, +234812XXXXXXX"
                 />
-                <p className="text-[10px] text-muted-foreground">Comma-separated phone numbers. Uses defaults if empty.</p>
+                <p className="text-[10px] text-muted-foreground">{t('Comma-separated phone numbers. Uses defaults if empty.')}</p>
               </div>
 
               {/* Simulate button */}
@@ -315,22 +317,22 @@ export default function SmsSimulator() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-600" /> Broadcast Result
+                  <CheckCircle2 className="w-4 h-4 text-green-600" /> {t('Broadcast Result')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-3 gap-4 mb-4">
                   <div className="text-center p-3 rounded-lg bg-green-50">
                     <p className="text-2xl font-bold text-green-700">{result.delivered ?? 0}</p>
-                    <p className="text-[10px] text-green-600">Delivered</p>
+                    <p className="text-[10px] text-green-600">{t('Delivered')}</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-red-50">
                     <p className="text-2xl font-bold text-red-700">{result.failed ?? 0}</p>
-                    <p className="text-[10px] text-red-600">Failed</p>
+                    <p className="text-[10px] text-red-600">{t('Failed')}</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-blue-50">
                     <p className="text-2xl font-bold text-blue-700">{result.total ?? 0}</p>
-                    <p className="text-[10px] text-blue-600">Total</p>
+                    <p className="text-[10px] text-blue-600">{t('Total')}</p>
                   </div>
                 </div>
 
@@ -357,7 +359,7 @@ export default function SmsSimulator() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Smartphone className="w-4 h-4" /> USSD Response
+                  <Smartphone className="w-4 h-4" /> {t('USSD Response')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex justify-center">
@@ -389,7 +391,7 @@ export default function SmsSimulator() {
           <Card>
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
               <CardTitle className="text-base flex items-center gap-2">
-                <MessageSquare className="w-4 h-4" /> SMS Logs
+                <MessageSquare className="w-4 h-4" /> {t('SMS Logs')}
               </CardTitle>
               <Button
                 variant="outline"
@@ -398,19 +400,19 @@ export default function SmsSimulator() {
                 disabled={logsLoading}
               >
                 <RotateCw className={`w-3.5 h-3.5 mr-1 ${logsLoading ? 'animate-spin' : ''}`} />
-                Refresh
+                {t('Refresh')}
               </Button>
             </CardHeader>
             <CardContent className="p-0">
               {logsLoading && logs.length === 0 ? (
                 <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-                  Loading logs...
+                  {t('Loading logs...')}
                 </div>
               ) : logs.length === 0 ? (
                 <div className="flex flex-col items-center py-12 text-center">
                   <MessageSquare className="w-10 h-10 text-muted-foreground/40 mb-3" />
-                  <p className="text-sm text-muted-foreground">No SMS logs yet</p>
-                  <p className="text-xs text-muted-foreground/60 mt-1">Run a simulation to see logs here</p>
+                  <p className="text-sm text-muted-foreground">{t('No SMS logs yet')}</p>
+                  <p className="text-xs text-muted-foreground/60 mt-1">{t('Run a simulation to see logs here')}</p>
                 </div>
               ) : (
                 <>
@@ -419,10 +421,10 @@ export default function SmsSimulator() {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-border">
-                          <th className="text-left px-4 py-2.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Phone</th>
-                          <th className="text-left px-4 py-2.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Message</th>
-                          <th className="text-left px-4 py-2.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell">Status</th>
-                          <th className="text-left px-4 py-2.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">Sent</th>
+                          <th className="text-left px-4 py-2.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{t('Phone')}</th>
+                          <th className="text-left px-4 py-2.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{t('Message')}</th>
+                          <th className="text-left px-4 py-2.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell">{t('Status')}</th>
+                          <th className="text-left px-4 py-2.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">{t('Sent')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
